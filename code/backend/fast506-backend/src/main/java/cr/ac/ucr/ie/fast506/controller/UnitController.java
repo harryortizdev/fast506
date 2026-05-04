@@ -1,0 +1,27 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/springframework/RestController.java to edit this template
+ */
+package cr.ac.ucr.ie.fast506.controller;
+
+import cr.ac.ucr.ie.fast506.domain.Unit;
+import cr.ac.ucr.ie.fast506.service.UnitService;
+import java.util.LinkedList;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@RestController
+@RequestMapping("/api/units")
+public class UnitController {
+    
+    @Autowired
+    private UnitService unitService;
+    
+    @GetMapping("/all")
+    public LinkedList<Unit> getAll(){
+        return unitService.getAll();
+    }
+    
+}
