@@ -2,10 +2,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
+
 package cr.ac.ucr.ie.fast506.domain;
 
 public class Unit {
-
+  
     private int idCar;
     private String VIN;
     private String engineNumber;
@@ -22,7 +23,7 @@ public class Unit {
     private String fuelType;
     private boolean stockStatus;
     private boolean isActive;
-    private int idSupplier;
+    private Integer idSupplier;
 
     public int getIdCar() {
         return idCar;
@@ -152,11 +153,11 @@ public class Unit {
         this.isActive = isActive;
     }
 
-    public int getIdSupplier() {
+    public Integer getIdSupplier() {
         return idSupplier;
     }
 
-    public void setIdSupplier(int idSupplier) {
+    public void setIdSupplier(Integer idSupplier) {
         this.idSupplier = idSupplier;
     }
 }

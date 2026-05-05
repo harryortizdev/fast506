@@ -9,13 +9,18 @@ import cr.ac.ucr.ie.fast506.domain.Unit;
 import java.util.LinkedList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 @Service
 public class UnitService {
-    
+
     @Autowired
     private UnitDAOImplement unitDAO;
-    
-    public LinkedList<Unit> getAll(){
+
+    public LinkedList<Unit> getAll() {
         return unitDAO.getAll();
+    }
+
+    public void add(Unit unit) {
+        unitDAO.add(unit);
     }
 }

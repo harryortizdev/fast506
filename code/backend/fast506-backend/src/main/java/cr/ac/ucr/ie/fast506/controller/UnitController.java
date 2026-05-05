@@ -8,7 +8,12 @@ import cr.ac.ucr.ie.fast506.domain.Unit;
 import cr.ac.ucr.ie.fast506.service.UnitService;
 import java.util.LinkedList;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -24,4 +29,13 @@ public class UnitController {
         return unitService.getAll();
     }
     
+      @PostMapping("/create")
+    public ResponseEntity<String> create(@RequestBody Unit unit){
+        try{
+            unitService.add(unit);
+            return ResponseEntity.ok("Unidad guardada correctamente");
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Error al guardar: " + e.getMessage());
+        }
+    }
 }

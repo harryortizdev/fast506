@@ -21,7 +21,7 @@ public class UnitDAOImplement implements UnitDAO {
     public LinkedList<Unit> getAll() {
         LinkedList<Unit> list = new LinkedList<>();
 
-        String sql = "SELECT id_car, VIN, engine_number, car_brand, car_name, legal_brand_name, year_manufacture, color, transmission, traction, mileage, body_work, engine_size, fuel_type, stock_status, is_active, id_supplier FROM units;";
+        String sql = "SELECT id_car, VIN, engine_number, car_brand, car_name, legal_brand_name, year_manufacture, color, transmission, traction, mileage, body_work, engine_size, fuel_type, stock_status, is_active, id_supplier FROM units WHERE is_active = 1;";
 
         try (Connection cn = DBConnection.getConnection(); PreparedStatement ps = cn.prepareStatement(sql); ResultSet rs = ps.executeQuery();) {
             while (rs.next()) {
@@ -53,8 +53,35 @@ public class UnitDAOImplement implements UnitDAO {
     }
 
     @Override
-    public void add(Unit t) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void add(Unit unit) {
+        String sql = "INSERT INTO units (VIN, engine_number, car_brand, car_name, legal_brand_name, "
+                + "year_manufacture, color, transmission, traction, mileage, body_work, "
+                + "engine_size, fuel_type, stock_status, is_active, id_supplier) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, null)";
+        try (Connection cn = DBConnection.getConnection(); PreparedStatement ps = cn.prepareStatement(sql);) {
+
+            System.out.println("Llegó al add: " + unit.getVIN()); // ← agrega esto
+
+            ps.setString(1, unit.getVIN());
+            ps.setString(2, unit.getEngineNumber());
+            ps.setString(3, unit.getCarBrand());
+            ps.setString(4, unit.getCarName());
+            ps.setString(5, unit.getLegalBrandName());
+            ps.setInt(6, unit.getYearManufacture());
+            ps.setString(7, unit.getColor());
+            ps.setString(8, unit.getTransmission());
+            ps.setString(9, unit.getTraction());
+            ps.setInt(10, unit.getMileage());
+            ps.setString(11, unit.getBodyWork());
+            ps.setString(12, unit.getEngineSize());
+            ps.setString(13, unit.getFuelType());
+            ps.setBoolean(14, unit.isStockStatus());
+           // ps.setInt(15, unit.getIdSupplier());
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Error al crear unidad" + e.getMessage());
+        }
     }
 
     @Override
