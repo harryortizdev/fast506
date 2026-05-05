@@ -6,11 +6,13 @@ interface TableGeneric<T> {
     key: keyof T;
     label: string;
   }[];
+  onDelete?: (item: T) => void;
 }
 
 const TableGeneric = <T extends object>({
   data,
   columns,
+  onDelete,
 }: TableGeneric<T>) => {
 
   return (
@@ -41,7 +43,7 @@ const TableGeneric = <T extends object>({
                 ))}
                 <td>
                   <button onClick={() => {}}>Editar</button>
-                  <button onClick={() => {}} style={{ marginLeft: "0.5rem", color: "red" }}>Eliminar</button>
+                  <button onClick={() => onDelete?.(item)} style={{ marginLeft: "0.5rem", color: "red" }}>Eliminar</button>
                 </td>
               </tr>
             ))

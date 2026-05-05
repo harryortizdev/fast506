@@ -16,3 +16,10 @@ export const create = async (unit: Partial<Unit>) => {
   });
   return res.text();
 };
+//fecth con delete
+export const deleteUnit = async (id: number) => {
+  const res = await fetch(`${API_URL}/delete?id=${id}`, {
+    method: "DELETE",
+  });
+  return res.text();
+};

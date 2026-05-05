@@ -17,7 +17,6 @@ public class Unit {
     private String color;
     private String transmission;
     private String traction;
-    private int mileage;
     private String bodyWork;
     private String engineSize;
     private String fuelType;
@@ -103,14 +102,6 @@ public class Unit {
 
     public void setTraction(String traction) {
         this.traction = traction;
-    }
-
-    public int getMileage() {
-        return mileage;
-    }
-
-    public void setMileage(int mileage) {
-        this.mileage = mileage;
     }
 
     public String getBodyWork() {

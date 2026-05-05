@@ -21,9 +21,11 @@ public class UnitDAOImplement implements UnitDAO {
     public LinkedList<Unit> getAll() {
         LinkedList<Unit> list = new LinkedList<>();
 
-        String sql = "SELECT id_car, VIN, engine_number, car_brand, car_name, legal_brand_name, year_manufacture, color, transmission, traction, mileage, body_work, engine_size, fuel_type, stock_status, is_active, id_supplier FROM units WHERE is_active = 1;";
+        String sql = "call db_fast506.getAllUnits();";
 
         try (Connection cn = DBConnection.getConnection(); PreparedStatement ps = cn.prepareStatement(sql); ResultSet rs = ps.executeQuery();) {
+             System.out.println("Conexión exitosa");
+        System.out.println("Filas encontradas: " + list.size());
             while (rs.next()) {
                 Unit unit = new Unit();
                 unit.setIdCar(rs.getInt("id_car"));
@@ -36,12 +38,10 @@ public class UnitDAOImplement implements UnitDAO {
                 unit.setColor(rs.getString("color"));
                 unit.setTransmission(rs.getString("transmission"));
                 unit.setTraction(rs.getString("traction"));
-                unit.setMileage(rs.getInt("mileage"));
                 unit.setBodyWork(rs.getString("body_work"));
                 unit.setEngineSize(rs.getString("engine_size"));
                 unit.setFuelType(rs.getString("fuel_type"));
                 unit.setStockStatus(rs.getBoolean("stock_status"));
-                unit.setIsActive(rs.getBoolean("is_active"));
                 unit.setIdSupplier(rs.getInt("id_supplier"));
                 list.add(unit);
 
@@ -54,10 +54,7 @@ public class UnitDAOImplement implements UnitDAO {
 
     @Override
     public void add(Unit unit) {
-        String sql = "INSERT INTO units (VIN, engine_number, car_brand, car_name, legal_brand_name, "
-                + "year_manufacture, color, transmission, traction, mileage, body_work, "
-                + "engine_size, fuel_type, stock_status, is_active, id_supplier) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, null)";
+        String sql = "CALL insertUnit(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null);";
         try (Connection cn = DBConnection.getConnection(); PreparedStatement ps = cn.prepareStatement(sql);) {
 
             System.out.println("Llegó al add: " + unit.getVIN()); // ← agrega esto
@@ -71,16 +68,15 @@ public class UnitDAOImplement implements UnitDAO {
             ps.setString(7, unit.getColor());
             ps.setString(8, unit.getTransmission());
             ps.setString(9, unit.getTraction());
-            ps.setInt(10, unit.getMileage());
-            ps.setString(11, unit.getBodyWork());
-            ps.setString(12, unit.getEngineSize());
-            ps.setString(13, unit.getFuelType());
-            ps.setBoolean(14, unit.isStockStatus());
-           // ps.setInt(15, unit.getIdSupplier());
+            ps.setString(10, unit.getBodyWork());
+            ps.setString(11, unit.getEngineSize());
+            ps.setString(12, unit.getFuelType());
+            ps.setBoolean(13, unit.isStockStatus());
+           // ps.setInt(14, unit.getIdSupplier());
 
             ps.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("Error al crear unidad" + e.getMessage());
+            System.err.println("Error al crear unidad " + e.getMessage());
         }
     }
 
@@ -90,8 +86,14 @@ public class UnitDAOImplement implements UnitDAO {
     }
 
     @Override
-    public void deleteById(Integer i) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void deleteById(Integer id) {
+        String sql = "call db_fast506.deleteUnit(?);"; 
+        try(Connection cn = DBConnection.getConnection(); PreparedStatement ps = cn.prepareStatement(sql);){
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        }catch(SQLException e){
+            System.err.println("Error al eliminar unidad " + e.getMessage());
+        }
     }
 
     @Override

@@ -1,28 +1,30 @@
-// src/components/UnitForm.tsx
-import { useState } from "react";
+import { useState } from "react"; //guarda y actualiza datos
 import { Unit } from "../models/Unit";
-import { create } from "../services/UnitService";
+import { create } from "../services/UnitService"; //llamada al backend
 
-interface UnitForm {
+interface UnitForm { //propiedades que el componente recibe desde afuera
   onClose: () => void;
+  onRefresh: () => void;
 }
 
-const UnitForm = ({ onClose }: UnitForm) => {
-  const [form, setForm] = useState<Partial<Unit>>({});
+const UnitForm = ({ onClose, onRefresh }: UnitForm) => { //crea el componente y las acciones a realizar
+  const [form, setForm] = useState<Partial<Unit>>({});//crea un estado y partial indica que los espacios van siendo 
+                                                      // llenados por el usuario
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {//actualiza el estado form
+    setForm({ ...form, [e.target.name]: e.target.value }); //mantiene los anteriores y actualiza el campo que cambio
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async () => {//función que se ejecuta al presionar guardar
   try {
-    const unitToSave = {
-      ...form,
-      stockStatus: true, // valor por defecto al crear
+    const unitToSave = {//crea el objeto
+      ...form, //copia todo lo de form
+      stockStatus: true, //valor por defecto al crear
     };
-    await create(unitToSave);
-    alert("Unidad creada correctamente");
-    onClose();
+    await create(unitToSave); //llama al que envia la unidad al backend
+    alert("Unidad creada correctamente"); //alerta de confirmación
+    onRefresh(); //recarga la tabla
+    onClose(); //cierra el formulario
   } catch (error) {
     alert("Error al guardar");
   }
@@ -88,11 +90,6 @@ const UnitForm = ({ onClose }: UnitForm) => {
           <option value="AWD">AWD - Total permanente</option>
           <option value="4WD">4WD - Cuatro ruedas</option>
         </select>
-      </div>
-
-      <div className="mb-2">
-        <label>Kilometraje</label>
-        <input className="form-control" name="mileage" placeholder="Kilometraje" type="number" onChange={handleChange} />
       </div>
 
       <div className="mb-2">

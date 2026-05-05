@@ -9,7 +9,6 @@ export interface Unit {
   color: string;
   transmission: string;
   traction: string;
-  mileage: number;
   bodyWork: string;
   engineSize: string;
   fuelType: string;
