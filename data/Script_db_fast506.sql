@@ -129,3 +129,233 @@ CREATE TABLE `db_fast506`.`units` (
 VALUES 
   ('1HGBH41JXMN109186', 'K24Z7-1234567', 'Honda', 'Civic EX', 'American Honda Motor Co.', '2021', 'Blanco Perla', 'Automática', 'FWD', 18500, 'Sedán', '1.5L Turbo', 'Gasolina', 1, 1, NULL);
 
+-- 05/05/2026 - Creación de procedimientos de tabla units (Harry)
+
+-- Se elimina el procedimiento si ya existe
+DROP procedure IF EXISTS `getAllUnits`;
+
+-- Procedimiento para obtener todas las units donde is_active = 1
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE `getAllUnits` ()
+BEGIN
+	SELECT 
+        id_car,
+        VIN,
+        engine_number,
+        car_brand,
+        car_name,
+        legal_brand_name,
+        year_manufacture,
+        color,
+        transmission,
+        traction,
+        mileage,
+        body_work,
+        engine_size,
+        fuel_type,
+        stock_status,
+        id_supplier
+    FROM units
+    WHERE is_active = 1;
+END$$
+
+DELIMITER ;
+
+-- Procedimiento para insertar en la tabla units
+
+-- Se elimina el procedimiento si ya existe
+DROP procedure IF EXISTS `insertUnit`;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE `insertUnit` (
+	IN p_VIN              VARCHAR(17),
+    IN p_engine_number    VARCHAR(17),
+    IN p_car_brand        VARCHAR(100),
+    IN p_car_name         VARCHAR(100),
+    IN p_legal_brand_name VARCHAR(100),
+    IN p_year_manufacture INT,
+    IN p_color            VARCHAR(50),
+    IN p_transmission     VARCHAR(10),
+    IN p_traction         VARCHAR(10),
+    IN p_mileage          INT,
+    IN p_body_work        VARCHAR(100),
+    IN p_engine_size      VARCHAR(20),
+    IN p_fuel_type        VARCHAR(20),
+    IN p_stock_status     TINYINT,
+    IN p_id_supplier      INT)
+BEGIN
+	INSERT INTO units (
+        VIN,
+        engine_number,
+        car_brand,
+        car_name,
+        legal_brand_name,
+        year_manufacture,
+        color,
+        transmission,
+        traction,
+        mileage,
+        body_work,
+        engine_size,
+        fuel_type,
+        stock_status,
+        is_active,
+        id_supplier
+    )
+    VALUES (
+        p_VIN,
+        p_engine_number,
+        p_car_brand,
+        p_car_name,
+        p_legal_brand_name,
+        p_year_manufacture,
+        p_color,
+        p_transmission,
+        p_traction,
+        p_mileage,
+        p_body_work,
+        p_engine_size,
+        p_fuel_type,
+        p_stock_status,
+        1,
+        p_id_supplier
+    );
+END$$
+
+DELIMITER ;
+
+-- Procedimiento para eliminar logicamente de tabla units 
+
+-- Se elimina el procedimiento si ya existe
+DROP procedure IF EXISTS `deleteUnit`;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE `deleteUnit` (IN p_id_car INT)
+BEGIN
+	UPDATE units
+	SET is_active = 0
+    WHERE id_car = p_id_car;
+END$$
+
+DELIMITER ;
+
+-- Procedimiento para buscar una unidad con el VIN 
+
+-- Se elimina el procedimiento si ya existe
+DROP procedure IF EXISTS `findUnitByVIN`;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE `findUnitByVIN` (IN p_VIN VARCHAR(17))
+BEGIN
+	SELECT 
+        id_car,
+        VIN,
+        engine_number,
+        car_brand,
+        car_name,
+        legal_brand_name,
+        year_manufacture,
+        color,
+        transmission,
+        traction,
+        mileage,
+        body_work,
+        engine_size,
+        fuel_type,
+        stock_status,
+        id_supplier
+    FROM units
+    WHERE VIN = p_VIN
+      AND is_active = 1;
+END$$
+
+DELIMITER ;
+
+-- Procedimiento para buscar una unidad con el ID
+
+-- Se elimina el procedimiento si ya existe
+DROP procedure IF EXISTS `findUnitById`;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE `findUnitById` (IN p_id_car INT)
+BEGIN
+	SELECT 
+        id_car,
+        VIN,
+        engine_number,
+        car_brand,
+        car_name,
+        legal_brand_name,
+        year_manufacture,
+        color,
+        transmission,
+        traction,
+        mileage,
+        body_work,
+        engine_size,
+        fuel_type,
+        stock_status,
+        id_supplier
+    FROM units
+    WHERE id_car = p_id_car;
+END$$
+
+DELIMITER ;
+
+-- Procedimiento para actualizar una unidad
+
+-- Se elimina el procedimiento si ya existe
+DROP procedure IF EXISTS `updateUnit`;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE `updateUnit` (
+	IN p_id_car           INT,
+	IN p_VIN              VARCHAR(17),
+    IN p_engine_number    VARCHAR(17),
+    IN p_car_brand        VARCHAR(100),
+    IN p_car_name         VARCHAR(100),
+    IN p_legal_brand_name VARCHAR(100),
+    IN p_year_manufacture INT,
+    IN p_color            VARCHAR(50),
+    IN p_transmission     VARCHAR(10),
+    IN p_traction         VARCHAR(10),
+    IN p_mileage          INT,
+    IN p_body_work        VARCHAR(100),
+    IN p_engine_size      VARCHAR(20),
+    IN p_fuel_type        VARCHAR(20),
+    IN p_stock_status     TINYINT,
+    IN p_id_supplier      INT)
+BEGIN
+	UPDATE units
+		SET
+			VIN              = p_VIN,
+			engine_number    = p_engine_number,
+			car_brand        = p_car_brand,
+			car_name         = p_car_name,
+			legal_brand_name = p_legal_brand_name,
+			year_manufacture = p_year_manufacture,
+			color            = p_color,
+			transmission     = p_transmission,
+			traction         = p_traction,
+			mileage          = p_mileage,
+			body_work        = p_body_work,
+			engine_size      = p_engine_size,
+			fuel_type        = p_fuel_type,
+			stock_status     = p_stock_status,
+			id_supplier      = p_id_supplier
+    WHERE id_car = p_id_car
+      AND is_active = 1;
+END$$
+
+DELIMITER ;
+
+
+
+
+
