@@ -107,7 +107,6 @@ CREATE TABLE `db_fast506`.`units` (
   `color` VARCHAR(50) NOT NULL,
   `transmission` VARCHAR(10) NOT NULL,
   `traction` VARCHAR(10) NOT NULL,
-  `mileage` INT NOT NULL,
   `body_work` VARCHAR(100) NOT NULL,
   `engine_size` VARCHAR(20) NOT NULL,
   `fuel_type` VARCHAR(20) NOT NULL,
@@ -125,9 +124,9 @@ CREATE TABLE `db_fast506`.`units` (
 
     -- Insertar datos de prueba a tabla units
     INSERT INTO `db_fast506`.`units` 
-  (`VIN`, `engine_number`, `car_brand`, `car_name`, `legal_brand_name`, `year_Manufacture`, `color`, `transmission`, `traction`, `mileage`, `body_work`, `engine_size`, `fuel_type`, `stock_status`, `is_active`, `id_supplier`)
+  (`VIN`, `engine_number`, `car_brand`, `car_name`, `legal_brand_name`, `year_Manufacture`, `color`, `transmission`, `traction`, `body_work`, `engine_size`, `fuel_type`, `stock_status`, `is_active`, `id_supplier`)
 VALUES 
-  ('1HGBH41JXMN109186', 'K24Z7-1234567', 'Honda', 'Civic EX', 'American Honda Motor Co.', '2021', 'Blanco Perla', 'Automática', 'FWD', 18500, 'Sedán', '1.5L Turbo', 'Gasolina', 1, 1, NULL);
+  ('1HGBH41JXMN109186', 'K24Z7-1234567', 'Honda', 'Civic EX', 'American Honda Motor Co.', '2021', 'Blanco Perla', 'Automática', 'FWD', 'Sedán', '1.5L Turbo', 'Gasolina', 1, 1, NULL);
 
 -- 05/05/2026 - Creación de procedimientos de tabla units (Harry)
 
@@ -150,7 +149,6 @@ BEGIN
         color,
         transmission,
         traction,
-        mileage,
         body_work,
         engine_size,
         fuel_type,
@@ -179,7 +177,6 @@ CREATE PROCEDURE `insertUnit` (
     IN p_color            VARCHAR(50),
     IN p_transmission     VARCHAR(10),
     IN p_traction         VARCHAR(10),
-    IN p_mileage          INT,
     IN p_body_work        VARCHAR(100),
     IN p_engine_size      VARCHAR(20),
     IN p_fuel_type        VARCHAR(20),
@@ -196,7 +193,6 @@ BEGIN
         color,
         transmission,
         traction,
-        mileage,
         body_work,
         engine_size,
         fuel_type,
@@ -214,7 +210,6 @@ BEGIN
         p_color,
         p_transmission,
         p_traction,
-        p_mileage,
         p_body_work,
         p_engine_size,
         p_fuel_type,
@@ -262,7 +257,6 @@ BEGIN
         color,
         transmission,
         traction,
-        mileage,
         body_work,
         engine_size,
         fuel_type,
@@ -295,7 +289,6 @@ BEGIN
         color,
         transmission,
         traction,
-        mileage,
         body_work,
         engine_size,
         fuel_type,
@@ -325,7 +318,6 @@ CREATE PROCEDURE `updateUnit` (
     IN p_color            VARCHAR(50),
     IN p_transmission     VARCHAR(10),
     IN p_traction         VARCHAR(10),
-    IN p_mileage          INT,
     IN p_body_work        VARCHAR(100),
     IN p_engine_size      VARCHAR(20),
     IN p_fuel_type        VARCHAR(20),
@@ -343,7 +335,6 @@ BEGIN
 			color            = p_color,
 			transmission     = p_transmission,
 			traction         = p_traction,
-			mileage          = p_mileage,
 			body_work        = p_body_work,
 			engine_size      = p_engine_size,
 			fuel_type        = p_fuel_type,
