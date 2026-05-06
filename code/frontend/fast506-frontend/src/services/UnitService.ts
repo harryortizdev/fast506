@@ -8,9 +8,9 @@ export const getAll = async () => { //async llamada asincronica que puede tardar
     return res.json(); //la respuesta se convierte a .json para que react lo pueda utilizar
 }
 //fecth con add
-export const create = async (unit: Partial<Unit>) => {
-  const res = await fetch(`${API_URL}/create`, {
-    method: "POST",
+export const create = async (unit: Partial<Unit>) => { //llamada asincronica
+  const res = await fetch(`${API_URL}/create`, { //hace la comunicación al http create 
+    method: "POST", 
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(unit),
   });
@@ -20,6 +20,15 @@ export const create = async (unit: Partial<Unit>) => {
 export const deleteUnit = async (id: number) => {
   const res = await fetch(`${API_URL}/delete?id=${id}`, {
     method: "DELETE",
+  });
+  return res.text();
+};
+//fect con update
+export const updateUnit = async (unit: Unit) => {
+  const res = await fetch(`${API_URL}/update`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(unit),
   });
   return res.text();
 };

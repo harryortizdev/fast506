@@ -24,8 +24,8 @@ public class UnitDAOImplement implements UnitDAO {
         String sql = "call db_fast506.getAllUnits();";
 
         try (Connection cn = DBConnection.getConnection(); PreparedStatement ps = cn.prepareStatement(sql); ResultSet rs = ps.executeQuery();) {
-             System.out.println("Conexión exitosa");
-        System.out.println("Filas encontradas: " + list.size());
+            System.out.println("Conexión exitosa");
+            System.out.println("Filas encontradas: " + list.size());
             while (rs.next()) {
                 Unit unit = new Unit();
                 unit.setIdCar(rs.getInt("id_car"));
@@ -72,7 +72,7 @@ public class UnitDAOImplement implements UnitDAO {
             ps.setString(11, unit.getEngineSize());
             ps.setString(12, unit.getFuelType());
             ps.setBoolean(13, unit.isStockStatus());
-           // ps.setInt(14, unit.getIdSupplier());
+            // ps.setInt(14, unit.getIdSupplier());
 
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -81,17 +81,41 @@ public class UnitDAOImplement implements UnitDAO {
     }
 
     @Override
-    public void update(Unit t) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void update(Unit unit) {
+        String sql = "call db_fast506.updateUnit(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null);";
+
+        try (Connection cn = DBConnection.getConnection(); PreparedStatement ps = cn.prepareStatement(sql)) {
+
+            ps.setInt(1, unit.getIdCar());
+            ps.setString(2, unit.getVIN());
+            ps.setString(3, unit.getEngineNumber());
+            ps.setString(4, unit.getCarBrand());
+            ps.setString(5, unit.getCarName());
+            ps.setString(6, unit.getLegalBrandName());
+            ps.setInt(7, unit.getYearManufacture());
+            ps.setString(8, unit.getColor());
+            ps.setString(9, unit.getTransmission());
+            ps.setString(10, unit.getTraction());
+            ps.setString(11, unit.getBodyWork());
+            ps.setString(12, unit.getEngineSize());
+            ps.setString(13, unit.getFuelType());
+            ps.setBoolean(14, unit.isStockStatus()); // TINYINT → boolean
+           // ps.setInt(15, unit.getIdSupplier());
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            System.err.println("Error al actualizar unidad: " + e.getMessage());
+        }
     }
 
     @Override
     public void deleteById(Integer id) {
-        String sql = "call db_fast506.deleteUnit(?);"; 
-        try(Connection cn = DBConnection.getConnection(); PreparedStatement ps = cn.prepareStatement(sql);){
+        String sql = "call db_fast506.deleteUnit(?);";
+        try (Connection cn = DBConnection.getConnection(); PreparedStatement ps = cn.prepareStatement(sql);) {
             ps.setInt(1, id);
             ps.executeUpdate();
-        }catch(SQLException e){
+        } catch (SQLException e) {
             System.err.println("Error al eliminar unidad " + e.getMessage());
         }
     }

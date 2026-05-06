@@ -6,34 +6,44 @@ import { getAll, deleteUnit } from "../services/UnitService";
 import { Unit } from "../models/Unit";
 
 const UnitPage = () => {
-  const [units, setUnits] = useState<Unit[]>([]); //crea un estado que empieza como lista vacia
-  const [showForm, setShowForm] = useState(false);//se crea un estado   que controla la vista del formulario o tabla
-
-  useEffect(() => {
-    loadUnits(); //ejecuta llenar la tabla con los datos nuevos
-  }, []);//no se vuelve a ejecutar a menos que se desmonte y se vuelva a montar
+  const [units, setUnits] = useState<Unit[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  const [unitToEdit, setUnitToEdit] = useState<Unit | undefined>(undefined);
 
   const loadUnits = async () => {
-    const data = await getAll(); //llama al servicio getAll
-    setUnits(data); //setea en la tabla los datos actualizados
+    const data = await getAll();
+    setUnits(data);
   };
 
-  const handleSaveAndClose = async () => {//esto es una funcioón que carga y despues cierra
-    await loadUnits();      //cargar los datos antes de cerrar el form
-    setShowForm(false);     //cerrar el form
+  useEffect(() => {
+    loadUnits();
+  }, []);
+
+  const handleSaveAndClose = async () => {
+    await loadUnits();
+    setUnitToEdit(undefined);
+    setShowForm(false);
   };
 
-  const handleDelete = async (unit: Unit) => {//funcion que elimina y carga y recibe unidad como parametro
-    if (!unit.idCar) return; //evita que la unidar no tenga id
+  const handleClose = () => {
+    setUnitToEdit(undefined);
+    setShowForm(false);
+  };
 
-    const confirmar = window.confirm(`¿Desea eliminar el vehiculo ${unit.idCar}?`); //muestra una confirmación
-    if(!confirmar) return;//si se presiona cancelar, la función para y no elimina nada
+  const handleEdit = (unit: Unit) => {
+    setUnitToEdit(unit);
+    setShowForm(true);
+  };
 
-    await deleteUnit(unit.idCar);//llama al servicio 
-    await loadUnits();//recarga la lista
-  }
+  const handleDelete = async (unit: Unit) => {
+    if (!unit.idCar) return;
+    const confirmar = window.confirm(`¿Desea eliminar el vehiculo ${unit.VIN}?`);
+    if (!confirmar) return;
+    await deleteUnit(unit.idCar!);
+    await loadUnits();
+  };
 
-  const columns: { key: keyof Unit; label: string }[] = [ //define lo que va en la tabla generica  
+  const columns: { key: keyof Unit; label: string }[] = [
     { key: "idCar", label: "ID" },
     { key: "VIN", label: "VIN" },
     { key: "carBrand", label: "Marca" },
@@ -46,15 +56,22 @@ const UnitPage = () => {
 
   return (
     <div>
-      {!showForm ? ( //si showForm es falso muestra la tabla y el boton
+      {!showForm ? (
         <>
           <ButtonNew label="Nueva Unidad" onClick={() => setShowForm(true)} />
-          <TableGeneric data={units} columns={columns} onDelete={handleDelete} />
+          <TableGeneric
+            data={units}
+            columns={columns}
+            onDelete={handleDelete}
+            onEdit={handleEdit}
+          />
         </>
       ) : (
         <UnitForm
-          onClose={() => setShowForm(false)}
-          onRefresh={handleSaveAndClose} />
+          onClose={handleClose}
+          onRefresh={handleSaveAndClose}
+          unitToEdit={unitToEdit}
+        />
       )}
     </div>
   );
