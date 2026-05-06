@@ -27,4 +27,8 @@ public class UnitService {
     public void deleteById(int id) {
         unitDAO.deleteById(id);
     }
+
+    public void update(Unit unit) {
+        unitDAO.update(unit);
+    }
 }

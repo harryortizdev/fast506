@@ -1,20 +1,16 @@
-import { useState } from "react";
-
-interface TableGeneric<T> {
+interface TableGenericProps<T> {
   data: T[];
-  columns: {
-    key: keyof T;
-    label: string;
-  }[];
+  columns: { key: keyof T; label: string }[];
   onDelete?: (item: T) => void;
+  onEdit?: (item: T) => void;
 }
 
 const TableGeneric = <T extends object>({
   data,
   columns,
   onDelete,
-}: TableGeneric<T>) => {
-
+  onEdit,
+}: TableGenericProps<T>) => {
   return (
     <div style={{ padding: "1rem" }}>
       <table border={1} cellPadding={8} style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -37,13 +33,23 @@ const TableGeneric = <T extends object>({
             data.map((item, index) => (
               <tr key={index}>
                 {columns.map((col) => (
-                  <td key={String(col.key)}>
-                    {String(item[col.key])}
+                   <td key={String(col.key)}>
+                    {typeof item[col.key] === "boolean"
+                      ? item[col.key] ? "Sí" : "No"  // ← boolean muestra Sí o No
+                      : String(item[col.key])}
                   </td>
                 ))}
                 <td>
-                  <button onClick={() => {}}>Editar</button>
-                  <button onClick={() => onDelete?.(item)} style={{ marginLeft: "0.5rem", color: "red" }}>Eliminar</button>
+                  <button
+                    onClick={() => onEdit?.(item)}
+                    style={{ marginRight: "0.5rem" }}>
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => onDelete?.(item)}
+                    style={{ color: "red" }}>
+                    Eliminar
+                  </button>
                 </td>
               </tr>
             ))
