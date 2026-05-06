@@ -35,7 +35,7 @@ const TableGeneric = <T extends object>({
                 {columns.map((col) => (
                    <td key={String(col.key)}>
                     {typeof item[col.key] === "boolean"
-                      ? item[col.key] ? "Sí" : "No"  // ← boolean muestra Sí o No
+                      ? item[col.key] ? "Sí" : "No" 
                       : String(item[col.key])}
                   </td>
                 ))}
