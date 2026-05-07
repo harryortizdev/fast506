@@ -67,7 +67,7 @@ CREATE TABLE client (
     ON UPDATE CASCADE
     
 );
-
+-- -----------------------------------------------------------------------------------------
 -- 02/05/2026 - Creación de la tabla supplier(proveedores) Nolan
 CREATE TABLE supplier (
     id_supplier INT PRIMARY KEY AUTO_INCREMENT,
@@ -94,6 +94,143 @@ CREATE TABLE supplier (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
+
+-- 07/05/2026 - Crear datos de prueba proveedor (Nolan)
+
+INSERT INTO supplier (name, company_name, legal_name, support_phone, bussines_contact_name, email, ubicacion, admin_id)
+VALUES
+    ('Auto Parts S.A.', 'Auto Parts S.A.', 'Auto Parts S.A.', '800-123-4567', 'Carlos González', 'cgonzalez@autoparts.com', 'San José, Costa Rica', 1),
+    ('Vehículos y Repuestos Ltda.', 'Vehículos y Repuestos Ltda.', 'Vehículos y Repuestos Ltda.', '800-234-5678', 'María Fernández', 'mariaf@repuestosltda.com', 'Heredia, Costa Rica', 2),
+	('Importadora de Vehículos CR', 'Importadora de Vehículos CR', 'Importadora de Vehículos CR S.A.', '800-567-8901', 'Luis Ramírez', 'luis.ramirez@importvehiculos.com', 'Puntarenas, Costa Rica', 2);
+  
+-- 07/05/2026 - Crear procedimientos de la tabla proveedor (Nolan)
+-- Procedimiento para agregar un supplier (Nolan)
+
+DROP procedure IF EXISTS `insertSupplier`;
+
+DELIMITER $$
+
+CREATE PROCEDURE insertSupplier(
+    IN p_name VARCHAR(50),
+    IN p_company_name VARCHAR(50),
+    IN p_legal_name VARCHAR(50),
+    IN p_support_phone VARCHAR(15),
+    IN p_bussines_contact_name VARCHAR(150),
+    IN p_email VARCHAR(100),
+    IN p_ubicacion VARCHAR(100),
+    IN p_admin_id INT
+)
+BEGIN
+    INSERT INTO supplier (
+        name, company_name, legal_name, support_phone, bussines_contact_name, email, ubicacion, admin_id
+    )
+    VALUES (
+        p_name, p_company_name, p_legal_name, p_support_phone, p_bussines_contact_name, p_email, p_ubicacion, p_admin_id
+    );
+END$$
+DELIMITER ;
+
+-- -- Procedimiento para obtener todos los proveedores donde is_active = 1 (Nolan)
+DROP procedure IF EXISTS `getAllSupplier`;
+
+DELIMITER $$
+CREATE PROCEDURE `getAllSuppliers` ()
+BEGIN
+    SELECT 
+        id_supplier,
+        name,
+        company_name,
+        legal_name,
+        support_phone,
+        bussines_contact_name,
+        email,
+        ubicacion,
+        is_active,
+        admin_id
+    FROM supplier
+    WHERE is_active = 1;
+END$$
+
+DELIMITER ;
+
+-- Procedimiento para actualizar un proveedor (Nolan)
+DROP procedure IF EXISTS `updateSupplier`;
+
+DELIMITER $$
+
+CREATE PROCEDURE updateSupplier(
+    IN p_id_supplier INT,
+    IN p_name VARCHAR(50),
+    IN p_company_name VARCHAR(50),
+    IN p_legal_name VARCHAR(50),
+    IN p_support_phone VARCHAR(15),
+    IN p_bussines_contact_name VARCHAR(150),
+    IN p_email VARCHAR(100),
+    IN p_ubicacion VARCHAR(100),
+    IN p_is_active BOOLEAN
+)
+BEGIN
+    UPDATE supplier
+    SET
+        name = p_name,
+        company_name = p_company_name,
+        legal_name = p_legal_name,
+        support_phone = p_support_phone,
+        bussines_contact_name = p_bussines_contact_name,
+        email = p_email,
+        ubicacion = p_ubicacion,
+        is_active = p_is_active
+    WHERE id_supplier = p_id_supplier;
+END$$
+DELIMITER ;
+
+-- Procedimiento para eliminar un proveedor (Nolan)
+DROP procedure IF EXISTS `deleteSupplier`;
+
+DELIMITER $$
+CREATE PROCEDURE deleteSupplier(
+    IN p_id_supplier INT
+)
+BEGIN
+    DELETE FROM supplier WHERE id_supplier = p_id_supplier;
+END$$
+
+DELIMITER ;
+
+-- Procedimiento para desactivar un proveedor o borrado logico (marcarlo como inactivo) (Nolan)
+DROP procedure IF EXISTS `deactivateSupplier`;
+
+DELIMITER $$
+CREATE PROCEDURE deactivateSupplier(IN p_id_supplier INT)
+BEGIN
+    UPDATE supplier
+    SET is_active = FALSE
+    WHERE id_supplier = p_id_supplier;
+END$$
+DELIMITER ;
+
+-- Para encontrar un proveedor mediante el id (Nolan)
+DROP procedure IF EXISTS `findSupplierById`;
+
+DELIMITER $$
+CREATE PROCEDURE `findSupplierById` (IN p_id_supplier INT)
+BEGIN
+    SELECT 
+        id_supplier,
+        name,
+        company_name,
+        legal_name,
+        support_phone,
+        bussines_contact_name,
+        email,
+        ubicacion,
+        is_active,
+        admin_id
+    FROM supplier
+    WHERE id_supplier = p_id_supplier;
+END$$
+DELIMITER ;
+-- -----------------------------------------------------------------------------------------
 -- 22/04/2026 - Creación de la tabla de units (Harry)
 
 CREATE TABLE `db_fast506`.`units` (
@@ -121,6 +258,8 @@ CREATE TABLE `db_fast506`.`units` (
     REFERENCES `db_fast506`.`supplier` (`id_supplier`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
+    
+    
 
     -- Insertar datos de prueba a tabla units
     INSERT INTO `db_fast506`.`units` 
