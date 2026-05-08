@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es6",  // Cambié de "es5" a "es6" porue supuestamente está obsoleto
     "lib": [
       "dom",
       "dom.iterable",
@@ -13,8 +13,8 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
-    "moduleResolution": "node",
+    "module": "node16", //temas de error cambie esto a versiones recientes y actualizadas
+    "moduleResolution": "node16", // esto igual
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
