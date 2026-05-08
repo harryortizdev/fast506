@@ -67,6 +67,11 @@ CREATE TABLE client (
     ON UPDATE CASCADE
     
 );
+-- lo puso Nolan para probar
+-- Insertar un usuario en la tabla users
+INSERT INTO `db_fast506`.`users`  (name, id, email, password, phone_number, date_birth, profile_image)
+VALUES 
+('Administrador de Prueba', 123456, 'admin@prueba.com', 'password123', '800-123-4567', '1985-10-15', 'profile.jpg');
 -- -----------------------------------------------------------------------------------------
 -- 02/05/2026 - Creación de la tabla supplier(proveedores) Nolan
 CREATE TABLE supplier (
@@ -97,11 +102,11 @@ CREATE TABLE supplier (
 
 -- 07/05/2026 - Crear datos de prueba proveedor (Nolan)
 
-INSERT INTO supplier (name, company_name, legal_name, support_phone, bussines_contact_name, email, ubicacion, admin_id)
+INSERT INTO `db_fast506`.`supplier` 
+(name, company_name, legal_name, support_phone, bussines_contact_name, email, ubicacion, admin_id)
 VALUES
-    ('Auto Parts S.A.', 'Auto Parts S.A.', 'Auto Parts S.A.', '800-123-4567', 'Carlos González', 'cgonzalez@autoparts.com', 'San José, Costa Rica', 1),
-    ('Vehículos y Repuestos Ltda.', 'Vehículos y Repuestos Ltda.', 'Vehículos y Repuestos Ltda.', '800-234-5678', 'María Fernández', 'mariaf@repuestosltda.com', 'Heredia, Costa Rica', 2),
-	('Importadora de Vehículos CR', 'Importadora de Vehículos CR', 'Importadora de Vehículos CR S.A.', '800-567-8901', 'Luis Ramírez', 'luis.ramirez@importvehiculos.com', 'Puntarenas, Costa Rica', 2);
+    ('Auto Parts S.A.', 'Auto Parts S.A.', 'Auto Parts S.A.', 
+    '800-123-4567', 'Carlos González', 'cgonzalez@autoparts.com', 'San José, Costa Rica', 1);
   
 -- 07/05/2026 - Crear procedimientos de la tabla proveedor (Nolan)
 -- Procedimiento para agregar un supplier (Nolan)
@@ -109,7 +114,6 @@ VALUES
 DROP procedure IF EXISTS `insertSupplier`;
 
 DELIMITER $$
-
 CREATE PROCEDURE insertSupplier(
     IN p_name VARCHAR(50),
     IN p_company_name VARCHAR(50),
@@ -156,7 +160,6 @@ DELIMITER ;
 DROP procedure IF EXISTS `updateSupplier`;
 
 DELIMITER $$
-
 CREATE PROCEDURE updateSupplier(
     IN p_id_supplier INT,
     IN p_name VARCHAR(50),
@@ -194,7 +197,6 @@ CREATE PROCEDURE deleteSupplier(
 BEGIN
     DELETE FROM supplier WHERE id_supplier = p_id_supplier;
 END$$
-
 DELIMITER ;
 
 -- Procedimiento para desactivar un proveedor o borrado logico (marcarlo como inactivo) (Nolan)
