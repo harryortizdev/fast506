@@ -145,7 +145,6 @@ BEGIN
         bussines_contact_name,
         email,
         ubicacion,
-        is_active,
         admin_id
     FROM supplier
     WHERE is_active = 1;
@@ -167,7 +166,7 @@ CREATE PROCEDURE updateSupplier(
     IN p_bussines_contact_name VARCHAR(150),
     IN p_email VARCHAR(100),
     IN p_ubicacion VARCHAR(100),
-    IN p_is_active BOOLEAN
+    IN p_admin_id BOOLEAN
 )
 BEGIN
     UPDATE supplier
@@ -179,8 +178,9 @@ BEGIN
         bussines_contact_name = p_bussines_contact_name,
         email = p_email,
         ubicacion = p_ubicacion,
-        is_active = p_is_active
-    WHERE id_supplier = p_id_supplier;
+        admin_id = p_admin_id
+    WHERE id_supplier = p_id_supplier
+    AND is_active = true;
 END$$
 DELIMITER ;
 
@@ -224,7 +224,6 @@ BEGIN
         bussines_contact_name,
         email,
         ubicacion,
-        is_active,
         admin_id
     FROM supplier
     WHERE id_supplier = p_id_supplier;
