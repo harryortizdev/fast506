@@ -4,7 +4,7 @@ import UnitPage from "./pages/UnitPage";
 function App() {
   return (
    <div>
-      <UnitPage />
+      <SupplierPage />
     </div>
   );
 }
