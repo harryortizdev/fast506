@@ -54,10 +54,8 @@ public class UnitDAOImplement implements UnitDAO {
 
     @Override
     public void add(Unit unit) {
-        String sql = "CALL insertUnit(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null);";
+        String sql = "CALL insertUnit(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         try (Connection cn = DBConnection.getConnection(); PreparedStatement ps = cn.prepareStatement(sql);) {
-
-            System.out.println("Llegó al add: " + unit.getVIN()); // ← agrega esto
 
             ps.setString(1, unit.getVIN());
             ps.setString(2, unit.getEngineNumber());
@@ -72,7 +70,7 @@ public class UnitDAOImplement implements UnitDAO {
             ps.setString(11, unit.getEngineSize());
             ps.setString(12, unit.getFuelType());
             ps.setBoolean(13, unit.isStockStatus());
-            // ps.setInt(14, unit.getIdSupplier());
+            ps.setInt(14, unit.getIdSupplier());
 
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -82,7 +80,7 @@ public class UnitDAOImplement implements UnitDAO {
 
     @Override
     public void update(Unit unit) {
-        String sql = "call db_fast506.updateUnit(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null);";
+        String sql = "call db_fast506.updateUnit(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
         try (Connection cn = DBConnection.getConnection(); PreparedStatement ps = cn.prepareStatement(sql)) {
 
@@ -99,8 +97,8 @@ public class UnitDAOImplement implements UnitDAO {
             ps.setString(11, unit.getBodyWork());
             ps.setString(12, unit.getEngineSize());
             ps.setString(13, unit.getFuelType());
-            ps.setBoolean(14, unit.isStockStatus()); // TINYINT → boolean
-           // ps.setInt(15, unit.getIdSupplier());
+            ps.setBoolean(14, unit.isStockStatus());
+            ps.setInt(15, unit.getIdSupplier());
 
             ps.executeUpdate();
 
@@ -123,6 +121,38 @@ public class UnitDAOImplement implements UnitDAO {
     @Override
     public Unit findById(Integer i) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    public Unit findByVIN(int vin) {
+         Unit unit = null;
+        String sql = "call db_fast506.findUnitByVIN(?);";
+
+        try (Connection cn = DBConnection.getConnection(); PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, vin);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                unit = new Unit();
+                unit.setIdCar(rs.getInt("id_car"));
+                unit.setVIN(rs.getString("VIN"));
+                unit.setEngineNumber(rs.getString("engine_number"));
+                unit.setCarBrand(rs.getString("car_brand"));
+                unit.setCarName(rs.getString("car_name"));
+                unit.setLegalBrandName(rs.getString("legal_brand_name"));
+                unit.setYearManufacture(rs.getInt("year_manufacture"));
+                unit.setColor(rs.getString("color"));
+                unit.setTransmission(rs.getString("transmission"));
+                unit.setTraction(rs.getString("traction"));
+                unit.setBodyWork(rs.getString("body_work"));
+                unit.setEngineSize(rs.getString("engine_size"));
+                unit.setFuelType(rs.getString("fuel_type"));
+                unit.setStockStatus(rs.getBoolean("stock_status"));
+                unit.setIdSupplier(rs.getInt("id_supplier"));
+
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al buscar la unidad" + e.getMessage());
+        }
+        return unit;
     }
 
 }

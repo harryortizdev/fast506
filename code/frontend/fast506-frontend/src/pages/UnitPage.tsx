@@ -71,6 +71,7 @@ const UnitPage = () => {
           onClose={handleClose}
           onRefresh={handleSaveAndClose}
           unitToEdit={unitToEdit}
+          units={units}
         />
       )}
     </div>
