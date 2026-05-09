@@ -67,12 +67,636 @@ CREATE TABLE client (
     ON UPDATE CASCADE
     
 );
+
 -- lo puso Nolan para probar
 -- Insertar un usuario en la tabla users
 INSERT INTO `db_fast506`.`users`  (name, id, email, password, phone_number, date_birth, profile_image)
 VALUES 
 ('Administrador de Prueba', 123456, 'admin@prueba.com', 'password123', '800-123-4567', '1985-10-15', 'profile.jpg');
 -- -----------------------------------------------------------------------------------------
+
+-- 07/05/26 Creacion de procedimientos para la tabla Administrator (Allan)
+
+-- Obtener administradores
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS getAllAdministrators;
+
+CREATE PROCEDURE getAllAdministrators()
+BEGIN
+
+    SELECT
+        u.id_user,
+        u.name,
+        u.id,
+        u.email,
+        u.phone_number,
+        u.date_birth,
+        u.profile_image,
+        a.employee_id,
+        a.corporate_email
+    FROM users u
+    INNER JOIN administrator a
+        ON u.id_user = a.id_user
+    WHERE u.is_active = TRUE;
+
+END $$
+
+DELIMITER ;
+
+-- Buscar administrador por ID 
+
+DROP PROCEDURE IF EXISTS findAdministratorById;
+
+DELIMITER $$
+
+CREATE PROCEDURE findAdministratorById(
+    IN p_id_user INT
+)
+BEGIN
+
+    SELECT
+        u.id_user,
+        u.name,
+        u.id,
+        u.email,
+        u.phone_number,
+        u.date_birth,
+        u.profile_image,
+        a.employee_id,
+        a.corporate_email
+    FROM users u
+    INNER JOIN administrator a
+        ON u.id_user = a.id_user
+    WHERE u.id_user = p_id_user
+      AND u.is_active = TRUE;
+
+END$$
+
+DELIMITER ;
+
+-- Insertar en administrator
+
+DROP PROCEDURE IF EXISTS insertAdministrator;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE insertAdministrator(
+
+   
+    IN p_name VARCHAR(100),
+    IN p_identification INT,
+    IN p_email VARCHAR(100),
+    IN p_password VARCHAR(255),
+    IN p_phone_number VARCHAR(15),
+    IN p_date_birth DATE,
+    IN p_profile_image VARCHAR(500),
+
+    IN p_employee_id VARCHAR(10),
+    IN p_corporate_email VARCHAR(100)
+
+)
+BEGIN
+
+    DECLARE v_id_user INT;
+    
+    START TRANSACTION;
+
+    INSERT INTO users(
+        name,
+        id,
+        email,
+        password,
+        phone_number,
+        date_birth,
+        profile_image,
+        is_active
+    )
+    VALUES(
+        p_name,
+        p_identification,
+        p_email,
+        p_password,
+        p_phone_number,
+        p_date_birth,
+        p_profile_image,
+        TRUE
+    );
+
+    SET v_id_user = LAST_INSERT_ID();
+
+    INSERT INTO administrator(
+        id_user,
+        employee_id,
+        corporate_email
+    )
+    VALUES(
+        v_id_user,
+        p_employee_id,
+        p_corporate_email
+    );
+
+END $$
+
+DELIMITER ;
+
+-- Datos de prueba
+
+CALL insertAdministrator(
+
+    'Allan Mejia',
+    123456789,
+    'allan@gmail.com',
+    '12345',
+    '88887777',
+    '2005-10-15',
+    'allan.png',
+
+    'ADM001',
+    'allan@fast506.com'
+
+);
+
+-- Editar administrador
+
+DROP PROCEDURE IF EXISTS updateAdministrator;
+
+DELIMITER $$
+
+CREATE PROCEDURE updateAdministrator(
+
+    IN p_id_user INT,
+    IN p_name VARCHAR(100),
+    IN p_identification INT,
+    IN p_email VARCHAR(100),
+    IN p_password VARCHAR(255),
+    IN p_phone_number VARCHAR(15),
+    IN p_date_birth DATE,
+    IN p_profile_image VARCHAR(500),
+    IN p_employee_id VARCHAR(10),
+    IN p_corporate_email VARCHAR(100)
+
+)
+BEGIN
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+    END;
+
+    START TRANSACTION;
+
+    UPDATE users
+    SET
+        name = p_name,
+        id = p_identification,
+        email = p_email,
+        password = p_password,
+        phone_number = p_phone_number,
+        date_birth = p_date_birth,
+        profile_image = p_profile_image
+    WHERE id_user = p_id_user
+      AND is_active = TRUE;
+
+    UPDATE administrator
+    SET
+        employee_id = p_employee_id,
+        corporate_email = p_corporate_email
+    WHERE id_user = p_id_user;
+
+    COMMIT;
+
+END$$
+
+DELIMITER ;
+
+-- Eliminar usuario
+
+DROP PROCEDURE IF EXISTS deleteUser;
+
+DELIMITER $$
+
+CREATE PROCEDURE deleteUser(
+    IN p_id_user INT
+)
+BEGIN
+
+    UPDATE users
+    SET is_active = FALSE
+    WHERE id_user = p_id_user;
+
+END$$
+
+DELIMITER ;
+
+-- 07/05/26 Creacion de procedimientos para la tabla mechanic (Allan)
+
+-- Insertar mecanico
+DROP PROCEDURE IF EXISTS insertMechanic;
+
+DELIMITER $$
+
+CREATE PROCEDURE insertMechanic(
+
+    IN p_name VARCHAR(100),
+    IN p_identification INT,
+    IN p_email VARCHAR(100),
+    IN p_password VARCHAR(255),
+    IN p_phone_number VARCHAR(15),
+    IN p_date_birth DATE,
+    IN p_profile_image VARCHAR(500),
+
+    IN p_employee_id VARCHAR(10),
+    IN p_corporate_email VARCHAR(100),
+    IN p_specialty VARCHAR(50),
+    IN p_cert_level VARCHAR(20)
+
+)
+BEGIN
+
+    DECLARE v_id_user INT;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+    END;
+
+    START TRANSACTION;
+
+    INSERT INTO users(
+        name,
+        id,
+        email,
+        password,
+        phone_number,
+        date_birth,
+        profile_image,
+        is_active
+    )
+    VALUES(
+        p_name,
+        p_identification,
+        p_email,
+        p_password,
+        p_phone_number,
+        p_date_birth,
+        p_profile_image,
+        TRUE
+    );
+
+    SET v_id_user = LAST_INSERT_ID();
+
+    INSERT INTO mechanic(
+        id_user,
+        employee_id,
+        corporate_email,
+        specialty,
+        cert_level
+    )
+    VALUES(
+        v_id_user,
+        p_employee_id,
+        p_corporate_email,
+        p_specialty,
+        p_cert_level
+    );
+
+    COMMIT;
+
+END$$
+
+DELIMITER ;
+
+-- Obtener mecanicos
+
+DROP PROCEDURE IF EXISTS getAllMechanics;
+
+DELIMITER $$
+
+CREATE PROCEDURE getAllMechanics()
+BEGIN
+
+    SELECT
+        u.id_user,
+        u.name,
+        u.id,
+        u.email,
+        u.phone_number,
+        u.date_birth,
+        u.profile_image,
+
+        m.employee_id,
+        m.corporate_email,
+        m.specialty,
+        m.cert_level
+
+    FROM users u
+    INNER JOIN mechanic m
+        ON u.id_user = m.id_user
+
+    WHERE u.is_active = TRUE;
+
+END$$
+
+DELIMITER ;
+
+-- Buscar mecanico por id
+
+DROP PROCEDURE IF EXISTS findMechanicById;
+
+DELIMITER $$
+
+CREATE PROCEDURE findMechanicById(
+    IN p_id_user INT
+)
+BEGIN
+
+    SELECT
+        u.id_user,
+        u.name,
+        u.id,
+        u.email,
+        u.phone_number,
+        u.date_birth,
+        u.profile_image,
+
+        m.employee_id,
+        m.corporate_email,
+        m.specialty,
+        m.cert_level
+
+    FROM users u
+    INNER JOIN mechanic m
+        ON u.id_user = m.id_user
+
+    WHERE u.id_user = p_id_user
+      AND u.is_active = TRUE;
+
+END$$
+
+DELIMITER ;
+
+-- Actualizar mecanico
+
+DROP PROCEDURE IF EXISTS updateMechanic;
+
+DELIMITER $$
+
+CREATE PROCEDURE updateMechanic(
+
+    IN p_id_user INT,
+
+    IN p_name VARCHAR(100),
+    IN p_identification INT,
+    IN p_email VARCHAR(100),
+    IN p_password VARCHAR(255),
+    IN p_phone_number VARCHAR(15),
+    IN p_date_birth DATE,
+    IN p_profile_image VARCHAR(500),
+
+    IN p_employee_id VARCHAR(10),
+    IN p_corporate_email VARCHAR(100),
+    IN p_specialty VARCHAR(50),
+    IN p_cert_level VARCHAR(20)
+
+)
+BEGIN
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+    END;
+
+    START TRANSACTION;
+
+    UPDATE users
+    SET
+        name = p_name,
+        id = p_identification,
+        email = p_email,
+        password = p_password,
+        phone_number = p_phone_number,
+        date_birth = p_date_birth,
+        profile_image = p_profile_image
+    WHERE id_user = p_id_user
+      AND is_active = TRUE;
+
+    UPDATE mechanic
+    SET
+        employee_id = p_employee_id,
+        corporate_email = p_corporate_email,
+        specialty = p_specialty,
+        cert_level = p_cert_level
+    WHERE id_user = p_id_user;
+
+    COMMIT;
+
+END$$
+
+DELIMITER ;
+
+-- 07/05/26 Creacion de procedimientos para la tabla client (Allan)
+
+-- Insertar cliente
+
+DROP PROCEDURE IF EXISTS insertClient;
+
+DELIMITER $$
+
+CREATE PROCEDURE insertClient(
+
+    IN p_name VARCHAR(100),
+    IN p_identification INT,
+    IN p_email VARCHAR(100),
+    IN p_password VARCHAR(255),
+    IN p_phone_number VARCHAR(15),
+    IN p_date_birth DATE,
+    IN p_profile_image VARCHAR(500),
+
+    IN p_comm_interest VARCHAR(50),
+    IN p_physical_address VARCHAR(255),
+    IN p_occupation VARCHAR(100)
+
+)
+BEGIN
+
+    DECLARE v_id_user INT;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+    END;
+
+    START TRANSACTION;
+
+    INSERT INTO users(
+        name,
+        id,
+        email,
+        password,
+        phone_number,
+        date_birth,
+        profile_image,
+        is_active
+    )
+    VALUES(
+        p_name,
+        p_identification,
+        p_email,
+        p_password,
+        p_phone_number,
+        p_date_birth,
+        p_profile_image,
+        TRUE
+    );
+
+    SET v_id_user = LAST_INSERT_ID();
+
+    INSERT INTO client(
+        id_user,
+        comm_interest,
+        physical_address,
+        occupation
+    )
+    VALUES(
+        v_id_user,
+        p_comm_interest,
+        p_physical_address,
+        p_occupation
+    );
+
+    COMMIT;
+
+END$$
+
+DELIMITER ;
+
+-- Obtener clientes
+
+DROP PROCEDURE IF EXISTS getAllClients;
+
+DELIMITER $$
+
+CREATE PROCEDURE getAllClients()
+BEGIN
+
+    SELECT
+        u.id_user,
+        u.name,
+        u.id,
+        u.email,
+        u.phone_number,
+        u.date_birth,
+        u.profile_image,
+
+        c.comm_interest,
+        c.physical_address,
+        c.occupation
+
+    FROM users u
+    INNER JOIN client c
+        ON u.id_user = c.id_user
+
+    WHERE u.is_active = TRUE;
+
+END$$
+
+DELIMITER ;
+
+-- Buscar cliente por id
+
+DROP PROCEDURE IF EXISTS findClientById;
+
+DELIMITER $$
+
+CREATE PROCEDURE findClientById(
+    IN p_id_user INT
+)
+BEGIN
+
+    SELECT
+        u.id_user,
+        u.name,
+        u.id,
+        u.email,
+        u.phone_number,
+        u.date_birth,
+        u.profile_image,
+
+        c.comm_interest,
+        c.physical_address,
+        c.occupation
+
+    FROM users u
+    INNER JOIN client c
+        ON u.id_user = c.id_user
+
+    WHERE u.id_user = p_id_user
+      AND u.is_active = TRUE;
+
+END$$
+
+DELIMITER ;
+
+-- Actualizar cliente
+
+DROP PROCEDURE IF EXISTS updateClient;
+
+DELIMITER $$
+
+CREATE PROCEDURE updateClient(
+
+    IN p_id_user INT,
+
+    IN p_name VARCHAR(100),
+    IN p_identification INT,
+    IN p_email VARCHAR(100),
+    IN p_password VARCHAR(255),
+    IN p_phone_number VARCHAR(15),
+    IN p_date_birth DATE,
+    IN p_profile_image VARCHAR(500),
+
+    IN p_comm_interest VARCHAR(50),
+    IN p_physical_address VARCHAR(255),
+    IN p_occupation VARCHAR(100)
+
+)
+BEGIN
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+    END;
+
+    START TRANSACTION;
+
+    UPDATE users
+    SET
+        name = p_name,
+        id = p_identification,
+        email = p_email,
+        password = p_password,
+        phone_number = p_phone_number,
+        date_birth = p_date_birth,
+        profile_image = p_profile_image
+    WHERE id_user = p_id_user
+      AND is_active = TRUE;
+
+    UPDATE client
+    SET
+        comm_interest = p_comm_interest,
+        physical_address = p_physical_address,
+        occupation = p_occupation
+    WHERE id_user = p_id_user;
+
+    COMMIT;
+
+END$$
+
+DELIMITER ;
+
+
 -- 02/05/2026 - Creación de la tabla supplier(proveedores) Nolan
 CREATE TABLE supplier (
     id_supplier INT PRIMARY KEY AUTO_INCREMENT,
