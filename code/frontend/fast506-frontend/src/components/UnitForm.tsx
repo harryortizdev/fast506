@@ -40,8 +40,9 @@ const UnitForm = ({ onClose, onRefresh, unitToEdit }: UnitFormProps) => {
   };
 
   return (
-    <div className="card p-3 mb-3">
-      <h3>{unitToEdit ? "Editar Unidad" : "Nueva Unidad"}</h3>
+    
+<div className="container d-flex justify-content-center">
+      <div className="card p-4 shadow-sm" style={{ maxWidth: '500px', width: '100%' }}>      <h3>{unitToEdit ? "Editar Unidad" : "Nueva Unidad"}</h3>
 
       <div className="mb-2">
         <label>VIN</label>
@@ -158,6 +159,7 @@ const UnitForm = ({ onClose, onRefresh, unitToEdit }: UnitFormProps) => {
         <button className="btn btn-secondary" onClick={onClose}>Cancelar</button>
       </div>
     </div>
+        </div>
   );
 };
 

@@ -5,6 +5,8 @@ function App() {
   return (
    <div>
       <SupplierPage />
+      <h1></h1>
+      <h2></h2>
       <UnitPage/>
     </div>
   );

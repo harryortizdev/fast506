@@ -13,7 +13,7 @@ const TableGeneric = <T extends object>({
 }: TableGenericProps<T>) => {
   return (
     <div style={{ padding: "1rem" }}>
-      <table border={1} cellPadding={8} style={{ width: "100%", borderCollapse: "collapse" }}>
+      <table className="table table-striped-columns" border={1} cellPadding={8} style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead style={{ backgroundColor: "#f0f0f0" }}>
           <tr>
             {columns.map((col) => (
