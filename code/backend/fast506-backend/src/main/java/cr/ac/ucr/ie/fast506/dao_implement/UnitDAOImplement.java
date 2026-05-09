@@ -123,36 +123,18 @@ public class UnitDAOImplement implements UnitDAO {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
-    public Unit findByVIN(int vin) {
-         Unit unit = null;
+    public boolean existsByVIN(String vin) {
+        Unit unit = null;
         String sql = "call db_fast506.findUnitByVIN(?);";
-
         try (Connection cn = DBConnection.getConnection(); PreparedStatement ps = cn.prepareStatement(sql)) {
-            ps.setInt(1, vin);
+            ps.setString(1, vin);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 unit = new Unit();
-                unit.setIdCar(rs.getInt("id_car"));
-                unit.setVIN(rs.getString("VIN"));
-                unit.setEngineNumber(rs.getString("engine_number"));
-                unit.setCarBrand(rs.getString("car_brand"));
-                unit.setCarName(rs.getString("car_name"));
-                unit.setLegalBrandName(rs.getString("legal_brand_name"));
-                unit.setYearManufacture(rs.getInt("year_manufacture"));
-                unit.setColor(rs.getString("color"));
-                unit.setTransmission(rs.getString("transmission"));
-                unit.setTraction(rs.getString("traction"));
-                unit.setBodyWork(rs.getString("body_work"));
-                unit.setEngineSize(rs.getString("engine_size"));
-                unit.setFuelType(rs.getString("fuel_type"));
-                unit.setStockStatus(rs.getBoolean("stock_status"));
-                unit.setIdSupplier(rs.getInt("id_supplier"));
-
             }
         } catch (SQLException e) {
             System.err.println("Error al buscar la unidad" + e.getMessage());
         }
-        return unit;
+        return unit != null;
     }
-
 }
