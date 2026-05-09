@@ -1110,7 +1110,105 @@ END$$
 
 DELIMITER ;
 
+-- 09/05/2026 - Creación de la tabla Branch (Ilian)
 
+CREATE TABLE `db_fast506`.`branch` (
+  `id_Branch` INT(11) NOT NULL,
+  `name` VARCHAR(50) NOT NULL,
+  `ubication` VARCHAR(100) NOT NULL,
+  `direction` VARCHAR(100) NOT NULL,
+  `branch_Phone_Number` VARCHAR(15) NOT NULL,
+  `operation_Schedule` VARCHAR(200) NOT NULL,
+  `id_Active` TINYINT NOT NULL,
+  `id_user` INT NULL DEFAULT NULL,
+  PRIMARY KEY (`id_Branch`),
+  INDEX `fk_branch_users_id_idx` (`id_user` ASC) ,
+  CONSTRAINT `fk_branch_users_id`
+    FOREIGN KEY (`id_user`)
+    REFERENCES `db_fast506`.`users` (`id_user`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+-- Procedimiento almacenado obtener Branch
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE `getAllBranch` ()
+BEGIN
+SELECT id_Branch ,name ,ubication , direction ,branch_Phone_Number , operation_Schedule ,id_user FROM Branch Where id_Active = 1;
+END$$
+
+DELIMITER ;
+
+-- Funcionamiento de auto incremento
+
+ALTER TABLE `db_fast506`.`branch` 
+CHANGE COLUMN `id_Branch` `id_Branch` INT(11) NOT NULL AUTO_INCREMENT ;
+
+-- datos de la tabla
+INSERT INTO branch (name, ubication, direction, branch_Phone_Number, operation_Schedule, id_Active, id_user) VALUES
+('Fast506 Guápiles', 'Limón, Pococí', '300 metros oeste de la entrada principal a la UCR', '+506 2710 1234', 'L-V: 8:00am-6:00pm, S: 9:00am-2:00pm', '1', null),
+('Fast506 San José', 'San José, La Uruca', 'Frente a las instalaciones de Repretel', '+506 2222 5678', 'L-V: 7:30am-5:30pm, S: 8:00am-12:00pm', '1', null),
+('Fast506 Grecia', 'Alajuela, Grecia', 'Diagonal al Mercado Municipal', '+506 2494 0011', 'L-V: 8:00am-5:00pm, S: Cerrado', '1', null),
+('Fast506 Escazú', 'San José, Escazú', 'Avenida Escazú, local #45', '+506 2288 9900', 'L-D: 10:00am-8:00pm', '1', null),
+('Fast506 Pérez Zeledón', 'San José, San Isidro', 'Contiguo a la gasolinera JSM', '+506 2771 4433', 'L-V: 8:00am-6:00pm, S: 9:00am-4:00pm', '1', null),
+('Fast506 Liberia', 'Guanacaste, Liberia', '200 metros norte del Aeropuerto Daniel Oduber', '+506 2665 9000', 'L-V: 8:00am-5:30pm, S: 9:00am-1:00pm', '1', null);
+
+-- creacion de procedimiento para agregar sucursales
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE `createBranch` (
+in nameB varchar(50),
+in ubicationb varchar(100),
+in directionB varchar (100),
+in branch_Phone_NumberB varchar(15),
+in operation_ScheduleB varchar(200),
+in id_UserB int )
+BEGIN
+INSERT INTO branch ( name, ubication, direction, branch_Phone_Number, operation_Schedule, id_Active, id_user) VALUES(
+nameB, ubicationb, directionB, branch_Phone_NumberB, operation_ScheduleB, 1, id_UserB);
+END$$
+
+DELIMITER ;
+
+-- procedimiento almacenado Actualizar Sucursal
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE `updateBranch` (
+in id_BranchB int,
+in nameB varchar(50),
+in ubicationb varchar(100),
+in directionB varchar (100),
+in branch_Phone_NumberB varchar(15),
+in operation_ScheduleB varchar(200),
+in id_userB int )
+BEGIN
+update branch set 
+name= nameb,
+ ubication=ubicationb,
+ direction= directionb,
+ branch_Phone_Number= branch_Phone_NumberB,
+ operation_Schedule= operation_ScheduleB,
+ id_user= id_userB
+ WHERE id_Branch = id_BranchB
+ AND id_Active =1;
+END$$
+
+DELIMITER ;
+
+-- procedimiento almacenado eliminar sucursal 
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE `deleteBranch` (in id_BranchB INT)
+BEGIN
+UPDATE branch
+	SET id_active = 0
+    WHERE id_Branch = id_BranchB;
+END$$
+
+DELIMITER ;
 
 
 
