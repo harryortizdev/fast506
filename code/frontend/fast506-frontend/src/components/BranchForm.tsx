@@ -73,58 +73,59 @@ const BranchForm = ({ onClose, onRefresh, branchToEdit }: BranchFormProps) => {
 
 
     return (
-        <div className="card p-3 mb-3">
-            <h3>{branchToEdit ? "Editar Sucursal" : "Nueva Sucursal"}</h3>
+        <div className="container d-flex justify-content-center">
+            <div className="card p-4 shadow-sm" style={{ maxWidth: '500px', width: '100%' }}>
+                <h3>{branchToEdit ? "Editar Sucursal" : "Nueva Sucursal"}</h3>
 
-            <div className="mb-2">
-                <label>Nombre</label>
-                <input className="form-control" name="name" placeholder="Ejemplo: Fast506 San José"
-                    value={form.name || ""} onChange={handleChange} required maxLength={50} type="text" />
-            </div>
+                <div className="mb-2">
+                    <label>Nombre</label>
+                    <input className="form-control" name="name" placeholder="Ejemplo: Fast506 San José"
+                        value={form.name || ""} onChange={handleChange} required maxLength={50} type="text" />
+                </div>
 
-            <div className="mb-2">
-                <label>Ubicación</label>
-                <input className="form-control" name="ubication" placeholder="Ejemplo: San José, Zapote"
-                    value={form.ubication || ""} onChange={handleChange} required maxLength={100} />
-            </div>
+                <div className="mb-2">
+                    <label>Ubicación</label>
+                    <input className="form-control" name="ubication" placeholder="Ejemplo: San José, Zapote"
+                        value={form.ubication || ""} onChange={handleChange} required maxLength={100} />
+                </div>
 
-            <div className="mb-2">
-                <label>Dirección</label>
-                <input className="form-control" name="direction" placeholder="Ejemplo: Frente al Hospital de Niños"
-                    value={form.direction || ""} onChange={handleChange} required maxLength={100} />
-            </div>
+                <div className="mb-2">
+                    <label>Dirección</label>
+                    <input className="form-control" name="direction" placeholder="Ejemplo: Frente al Hospital de Niños"
+                        value={form.direction || ""} onChange={handleChange} required maxLength={100} />
+                </div>
 
 
-            <div className="mb-2">
-                <label>Número de la sucursal</label>
-                <input
-                    className="form-control" name="branchPhoneNumber" value={(form.branchPhoneNumber || "").replace(/\D/g, "").slice(-8)}
-                    onChange={handleChange} minLength={8} maxLength={8} placeholder="Ejemplo:88888888" type="number"
-                />
-            </div>
+                <div className="mb-2">
+                    <label>Número de la sucursal</label>
+                    <input
+                        className="form-control" name="branchPhoneNumber" value={(form.branchPhoneNumber || "").replace(/\D/g, "").slice(-8)}
+                        onChange={handleChange} minLength={8} maxLength={8} placeholder="Ejemplo:88888888" type="number"
+                    />
+                </div>
 
-            <div className="mb-2">
-                <label>Horario de la sucursal</label>
-                <input className="form-control" name="operationSchedule" placeholder="Ejemplo: L-V: 9:00am-5:00pm, S-D: 8:00am-12:00pm"
-                    value={form.operationSchedule || ""} onChange={handleChange} required maxLength={200} />
-            </div>
+                <div className="mb-2">
+                    <label>Horario de la sucursal</label>
+                    <input className="form-control" name="operationSchedule" placeholder="Ejemplo: L-V: 9:00am-5:00pm, S-D: 8:00am-12:00pm"
+                        value={form.operationSchedule || ""} onChange={handleChange} required maxLength={200} />
+                </div>
 
-            <div className="mb-2">
-                <label>Usuario Encargado del registro</label>
-                <select className="form-select" name="idUser"
-                    value={form.idUser || ""} onChange={handleChange} required>
-                    <option value="">Seleccione un encargado</option>
-                    <option value="0">Encargado 1</option>
-                    <option value="0">Encargado 2</option>
-                    <option value="0">Encargado 3</option>
-                </select>
-            </div>
+                <div className="mb-2">
+                    <label>Usuario Encargado del registro</label>
+                    <select className="form-select" name="idUser"
+                        value={form.idUser || ""} onChange={handleChange} required>
+                        <option value="">Seleccione un encargado</option>
+                        <option value="0">Encargado 1</option>
+                        <option value="0">Encargado 2</option>
+                        <option value="0">Encargado 3</option>
+                    </select>
+                </div>
 
-            <div className="mt-3">
-                <button className="btn btn-success me-2" onClick={handleSubmit}>Guardar</button>
-                <button className="btn btn-secondary" onClick={onClose}>Cancelar</button>
-            </div>
-        </div>
+                <div className="mt-3">
+                    <button className="btn btn-success me-2" onClick={handleSubmit}>Guardar</button>
+                    <button className="btn btn-secondary" onClick={onClose}>Cancelar</button>
+                </div>
+            </div></div>
     );
 };
 
