@@ -1,18 +1,17 @@
+import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
+
 const Navbar = () => {
   return (
     <nav className="navbar navbar-expand-lg" style={{ backgroundColor: "#1A2633" }}>
       <div className="container-fluid">
-        <a className="navbar-brand" href="#" style={{ color: "#EEF1EF" }}>
-          <img
-            src={logo}
-            alt="logo"
-            width="80"
-            height="40"
-          />
-        </a>
+        <Link className="navbar-brand" to="/">
+          <img src={logo} alt="logo" width="80" height="40" />
+        </Link>
+
         <div className="collapse navbar-collapse">
           <ul className="navbar-nav mx-auto">
+
             <li className="nav-item dropdown">
               <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style={{ color: "#EEF1EF" }}>
                 AUTOS
@@ -23,6 +22,7 @@ const Navbar = () => {
                 <li><a className="dropdown-item" href="#" style={{ color: "#EEF1EF" }}>CATALOGO 3</a></li>
               </ul>
             </li>
+
             <li className="nav-item dropdown">
               <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style={{ color: "#EEF1EF" }}>
                 SERVICIOS
@@ -31,25 +31,28 @@ const Navbar = () => {
                 <li><a className="dropdown-item" href="#" style={{ color: "#EEF1EF" }}>TEST DRIVE</a></li>
               </ul>
             </li>
+
             <li className="nav-item">
               <a className="nav-link" href="#" style={{ color: "#EEF1EF" }}>CITAS TALLER</a>
             </li>
+
             <li className="nav-item">
               <a className="nav-link" href="#" style={{ color: "#EEF1EF" }}>SUCURSALES</a>
             </li>
-             <li className="nav-item dropdown">
+
+            <li className="nav-item dropdown">
               <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style={{ color: "#EEF1EF" }}>
-                ADMINISTRACI&Oacute;N
+                ADMINISTRACIÓN
               </a>
               <ul className="dropdown-menu" style={{ backgroundColor: "#1A2633" }}>
-                <li><a className="dropdown-item" href="#" style={{ color: "#EEF1EF" }}>UNIDADES</a></li>
-                <li><a className="dropdown-item" href="#" style={{ color: "#EEF1EF" }}>SUCURSALES</a></li>
-                <li><a className="dropdown-item" href="#" style={{ color: "#EEF1EF" }}>PROVEEDORES</a></li>
-                <li><a className="dropdown-item" href="#" style={{ color: "#EEF1EF" }}>USUARIOS</a></li>
+                <li><Link className="dropdown-item" to="/admin/units" style={{ color: "#EEF1EF" }}>UNIDADES</Link></li>
+                <li><Link className="dropdown-item" to="/admin/branches" style={{ color: "#EEF1EF" }}>SUCURSALES</Link></li>
+                <li><Link className="dropdown-item" to="/admin/suppliers" style={{ color: "#EEF1EF" }}>PROVEEDORES</Link></li>
               </ul>
             </li>
+
           </ul>
-         
+
           <ul className="navbar-nav">
             <li className="nav-item dropdown">
               <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -69,6 +72,7 @@ const Navbar = () => {
               </ul>
             </li>
           </ul>
+
         </div>
       </div>
     </nav>
