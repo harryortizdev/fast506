@@ -16,12 +16,16 @@ code {
   background-color: #2C3E50 !important;
   color: #EEF1EF !important;
 }
-
+/* Cambia el color de la tabla*/
 .table {
   background-color: #EEF1EF !important;
 }
-
+/* Cambia el color de los td y tr*/
 .table td, .table tr {
   background-color: #EEF1EF !important;
 }
-
+/* Redondea es swal*/
+.swal-redondo {
+    border-radius: 20px !important;
+    padding: 2rem !important;
+}

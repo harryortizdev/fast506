@@ -6,6 +6,7 @@ import { getAll, deleteUnit } from "../services/UnitService";
 import { Unit } from "../models/Unit";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import AlertConfirm from "../components/AlertConfirm";
 
 const UnitPage = () => {
   const [units, setUnits] = useState<Unit[]>([]);//guardo la lista
@@ -14,6 +15,7 @@ const UnitPage = () => {
 
   const loadUnits = async () => {
     const data = await getAll();//pide al backend la lista
+     console.log(data);
     setUnits(data);//las guarda
   };
 
@@ -39,7 +41,7 @@ const UnitPage = () => {
 
   const handleDelete = async (unit: Unit) => {// cuando presiono el boton eliminar
     if (!unit.idCar) return;//  si no tiene id no haga nada
-    const confirmar = window.confirm(`¿Desea eliminar el vehiculo ${unit.VIN}?`);//confirmación del usuario
+    const confirmar = await AlertConfirm(`¿Desea eliminar el vehículo ${unit.idCar}?`);//confirmación del usuario
     if (!confirmar) return;//si cancela no hago nada
     await deleteUnit(unit.idCar!);//envia la señal al backend de eliminar
     await loadUnits();//recargo la lista 
