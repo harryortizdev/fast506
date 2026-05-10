@@ -5,46 +5,47 @@ import TableGeneric from "../components/TableGeneric";
 import { getAll, deleteUnit } from "../services/UnitService";
 import { Unit } from "../models/Unit";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 const UnitPage = () => {
-  const [units, setUnits] = useState<Unit[]>([]);
-  const [showForm, setShowForm] = useState(false);
-  const [unitToEdit, setUnitToEdit] = useState<Unit | undefined>(undefined);
+  const [units, setUnits] = useState<Unit[]>([]);//guardo la lista
+  const [showForm, setShowForm] = useState(false);//controlo el formulario
+  const [unitToEdit, setUnitToEdit] = useState<Unit | undefined>(undefined);//guarda la unidad que desea editar
 
   const loadUnits = async () => {
-    const data = await getAll();
-    setUnits(data);
+    const data = await getAll();//pide al backend la lista
+    setUnits(data);//las guarda
   };
 
-  useEffect(() => {
-    loadUnits();
-  }, []);
+  useEffect(() => {//cuando la pagina carga por primera vez
+    loadUnits();//carga la lista
+  }, []);//solo se ejecuta una vez
 
   const handleSaveAndClose = async () => {
-    await loadUnits();
-    setUnitToEdit(undefined);
-    setShowForm(false);
+    await loadUnits();//recargo la lista actualizada
+    setUnitToEdit(undefined);//limpio la unidad que se estaba editando
+    setShowForm(false);//limpio el formulario
   };
 
-  const handleClose = () => {
-    setUnitToEdit(undefined);
-    setShowForm(false);
+  const handleClose = () => {//cancelar editar formulario
+    setUnitToEdit(undefined);//limpio la unidad que se estaba editando
+    setShowForm(false);//cierro el formulario
   };
 
-  const handleEdit = (unit: Unit) => {
-    setUnitToEdit(unit);
-    setShowForm(true);
+  const handleEdit = (unit: Unit) => {//cuando presiono el boton editar
+    setUnitToEdit(unit);//guardo la unidad que quiero editar
+    setShowForm(true);//abro el formulario
   };
 
-  const handleDelete = async (unit: Unit) => {
-    if (!unit.idCar) return;
-    const confirmar = window.confirm(`¿Desea eliminar el vehiculo ${unit.VIN}?`);
-    if (!confirmar) return;
-    await deleteUnit(unit.idCar!);
-    await loadUnits();
+  const handleDelete = async (unit: Unit) => {// cuando presiono el boton eliminar
+    if (!unit.idCar) return;//  si no tiene id no haga nada
+    const confirmar = window.confirm(`¿Desea eliminar el vehiculo ${unit.VIN}?`);//confirmación del usuario
+    if (!confirmar) return;//si cancela no hago nada
+    await deleteUnit(unit.idCar!);//envia la señal al backend de eliminar
+    await loadUnits();//recargo la lista 
   };
 
-  const columns: { key: keyof Unit; label: string }[] = [
+  const columns: { key: keyof Unit; label: string }[] = [//defino las columnas a mostrar en la tabla
     { key: "idCar", label: "ID" },
     { key: "VIN", label: "VIN" },
     { key: "carBrand", label: "Marca" },
@@ -53,37 +54,49 @@ const UnitPage = () => {
     { key: "color", label: "Color" },
     { key: "fuelType", label: "Combustible" },
     { key: "stockStatus", label: "En Stock" },
+    { key: "engineNumber", label: "N° Motor" },
+    { key: "legalBrandName", label: "Nombre legal" },
+    { key: "transmission", label: "Tranmisión" },
+    { key: "traction", label: "Tracción" },
+    { key: "bodyWork", label: "Carrocería" },
+    { key: "engineSize", label: "Cilindraje" },
+    { key: "idSupplier", label: "Proovedor" },
   ];
 
   return (
-    <div style={{ backgroundColor: "#EEF1EF", minHeight: "100vh" }}>
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", backgroundColor: "#EEF1EF" }}>
       <Navbar />
-      <div className="container mt-4">
-        <div className="card shadow-sm">
-          <div className="card-header d-flex justify-content-between align-items-center"
-            style={{ backgroundColor: "#2C3E50" }}>
-            <h5 className="mb-0" style={{ color: "#EEF1EF" }}>Gesti&oacute;n de Veh&iacute;culos</h5>
-            <ButtonNew label="Nuevo" onClick={() => setShowForm(true)} />
-          </div>
-          <div className="card-body" style={{ backgroundColor: "#EEF1EF" }}>
-            {!showForm ? (
-              <TableGeneric
-                data={units}
-                columns={columns}
-                onDelete={handleDelete}
-                onEdit={handleEdit}
-              />
-            ) : (
-              <UnitForm
-                onClose={handleClose}
-                onRefresh={handleSaveAndClose}
-                unitToEdit={unitToEdit}
-                units={units}
-              />
-            )}
+
+      <main style={{ flex: 1 }}>
+        <div className="container mt-4">
+          <div className="card shadow-sm">
+            <div className="card-header d-flex justify-content-between align-items-center"
+              style={{ backgroundColor: "#2C3E50" }}>
+              <h5 className="mb-0" style={{ color: "#EEF1EF" }}>Gestión de Vehículos</h5>
+              <ButtonNew label="Nuevo" onClick={() => setShowForm(true)} />
+            </div>
+            <div className="card-body" style={{ backgroundColor: "#EEF1EF" }}>
+              {!showForm ? (
+                <TableGeneric
+                  data={units}
+                  columns={columns}
+                  onDelete={handleDelete}
+                  onEdit={handleEdit}
+                />
+              ) : (
+                <UnitForm
+                  onClose={handleClose}
+                  onRefresh={handleSaveAndClose}
+                  unitToEdit={unitToEdit}
+                  units={units}
+                />
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      </main>
+
+      <Footer />
     </div>
   );
 };
