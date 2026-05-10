@@ -4,6 +4,7 @@ import UnitForm from "../components/UnitForm";
 import TableGeneric from "../components/TableGeneric";
 import { getAll, deleteUnit } from "../services/UnitService";
 import { Unit } from "../models/Unit";
+import Navbar from "../components/Navbar";
 
 const UnitPage = () => {
   const [units, setUnits] = useState<Unit[]>([]);
@@ -55,25 +56,34 @@ const UnitPage = () => {
   ];
 
   return (
-    <div>
-      {!showForm ? (
-        <>
-          <ButtonNew label="Nueva Unidad" onClick={() => setShowForm(true)} />
-          <TableGeneric
-            data={units}
-            columns={columns}
-            onDelete={handleDelete}
-            onEdit={handleEdit}
-          />
-        </>
-      ) : (
-        <UnitForm
-          onClose={handleClose}
-          onRefresh={handleSaveAndClose}
-          unitToEdit={unitToEdit}
-          units={units}
-        />
-      )}
+    <div style={{ backgroundColor: "#EEF1EF", minHeight: "100vh" }}>
+      <Navbar />
+      <div className="container mt-4">
+        <div className="card shadow-sm">
+          <div className="card-header d-flex justify-content-between align-items-center"
+            style={{ backgroundColor: "#2C3E50" }}>
+            <h5 className="mb-0" style={{ color: "#EEF1EF" }}>Gesti&oacute;n de Veh&iacute;culos</h5>
+            <ButtonNew label="Nuevo" onClick={() => setShowForm(true)} />
+          </div>
+          <div className="card-body" style={{ backgroundColor: "#EEF1EF" }}>
+            {!showForm ? (
+              <TableGeneric
+                data={units}
+                columns={columns}
+                onDelete={handleDelete}
+                onEdit={handleEdit}
+              />
+            ) : (
+              <UnitForm
+                onClose={handleClose}
+                onRefresh={handleSaveAndClose}
+                unitToEdit={unitToEdit}
+                units={units}
+              />
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

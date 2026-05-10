@@ -21,7 +21,7 @@ public class UnitDAOImplement implements UnitDAO {
     public LinkedList<Unit> getAll() {
         LinkedList<Unit> list = new LinkedList<>();
 
-        String sql = "call db_fast506.getAllUnits();";
+        String sql = "{call db_fast506.getAllUnits()}";
 
         try (Connection cn = DBConnection.getConnection(); PreparedStatement ps = cn.prepareStatement(sql); ResultSet rs = ps.executeQuery();) {
             System.out.println("Conexión exitosa");
