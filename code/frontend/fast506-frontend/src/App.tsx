@@ -3,6 +3,7 @@ import HomePage from "./pages/HomePage";
 import UnitPage from "./pages/UnitPage";
 import BranchPage from "./pages/BranchPage";
 import SupplierPage from "./pages/SupplierPage";
+import ShowBranches from "./pages/ShowBranches";
 
 function App() {
   return (
@@ -12,6 +13,8 @@ function App() {
         <Route path="/admin/units" element={<UnitPage />} />
         <Route path="/admin/branches" element={<BranchPage />} />
         <Route path="/admin/suppliers" element={<SupplierPage />} />
+        <Route path="/branches" element={<ShowBranches />} />
+
       </Routes>
     </BrowserRouter>
   );

@@ -37,7 +37,7 @@ const Navbar = () => {
             </li>
 
             <li className="nav-item">
-              <a className="nav-link" href="#" style={{ color: "#EEF1EF" }}>SUCURSALES</a>
+              <a className="nav-link" href="/branches" style={{ color: "#EEF1EF" }}>SUCURSALES</a>
             </li>
 
             <li className="nav-item dropdown">
