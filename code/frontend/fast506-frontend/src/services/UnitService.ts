@@ -31,5 +31,6 @@ export const updateUnit = async (unit: Unit) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(unit),
   });
+ 
   return res.text();
 };

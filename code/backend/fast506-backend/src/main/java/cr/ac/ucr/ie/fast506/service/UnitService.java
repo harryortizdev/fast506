@@ -22,7 +22,10 @@ public class UnitService {
     }
 
     public void add(Unit unit) {
-
+        if (existsByVIN(unit.getVIN())) {
+            throw new IllegalArgumentException("El VIN ya está registrado.");
+        }
+        validate(unit);
         unitDAO.add(unit);
     }
 
@@ -31,6 +34,7 @@ public class UnitService {
     }
 
     public void update(Unit unit) {
+        validate(unit);
         unitDAO.update(unit);
     }
 
@@ -39,16 +43,13 @@ public class UnitService {
     }
 
     private void validate(Unit unit) {
-        if (existsByVIN(unit.getVIN())) {
-            throw new IllegalArgumentException("El VIN ya está registrado.");
-        }
 
         if (unit.getVIN() == null || !unit.getVIN().matches("^[A-HJ-NPR-Za-hj-npr-z0-9]{17}$")) {
             throw new IllegalArgumentException("VIN inválido: debe tener 17 caracteres alfanuméricos sin las letras I, O o Q.");
         }
 
-        if (unit.getEngineNumber() == null || !unit.getEngineNumber().matches("^[A-Za-z0-9]{1,17}$")) {
-            throw new IllegalArgumentException("Número de motor inválido: solo letras y números, máximo 17 caracteres.");
+        if (unit.getEngineNumber() == null || unit.getEngineNumber().trim().isEmpty() || unit.getEngineNumber().length() > 17) {
+            throw new IllegalArgumentException("Número de motor inválido: debe llenar el espacio y máximo 17 caracteres.");
         }
 
         if (unit.getCarBrand() == null || !unit.getCarBrand().matches("^[a-záéíóúüñA-ZÁÉÍÓÚÜÑ\\s]{1,100}$")) {
@@ -59,8 +60,8 @@ public class UnitService {
             throw new IllegalArgumentException("Nombre inválido: solo letras y espacios, máximo 100 caracteres.");
         }
 
-        if (unit.getLegalBrandName() == null || !unit.getLegalBrandName().matches("^[a-záéíóúüñA-ZÁÉÍÓÚÜÑ\\s]{1,100}$")) {
-            throw new IllegalArgumentException("Nombre legal inválido: solo letras y espacios, máximo 100 caracteres.");
+        if (unit.getLegalBrandName() == null || unit.getLegalBrandName().trim().isEmpty() || unit.getLegalBrandName().length() > 100) {
+            throw new IllegalArgumentException("Nombre legal inválido: no puede estar vacío, máximo 100 caracteres.");
         }
 
         if (unit.getYearManufacture() <= 0) {
