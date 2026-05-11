@@ -1145,14 +1145,7 @@ DELIMITER ;
 ALTER TABLE `db_fast506`.`branch` 
 CHANGE COLUMN `id_Branch` `id_Branch` INT(11) NOT NULL AUTO_INCREMENT ;
 
--- datos de la tabla
-INSERT INTO branch (name, ubication, direction, branch_Phone_Number, operation_Schedule, id_Active, id_user) VALUES
-('Fast506 Guápiles', 'Limón, Pococí', '300 metros oeste de la entrada principal a la UCR', '+506 2710 1234', 'L-V: 8:00am-6:00pm, S: 9:00am-2:00pm', '1', null),
-('Fast506 San José', 'San José, La Uruca', 'Frente a las instalaciones de Repretel', '+506 2222 5678', 'L-V: 7:30am-5:30pm, S: 8:00am-12:00pm', '1', null),
-('Fast506 Grecia', 'Alajuela, Grecia', 'Diagonal al Mercado Municipal', '+506 2494 0011', 'L-V: 8:00am-5:00pm, S: Cerrado', '1', null),
-('Fast506 Escazú', 'San José, Escazú', 'Avenida Escazú, local #45', '+506 2288 9900', 'L-D: 10:00am-8:00pm', '1', null),
-('Fast506 Pérez Zeledón', 'San José, San Isidro', 'Contiguo a la gasolinera JSM', '+506 2771 4433', 'L-V: 8:00am-6:00pm, S: 9:00am-4:00pm', '1', null),
-('Fast506 Liberia', 'Guanacaste, Liberia', '200 metros norte del Aeropuerto Daniel Oduber', '+506 2665 9000', 'L-V: 8:00am-5:30pm, S: 9:00am-1:00pm', '1', null);
+
 
 -- creacion de procedimiento para agregar sucursales
 
@@ -1210,5 +1203,122 @@ END$$
 
 DELIMITER ;
 
+-- 10/5/2026 (Ajustes para ingresar un nuevo atributo a Branch (Coordinates))
 
+-- Nueva columna coordenadas
+ALTER TABLE `db_fast506`.`branch` 
+ADD COLUMN `coordinates` VARCHAR(40) NOT NULL AFTER `id_Active`;
+
+-- PA guardar Branch
+
+USE `db_fast506`;
+DROP procedure IF EXISTS `createBranch`;
+
+USE `db_fast506`;
+DROP procedure IF EXISTS `db_fast506`.`createBranch`;
+;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `createBranch`(
+in nameB varchar(50),
+in ubicationb varchar(100),
+in directionB varchar (100),
+in branch_Phone_NumberB varchar(15),
+in operation_ScheduleB varchar(200),
+in coordinatesB varchar(40),
+in id_UserB int )
+BEGIN
+INSERT INTO branch ( name, ubication, direction, branch_Phone_Number, operation_Schedule, id_Active, coordinates, id_user) VALUES(
+nameB, ubicationb, directionB, branch_Phone_NumberB, operation_ScheduleB, 1, coordinatesB ,id_UserB);
+END$$
+
+DELIMITER ;
+;
+
+-- PA Obtener todas las Sucursales
+
+USE `db_fast506`;
+DROP procedure IF EXISTS `getAllBranch`;
+
+USE `db_fast506`;
+DROP procedure IF EXISTS `db_fast506`.`getAllBranch`;
+;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getAllBranch`()
+BEGIN
+SELECT id_Branch ,name ,ubication , direction ,branch_Phone_Number , operation_Schedule, coordinates ,id_user FROM Branch Where id_Active = 1;
+END$$
+
+DELIMITER ;
+;
+
+-- PA Actualizar Sucursal
+
+USE `db_fast506`;
+DROP procedure IF EXISTS `updateBranch`;
+
+USE `db_fast506`;
+DROP procedure IF EXISTS `db_fast506`.`updateBranch`;
+;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `updateBranch`(
+in id_BranchB int,
+in nameB varchar(50),
+in ubicationb varchar(100),
+in directionB varchar (100),
+in branch_Phone_NumberB varchar(15),
+in operation_ScheduleB varchar(200),
+in coordinatesB varchar(40),
+in id_userB int )
+BEGIN
+update branch set 
+name= nameb,
+ ubication=ubicationb,
+ direction= directionb,
+ branch_Phone_Number= branch_Phone_NumberB,
+ operation_Schedule= operation_ScheduleB,
+ coordinates = coordinatesB,
+ id_user= id_userB
+ WHERE id_Branch = id_BranchB
+ AND id_Active =1;
+END$$
+
+DELIMITER ;
+;
+
+-- Eliminacion de datos de prueba
+DELETE FROM branch where id_Branch=1;
+DELETE FROM branch where id_Branch=2;
+DELETE FROM branch where id_Branch=3;
+DELETE FROM branch where id_Branch=4;
+DELETE FROM branch where id_Branch=5;
+DELETE FROM branch where id_Branch=6;
+DELETE FROM branch where id_Branch=7;
+DELETE FROM branch where id_Branch=8;
+DELETE FROM branch where id_Branch=9;
+DELETE FROM branch where id_Branch=10;
+DELETE FROM branch where id_Branch=11;
+DELETE FROM branch where id_Branch=12;
+DELETE FROM branch where id_Branch=13;
+DELETE FROM branch where id_Branch=14;
+DELETE FROM branch where id_Branch=15;
+DELETE FROM branch where id_Branch=16;
+DELETE FROM branch where id_Branch=17;
+DELETE FROM branch where id_Branch=18;
+DELETE FROM branch where id_Branch=19;
+DELETE FROM branch where id_Branch=20;
+
+-- Datos con 'coordinates' después de 'id_Active' y antes de 'id_user'
+INSERT INTO branch (name, ubication, direction, branch_Phone_Number, operation_Schedule, id_Active, coordinates, id_user) VALUES
+('Fast506 Guápiles', 'Limón, Pococí', 'Frente a la UCR Recinto de Guápiles', '+506 2710 1234', 'L-V: 8:00am-6:00pm, S: 9:00am-2:00pm', '1', '10.211306686307188, -83.77130550738062', NULL),
+('Fast506 San José', 'San José, La Uruca', 'Frente a las instalaciones de Repretel', '+506 2222 5678', 'L-V: 7:30am-5:30pm, S: 8:00am-12:00pm', '1', '9.955604275880729, -84.1164932910103', NULL),
+('Fast506 Grecia', 'Alajuela, Grecia', '600 metros Oeste del Hospital de Grecia', '+506 2494 0011', 'L-V: 8:00am-5:00pm, S: Cerrado', '1', '10.070330987790673, -84.32156284301192', NULL),
+('Fast506 Escazú', 'San José, Escazú', 'Centro Comercial Escazu Village', '+506 2288 9900', 'L-D: 10:00am-8:00pm', '1', '9.933832242947375, -84.12909517764673', NULL),
+('Fast506 Pérez Zeledón', 'San José, San Isidro', 'Contiguo a la gasolinera El Jorón', '+506 2771 4433', 'L-V: 8:00am-6:00pm, S: 9:00am-4:00pm', '1', '9.330757708994817, -83.669410048738', NULL),
+('Fast506 Liberia', 'Guanacaste, Liberia', 'Frente a la entrada al Aeropuerto Daniel Oduber', '+506 2665 9000', 'L-V: 8:00am-5:30pm, S: 9:00am-1:00pm', '1', '10.596253373403933, -85.52703150704106', NULL);
 

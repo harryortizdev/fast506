@@ -70,7 +70,7 @@ const UnitPage = () => {
       <Navbar />
 
       <main style={{ flex: 1 }}>
-        <div className="container mt-4">
+        <div className="container mt-4 mb-4">
           <div className="card shadow-sm">
             <div className="card-header d-flex justify-content-between align-items-center"
               style={{ backgroundColor: "#2C3E50" }}>

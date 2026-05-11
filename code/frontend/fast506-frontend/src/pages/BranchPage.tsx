@@ -4,6 +4,10 @@ import BranchForm from "../components/BranchForm";
 import TableGeneric from "../components/TableGeneric";
 import { getAll, deleteBranch } from "../services/BranchService";
 import { Branch } from "../models/Branch";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import AlertConfirm from "../components/AlertConfirm";
+import AlertWarning from "../components/AlertWarning";
 
 
 
@@ -41,9 +45,10 @@ const BranchPage = () => {
 
   const handleDelete = async (branch: Branch) => {
     if (!branch.idBranch) return;
-    const confirmar = window.confirm(`¿Desea eliminar la Sucursal ${branch.name}?`);
+    const confirmar = await AlertConfirm(`¿Desea eliminar la sucursal ${branch.name}?`);
     if (!confirmar) return;
     await deleteBranch(branch.idBranch!);
+    AlertWarning("Sucursal eliminada correctamente.");
     await loadBranch();
   };
 
@@ -59,24 +64,38 @@ const BranchPage = () => {
   ];
 
   return (
-    <div>
-      {!showForm ? (
-        <>
-          <ButtonNew label="Nueva Sucursal" onClick={() => setShowForm(true)} />
-          <TableGeneric
-            data={branch}
-            columns={columns}
-            onDelete={handleDelete}
-            onEdit={handleEdit}
-          />
-        </>
-      ) : (
-        <BranchForm
-          onClose={handleClose}
-          onRefresh={handleSaveAndClose}
-          branchToEdit={branchToEdit}
-        />
-      )}
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", backgroundColor: "#EEF1EF" }}>
+      <Navbar />
+
+      <main style={{ flex: 1 }}>
+        <div className="container mt-4 mb-4">
+          <div className="card shadow-sm">
+            <div className="card-header d-flex justify-content-between align-items-center"
+              style={{ backgroundColor: "#2C3E50" }}>
+              <h5 className="mb-0" style={{ color: "#EEF1EF" }}>Gestión de Sucursales</h5>
+              <ButtonNew label="Nuevo" onClick={() => setShowForm(true)} />
+            </div>
+            <div className="card-body" style={{ backgroundColor: "#EEF1EF" }}>
+              {!showForm ? (
+                <TableGeneric
+                  data={branch}
+                  columns={columns}
+                  onDelete={handleDelete}
+                  onEdit={handleEdit}
+                />
+              ) : (
+                <BranchForm
+                  onClose={handleClose}
+                  onRefresh={handleSaveAndClose}
+                  branchToEdit={branchToEdit}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <Footer />
     </div>
   );
 };

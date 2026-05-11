@@ -6,6 +6,7 @@ direction: string;
 branchPhoneNumber : string;
 operationSchedule : string;
 isActive : boolean;
+coordinates : string;
 idUser : number;
 
 }

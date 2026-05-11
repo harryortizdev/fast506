@@ -4,7 +4,7 @@ const AlertConfirm = async (mensaje: string): Promise<boolean> => {
     const result = await Swal.fire({
         title: "¿Está seguro?",
         text: mensaje,
-        icon: "warning",
+        icon: "question",
         showCancelButton: true,
         confirmButtonColor: "#d33",
         cancelButtonColor: "#6c757d",

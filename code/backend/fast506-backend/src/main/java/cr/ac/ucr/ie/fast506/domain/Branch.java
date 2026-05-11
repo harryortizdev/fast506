@@ -15,6 +15,7 @@ public class Branch {
     private String operationSchedule;
     private boolean isActive;
     private int idUser;
+    private String coordinates; 
     
     
     public Branch() {
@@ -83,5 +84,14 @@ public class Branch {
     public void setIdUser(int idUser) {
         this.idUser = idUser;
     }
+
+    public String getCoordinates() {
+        return coordinates;
+    }
+
+    public void setCoordinates(String coordinates) {
+        this.coordinates = coordinates;
+    }
        
+    
 }

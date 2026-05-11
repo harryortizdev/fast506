@@ -38,6 +38,7 @@ public class BranchDAOImplement implements BranchDAO {
                 branch.setDirection(rs.getString("direction"));
                 branch.setBranchPhoneNumber(rs.getString("branch_Phone_Number"));
                 branch.setOperationSchedule(rs.getString("operation_Schedule"));
+                branch.setCoordinates(rs.getString("coordinates"));
                 branch.setIdUser(rs.getInt("id_user"));
 
                 list.add(branch);
@@ -51,7 +52,7 @@ public class BranchDAOImplement implements BranchDAO {
 
     @Override
     public void add(Branch branch) {
-        String sql = "call db_fast506.createBranch(?, ?, ?, ?, ?, null);";
+        String sql = "call db_fast506.createBranch(?, ?, ?, ?, ?, ?, null);";
 
         try (Connection cn = DBConnection.getConnection(); PreparedStatement ps = cn.prepareStatement(sql);) {
 
@@ -60,8 +61,9 @@ public class BranchDAOImplement implements BranchDAO {
             ps.setString(3, branch.getDirection());
             ps.setString(4, branch.getBranchPhoneNumber());
             ps.setString(5, branch.getOperationSchedule());
-            //ps.setInt(6, branch.getIdUser());
+            ps.setString(6, branch.getCoordinates());
 
+            //ps.setInt(6, branch.getIdUser());
             ps.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Error al crear sucursal " + e.getMessage());
@@ -70,7 +72,7 @@ public class BranchDAOImplement implements BranchDAO {
 
     @Override
     public void update(Branch branch) {
-        String sql = "call db_fast506.updateBranch(?, ?, ?, ?, ?, ?, null);";
+        String sql = "call db_fast506.updateBranch(?, ?, ?, ?, ?, ?, ?, null);";
 
         try (Connection cn = DBConnection.getConnection(); PreparedStatement ps = cn.prepareStatement(sql);) {
 
@@ -80,6 +82,7 @@ public class BranchDAOImplement implements BranchDAO {
             ps.setString(4, branch.getDirection());
             ps.setString(5, branch.getBranchPhoneNumber());
             ps.setString(6, branch.getOperationSchedule());
+            ps.setString(7, branch.getCoordinates());
             //ps.setInt(7, branch.getIdUser());
 
             ps.executeUpdate();
