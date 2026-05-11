@@ -18,7 +18,7 @@ const UnitForm = ({ onClose, onRefresh, unitToEdit, units }: UnitFormProps) => {
     unitToEdit || { yearManufacture: currentYear } //si viene unitToEdit precarga los datos de unit
   );
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);//guarda la lista de proveedores
-  const [errors, setErrors] = useState<Partial<Record<keyof Unit, string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof Unit, string>>>({});//guardar los errores para mostrarlos
 
   useEffect(() => {
     getAll().then(setSuppliers);//cuando carga llama al API de supplier y guarda el resultado
