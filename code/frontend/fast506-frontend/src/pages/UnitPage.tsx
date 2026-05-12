@@ -15,7 +15,7 @@ const UnitPage = () => {
 
   const loadUnits = async () => {
     const data = await getAll();//pide al backend la lista
-     console.log(data);
+    console.log(data);
     setUnits(data);//las guarda
   };
 
@@ -66,18 +66,30 @@ const UnitPage = () => {
   ];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", backgroundColor: "#EEF1EF" }}>
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", backgroundColor: "#EEF1EF", }}>
+
       <Navbar />
 
       <main style={{ flex: 1 }}>
-        <div className="container mt-4 mb-4">
-          <div className="card shadow-sm">
-            <div className="card-header d-flex justify-content-between align-items-center"
-              style={{ backgroundColor: "#2C3E50" }}>
-              <h5 className="mb-0" style={{ color: "#EEF1EF" }}>Gestión de Vehículos</h5>
-              <ButtonNew label="Nuevo" onClick={() => setShowForm(true)} />
+        <div className="container-fluid container-md mt-3 mt-md-4 mb-4 px-2 px-md-4">
+          <div className="card shadow-sm border-0">
+            <div
+              className="card-header d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center gap-2"
+              style={{ backgroundColor: "#2C3E50" }}
+            >
+              <h5 className="mb-0 text-center text-md-start" style={{ color: "#EEF1EF" }}>
+                Gestión de Vehículos
+              </h5>
+
+              <div className="d-flex justify-content-center justify-content-md-end">
+                <ButtonNew label="Nuevo" onClick={() => setShowForm(true)} />
+              </div>
             </div>
-            <div className="card-body" style={{ backgroundColor: "#EEF1EF" }}>
+
+            <div
+              className="card-body p-2 p-md-4"
+              style={{ backgroundColor: "#EEF1EF" }}
+            >
               {!showForm ? (
                 <TableGeneric
                   data={units}
