@@ -218,6 +218,7 @@ CALL insertAdministrator(
 
 );
 
+
 -- Editar administrador
 
 DROP PROCEDURE IF EXISTS updateAdministrator;
