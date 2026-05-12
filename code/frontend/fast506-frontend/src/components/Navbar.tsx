@@ -60,6 +60,9 @@ const Navbar = () => {
                 <li><Link className="dropdown-item" to="/admin/units" style={{ color: "#EEF1EF" }}>UNIDADES</Link></li>
                 <li><Link className="dropdown-item" to="/admin/branches" style={{ color: "#EEF1EF" }}>SUCURSALES</Link></li>
                 <li><Link className="dropdown-item" to="/admin/suppliers" style={{ color: "#EEF1EF" }}>PROVEEDORES</Link></li>
+                <li><Link className="dropdown-item" to="/admin/administrators" style={{ color: "#EEF1EF" }}>ADMINISTRADORES</Link></li>
+                <li><Link className="dropdown-item" to="/admin/clients" style={{ color: "#EEF1EF" }}>CLIENTES</Link></li>
+                <li><Link className="dropdown-item" to="/admin/mechanics" style={{ color: "#EEF1EF" }}>MECANICOS</Link></li>
               </ul>
             </li>
 
