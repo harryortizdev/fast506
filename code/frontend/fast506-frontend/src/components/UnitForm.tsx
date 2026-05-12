@@ -4,6 +4,7 @@ import { Supplier } from "../models/Supplier";
 import { create, updateUnit } from "../services/UnitService";
 import { getAll } from "../services/SupplierService";
 import AlertSuccess from "./AlertSuccess";
+import AlertWarning from "./AlertWarning";
 
 interface UnitFormProps { //define que props recibe el componente
   onClose: () => void;//vienen del padre del unitPage, cierra el form
@@ -85,7 +86,7 @@ const UnitForm = ({ onClose, onRefresh, unitToEdit, units }: UnitFormProps) => {
     if (!unitToEdit) {//solo entra si es creación no edición
       const vinExiste = units.some((u: Unit) => u.VIN === form.VIN);//recorre la lista y por cada vin compara con el que se va a registrar
       if (vinExiste) {//si encuentra alguna unidad igual
-        alert("El VIN ya está registrado.");//ya existe
+        AlertWarning("El VIN ya está registrado.");//ya existe
         return;//cancela guardar
       }
     }
@@ -106,7 +107,7 @@ const UnitForm = ({ onClose, onRefresh, unitToEdit, units }: UnitFormProps) => {
       onRefresh();//refresca la tabla
       onClose();//cierra el formulario
     } catch (error) {
-      alert("Error al guardar");// si algo da error
+      AlertWarning("Error al guardar");// si algo da error
     }
   };
 

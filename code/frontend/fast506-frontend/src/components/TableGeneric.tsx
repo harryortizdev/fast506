@@ -1,60 +1,106 @@
-interface TableGenericProps<T> {//define los tipos de props que recibe tablegeneric
+import React from "react";
+
+interface TableGenericProps<T> {
   data: T[];
   columns: { key: keyof T; label: string }[];
   onDelete?: (item: T) => void;
   onEdit?: (item: T) => void;
 }
 
-const stickyRight = (bg = "#EEF1EF"): React.CSSProperties => ({//funcion de css
-  position: "sticky",//la columna se queda fija
-  right: 0, //la pega al lado derecho
-  backgroundColor: bg,//le da color para tapar lo que queda detras
-  whiteSpace: "nowrap", //evita que el texto se parta en varias lineas
-  borderLeft: "2px solid #A9B4C2", //borde izquierdo para separar la columna
+const stickyRight = (bg = "#EEF1EF"): React.CSSProperties => ({
+  position: "sticky",
+  right: 0,
+  backgroundColor: bg,
+  whiteSpace: "nowrap",
+  borderLeft: "2px solid #A9B4C2",
 });
 
-const TableGeneric = <T extends object>({ data, columns, onDelete, onEdit }: TableGenericProps<T>) => {
+const TableGeneric = <T extends object>({
+  data,
+  columns,
+  onDelete,
+  onEdit,
+}: TableGenericProps<T>) => {
   return (
-    <div style={{ maxHeight: "400px", overflowY: "auto", overflowX: "auto" }}>
-      <table className="table table-hover" style={{ minWidth: "900px", backgroundColor: "#EEF1EF", borderCollapse: "separate", borderSpacing: 0 }}>
-
+    <div className="table-responsive" style={{ maxHeight: "400px", overflowY: "auto", overflowX: "auto", borderRadius: "10px",}}>
+      <table className="table table-hover align-middle" style={{ minWidth: "750px", backgroundColor: "#EEF1EF", borderCollapse: "separate", borderSpacing: 0,}}>
         <thead style={{ position: "sticky", top: 0, zIndex: 2 }}>
           <tr>
             {columns.map((col) => (
-              <th key={String(col.key)} style={{ backgroundColor: "#A9B4C2", whiteSpace: "nowrap" }}>
+              <th
+                key={String(col.key)}
+                style={{
+                  backgroundColor: "#A9B4C2",
+                  whiteSpace: "nowrap",
+                  fontSize: "clamp(0.8rem, 1vw, 1rem)",
+                }}
+              >
                 {col.label}
               </th>
             ))}
-            <th style={{ ...stickyRight("#A9B4C2"), zIndex: 3, width: "1%" }}>Acciones</th>
+
+            <th
+              style={{
+                ...stickyRight("#A9B4C2"),
+                zIndex: 3,
+                width: "1%",
+                fontSize: "clamp(0.8rem, 1vw, 1rem)",
+              }}
+            >
+              Acciones
+            </th>
           </tr>
         </thead>
 
         <tbody>
           {data.length === 0 ? (
             <tr>
-              <td colSpan={columns.length + 1} style={{ textAlign: "center" }}>No hay datos</td>
+              <td colSpan={columns.length + 1} className="text-center">
+                No hay datos
+              </td>
             </tr>
           ) : (
             data.map((item, index) => (
               <tr key={index}>
                 {columns.map((col) => (
-                  <td key={String(col.key)} style={{ whiteSpace: "nowrap" }}>
-                    {typeof item[col.key] === "boolean" ? (item[col.key] ? "Sí" : "No") : String(item[col.key])}
+                  <td
+                    key={String(col.key)}
+                    style={{
+                      whiteSpace: "nowrap",
+                      fontSize: "clamp(0.8rem, 1vw, 0.95rem)",
+                    }}
+                  >
+                    {typeof item[col.key] === "boolean"
+                      ? item[col.key]
+                        ? "Sí"
+                        : "No"
+                      : String(item[col.key])}
                   </td>
                 ))}
+
                 <td style={{ ...stickyRight(), width: "1%" }}>
-                  <button className="btn btn-outline-warning me-2" onClick={() => onEdit?.(item)}>
-                    <i className="bi bi-pencil-square"></i> Editar
-                  </button>
-                  <button className="btn btn-outline-danger" onClick={() => onDelete?.(item)}>
-                    <i className="bi bi-trash3"></i> Eliminar
-                  </button>
+                  <div className="d-flex flex-column flex-sm-row gap-2">
+                    <button
+                      className="btn btn-outline-warning btn-sm"
+                      onClick={() => onEdit?.(item)}
+                    >
+                      <i className="bi bi-pencil-square"></i>
+                      <span className="d-none d-md-inline ms-1">Editar</span>
+                    </button>
+
+                    <button
+                      className="btn btn-outline-danger btn-sm"
+                      onClick={() => onDelete?.(item)}
+                    >
+                      <i className="bi bi-trash3"></i>
+                      <span className="d-none d-md-inline ms-1">Eliminar</span>
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))
           )}
         </tbody>
-
       </table>
     </div>
   );
