@@ -1,10 +1,10 @@
-interface buttonIcon {
+interface ButtonIconProps {
   label: string;
   onClick: () => void;
   icon: string; // Nueva propiedad para el símbolo
 }
 
-const ButtonNew = ({ label, onClick, icon }: buttonIcon) => {
+const ButtonIcon = ({ label, onClick, icon }: ButtonIconProps) => {
   return (
     <button
       className="btn mb-3"
@@ -18,4 +18,4 @@ const ButtonNew = ({ label, onClick, icon }: buttonIcon) => {
   );
 };
 
-export default ButtonNew;
+export default ButtonIcon;
