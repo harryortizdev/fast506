@@ -1,5 +1,6 @@
 -- 22/04/2026 - Creación de la base de datos (Harry)
 CREATE DATABASE IF NOT EXISTS db_fast506;
+
 USE db_fast506;
 
 -- 02/05/2026 - Creación de la tabla Users (Allan)
@@ -67,6 +68,7 @@ CREATE TABLE client (
     ON UPDATE CASCADE
     
 );
+
 -- lo puso Nolan para probar
 -- Insertar un usuario en la tabla users
 INSERT INTO `db_fast506`.`users`  (name, id, email, password, phone_number, date_birth, profile_image)
@@ -88,7 +90,7 @@ CREATE TABLE supplier (
     
     ubicacion VARCHAR(100) NOT NULL,
     
-    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_active BOOLEAN DEFAULT TRUE,
     
     -- Llave foránea de Administrador
     admin_id INT NOT NULL,
