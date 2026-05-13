@@ -57,7 +57,6 @@ const AdministratorPage = () => {
     const columns: { key: keyof Administrator; label: string }[] = [
         { key: "name", label: "Nombre" },
         { key: "email", label: "Email" },
-        { key: "password", label: "Contraseña" },
         { key: "phoneNumber", label: "Telefono" },
         { key: "dateBirth", label: "Fecha de Nacimiento" },
         { key: "profileImage", label: "Imagen de Perfil" },

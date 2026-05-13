@@ -5,6 +5,9 @@ import TableGeneric from "../components/TableGeneric";
 import { getAll, deleteClient } from "../services/ClientService";
 import { Client } from "../models/Client";
 
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+
 const ClientPage = () => {
 
     const [clients, setClients] = useState<Client[]>([]);
@@ -51,7 +54,6 @@ const ClientPage = () => {
     const columns: { key: keyof Client; label: string }[] = [
         { key: "name", label: "Nombre" },
         { key: "email", label: "Email" },
-        { key: "password", label: "Contraseña" },
         { key: "phoneNumber", label: "Telefono" },
         { key: "dateBirth", label: "Fecha de Nacimiento" },
         { key: "profileImage", label: "Imagen de Perfil" },
@@ -61,25 +63,52 @@ const ClientPage = () => {
 
     return (
 
-        <div>
-            {!showForm ? (
-                <>
-                    <ButtonNew label="Nuevo Cliente" onClick={() => setShowForm(true)} />
-                    <TableGeneric
-                        data={clients}
-                        columns={columns}
-                        onDelete={handleDelete}
-                        onEdit={handleEdit}
-                    />
-                </>
-            ) : (
-                <ClientForm
-                    onClose={handleClose}
-                    onRefresh={handleSaveAndClose}
-                    clientToEdit={clientToEdit}
+      <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", backgroundColor: "#EEF1EF", }}>
+
+      <Navbar />
+
+      <main style={{ flex: 1 }}>
+        <div className="container-fluid container-md mt-3 mt-md-4 mb-4 px-2 px-md-4">
+          <div className="card shadow-sm border-0">
+            <div
+              className="card-header d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center gap-2"
+              style={{ backgroundColor: "#2C3E50" }}
+            >
+              <h5 className="mb-0 text-center text-md-start" style={{ color: "#EEF1EF" }}>
+                Gestión de Clientes
+              </h5>
+
+              <div className="d-flex justify-content-center justify-content-md-end">
+                <ButtonNew label="Nuevo" onClick={() => setShowForm(true)} />
+              </div>
+            </div>
+
+            <div
+              className="card-body p-2 p-md-4"
+              style={{ backgroundColor: "#EEF1EF" }}
+            >
+              {!showForm ? (
+                <TableGeneric
+                  data={clients}
+                  columns={columns}
+                  onDelete={handleDelete}
+                  onEdit={handleEdit}
                 />
-            )}
+              ) : (
+                <ClientForm
+                  onClose={handleClose}
+                  onRefresh={handleSaveAndClose}
+                  clientToEdit={clientToEdit}
+                  //clients={clients}
+                />
+              )}
+            </div>
+          </div>
         </div>
+      </main>
+
+      <Footer />
+    </div>
 
     );
 

@@ -4,7 +4,7 @@ const API_URL = "http://localhost:8080/api/clients";
 // Fetch getAll
 export const getAll = async () => {
 
-    const res = await fetch('${API_URL}/all');
+    const res = await fetch(`${API_URL}/all`);
     return res.json();
 
 }
@@ -13,11 +13,14 @@ export const getAll = async () => {
 
 export const create = async (client: Partial<Client>) => {
 
-    const res = await fetch('${API_URL}/create', {
+    const res = await fetch(`${API_URL}/create`, {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(client),
     });
+    if (!res.ok) {
+        throw new Error(`Error creating client: ${res.statusText}`);
+    }
     return res.text();
 
 };
@@ -26,7 +29,7 @@ export const create = async (client: Partial<Client>) => {
 
 export const deleteClient = async (id: number) => {
 
-    const res = await fetch('${API_URL}/delete?id=${id}', {
+    const res = await fetch(`${API_URL}/delete?id=${id}`, {
 
         method: "DELETE",
 
@@ -40,13 +43,16 @@ export const deleteClient = async (id: number) => {
 
 export const updateClient = async (client: Client) => {
 
-    const res = await fetch('${API_URL}/update', {
+    const res = await fetch(`${API_URL}/update`, {
 
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(client),
 
     });
+    if (!res.ok) {
+        throw new Error(`Error updating client: ${res.statusText}`);
+    }
 
     return res.text();
 

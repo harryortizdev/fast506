@@ -31,21 +31,37 @@ const AdministratorForm = ({ onClose, onRefresh, administratorToEdit }: Administ
 
         try {
             if (administratorToEdit) {
-
-                const { profileImage, ...formWithoutImage } = form;
-                await updateAdministrator(formWithoutImage as Administrator);
-
-                await updateAdministrator(form as Administrator);
-
+                // Merge original data with form changes
+                const dataToSend = {
+                    ...administratorToEdit,
+                    ...form,
+                    dateBirth: form.dateBirth 
+                        ? new Date(form.dateBirth).toISOString().split('T')[0]
+                        : administratorToEdit.dateBirth,
+                    profileImage: administratorToEdit.profileImage || ""
+                };
+                console.log("Enviando datos de actualización:", dataToSend);
+                await updateAdministrator(dataToSend as unknown as Administrator);
                 alert("Administrador actualizado correctamente");
             } else {
-                await create(form as Administrator);
+                // Create new administrator with form data
+                const dataToSend = {
+                    ...form,
+                    dateBirth: form.dateBirth 
+                        ? new Date(form.dateBirth).toISOString().split('T')[0]
+                        : null,
+                    profileImage: form.profileImage || "",
+                    isActive: form.isActive !== undefined ? form.isActive : true
+                };
+                console.log("Enviando datos de creación:", dataToSend);
+                await create(dataToSend as unknown as Administrator);
                 alert("Administrador creado correctamente");
             }
             onRefresh();
             onClose();
         } catch (error) {
-            alert("Error al guardar");
+            console.error("Error al guardar:", error);
+            alert(`Error al guardar: ${error instanceof Error ? error.message : 'Error desconocido'}`);
         }
 
     };

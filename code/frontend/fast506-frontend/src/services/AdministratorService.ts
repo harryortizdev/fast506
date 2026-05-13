@@ -18,6 +18,9 @@ export const create = async (administrator: Partial<Administrator>) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(administrator),
     });
+    if (!res.ok) {
+        throw new Error(`Error creating administrator: ${res.statusText}`);
+    }
     return res.text();
 
 };
@@ -40,6 +43,7 @@ export const deleteAdministrator = async (id: number) => {
 
 export const updateAdministrator = async (administrator: Administrator) => {
 
+    console.log("Datos enviados en PUT:", administrator);
     const res = await fetch(`${API_URL}/update`, {
 
         method: "PUT",
@@ -47,6 +51,12 @@ export const updateAdministrator = async (administrator: Administrator) => {
         body: JSON.stringify(administrator),
 
     });
+    console.log("Respuesta del servidor:", res.status, res.statusText);
+    if (!res.ok) {
+        const errorText = await res.text();
+        console.log("Error del servidor:", errorText);
+        throw new Error(`Error updating administrator: ${res.statusText}`);
+    }
 
     return res.text();
 
