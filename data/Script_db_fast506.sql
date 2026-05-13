@@ -75,6 +75,629 @@ INSERT INTO `db_fast506`.`users`  (name, id, email, password, phone_number, date
 VALUES 
 ('Administrador de Prueba', 123456, 'admin@prueba.com', 'password123', '800-123-4567', '1985-10-15', 'profile.jpg');
 -- -----------------------------------------------------------------------------------------
+
+-- 07/05/26 Creacion de procedimientos para la tabla Administrator (Allan)
+
+-- Obtener administradores
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS getAllAdministrators;
+
+CREATE PROCEDURE getAllAdministrators()
+BEGIN
+
+    SELECT
+        u.id_user,
+        u.name,
+        u.id,
+        u.email,
+        u.phone_number,
+        u.date_birth,
+        u.profile_image,
+        a.employee_id,
+        a.corporate_email
+    FROM users u
+    INNER JOIN administrator a
+        ON u.id_user = a.id_user
+    WHERE u.is_active = TRUE;
+
+END $$
+
+DELIMITER ;
+
+-- Buscar administrador por ID 
+
+DROP PROCEDURE IF EXISTS findAdministratorById;
+
+DELIMITER $$
+
+CREATE PROCEDURE findAdministratorById(
+    IN p_id_user INT
+)
+BEGIN
+
+    SELECT
+        u.id_user,
+        u.name,
+        u.id,
+        u.email,
+        u.phone_number,
+        u.date_birth,
+        u.profile_image,
+        a.employee_id,
+        a.corporate_email
+    FROM users u
+    INNER JOIN administrator a
+        ON u.id_user = a.id_user
+    WHERE u.id_user = p_id_user
+      AND u.is_active = TRUE;
+
+END$$
+
+DELIMITER ;
+
+-- Insertar en administrator
+
+DROP PROCEDURE IF EXISTS insertAdministrator;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE insertAdministrator(
+
+   
+    IN p_name VARCHAR(100),
+    IN p_identification INT,
+    IN p_email VARCHAR(100),
+    IN p_password VARCHAR(255),
+    IN p_phone_number VARCHAR(15),
+    IN p_date_birth DATE,
+    IN p_profile_image VARCHAR(500),
+
+    IN p_employee_id VARCHAR(10),
+    IN p_corporate_email VARCHAR(100)
+
+)
+BEGIN
+
+    DECLARE v_id_user INT;
+    
+    START TRANSACTION;
+
+    INSERT INTO users(
+        name,
+        id,
+        email,
+        password,
+        phone_number,
+        date_birth,
+        profile_image,
+        is_active
+    )
+    VALUES(
+        p_name,
+        p_identification,
+        p_email,
+        p_password,
+        p_phone_number,
+        p_date_birth,
+        p_profile_image,
+        TRUE
+    );
+
+    SET v_id_user = LAST_INSERT_ID();
+
+    INSERT INTO administrator(
+        id_user,
+        employee_id,
+        corporate_email
+    )
+    VALUES(
+        v_id_user,
+        p_employee_id,
+        p_corporate_email
+    );
+
+END $$
+
+DELIMITER ;
+
+-- Datos de prueba
+
+CALL insertAdministrator(
+
+    'Allan Mejia',
+    123456789,
+    'allan@gmail.com',
+    '12345',
+    '88887777',
+    '2005-10-15',
+    'allan.png',
+
+    'ADM001',
+    'allan@fast506.com'
+
+);
+
+-- Editar administrador
+
+DROP PROCEDURE IF EXISTS updateAdministrator;
+
+DELIMITER $$
+
+CREATE PROCEDURE updateAdministrator(
+
+    IN p_id_user INT,
+    IN p_name VARCHAR(100),
+    IN p_identification INT,
+    IN p_email VARCHAR(100),
+    IN p_password VARCHAR(255),
+    IN p_phone_number VARCHAR(15),
+    IN p_date_birth DATE,
+    IN p_profile_image VARCHAR(500),
+    IN p_employee_id VARCHAR(10),
+    IN p_corporate_email VARCHAR(100)
+
+)
+BEGIN
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+    END;
+
+    START TRANSACTION;
+
+    UPDATE users
+    SET
+        name = p_name,
+        id = p_identification,
+        email = p_email,
+        password = p_password,
+        phone_number = p_phone_number,
+        date_birth = p_date_birth,
+        profile_image = p_profile_image
+    WHERE id_user = p_id_user
+      AND is_active = TRUE;
+
+    UPDATE administrator
+    SET
+        employee_id = p_employee_id,
+        corporate_email = p_corporate_email
+    WHERE id_user = p_id_user;
+
+    COMMIT;
+
+END$$
+
+DELIMITER ;
+
+-- Eliminar usuario
+
+DROP PROCEDURE IF EXISTS deleteUser;
+
+DELIMITER $$
+
+CREATE PROCEDURE deleteUser(
+    IN p_id_user INT
+)
+BEGIN
+
+    UPDATE users
+    SET is_active = FALSE
+    WHERE id_user = p_id_user;
+
+END$$
+
+DELIMITER ;
+
+-- 07/05/26 Creacion de procedimientos para la tabla mechanic (Allan)
+
+-- Insertar mecanico
+DROP PROCEDURE IF EXISTS insertMechanic;
+
+DELIMITER $$
+
+CREATE PROCEDURE insertMechanic(
+
+    IN p_name VARCHAR(100),
+    IN p_identification INT,
+    IN p_email VARCHAR(100),
+    IN p_password VARCHAR(255),
+    IN p_phone_number VARCHAR(15),
+    IN p_date_birth DATE,
+    IN p_profile_image VARCHAR(500),
+
+    IN p_employee_id VARCHAR(10),
+    IN p_corporate_email VARCHAR(100),
+    IN p_specialty VARCHAR(50),
+    IN p_cert_level VARCHAR(20)
+
+)
+BEGIN
+
+    DECLARE v_id_user INT;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+    END;
+
+    START TRANSACTION;
+
+    INSERT INTO users(
+        name,
+        id,
+        email,
+        password,
+        phone_number,
+        date_birth,
+        profile_image,
+        is_active
+    )
+    VALUES(
+        p_name,
+        p_identification,
+        p_email,
+        p_password,
+        p_phone_number,
+        p_date_birth,
+        p_profile_image,
+        TRUE
+    );
+
+    SET v_id_user = LAST_INSERT_ID();
+
+    INSERT INTO mechanic(
+        id_user,
+        employee_id,
+        corporate_email,
+        specialty,
+        cert_level
+    )
+    VALUES(
+        v_id_user,
+        p_employee_id,
+        p_corporate_email,
+        p_specialty,
+        p_cert_level
+    );
+
+    COMMIT;
+
+END$$
+
+DELIMITER ;
+
+-- Obtener mecanicos
+
+DROP PROCEDURE IF EXISTS getAllMechanics;
+
+DELIMITER $$
+
+CREATE PROCEDURE getAllMechanics()
+BEGIN
+
+    SELECT
+        u.id_user,
+        u.name,
+        u.id,
+        u.email,
+        u.phone_number,
+        u.date_birth,
+        u.profile_image,
+
+        m.employee_id,
+        m.corporate_email,
+        m.specialty,
+        m.cert_level
+
+    FROM users u
+    INNER JOIN mechanic m
+        ON u.id_user = m.id_user
+
+    WHERE u.is_active = TRUE;
+
+END$$
+
+DELIMITER ;
+
+-- Buscar mecanico por id
+
+DROP PROCEDURE IF EXISTS findMechanicById;
+
+DELIMITER $$
+
+CREATE PROCEDURE findMechanicById(
+    IN p_id_user INT
+)
+BEGIN
+
+    SELECT
+        u.id_user,
+        u.name,
+        u.id,
+        u.email,
+        u.phone_number,
+        u.date_birth,
+        u.profile_image,
+
+        m.employee_id,
+        m.corporate_email,
+        m.specialty,
+        m.cert_level
+
+    FROM users u
+    INNER JOIN mechanic m
+        ON u.id_user = m.id_user
+
+    WHERE u.id_user = p_id_user
+      AND u.is_active = TRUE;
+
+END$$
+
+DELIMITER ;
+
+-- Actualizar mecanico
+
+DROP PROCEDURE IF EXISTS updateMechanic;
+
+DELIMITER $$
+
+CREATE PROCEDURE updateMechanic(
+
+    IN p_id_user INT,
+
+    IN p_name VARCHAR(100),
+    IN p_identification INT,
+    IN p_email VARCHAR(100),
+    IN p_password VARCHAR(255),
+    IN p_phone_number VARCHAR(15),
+    IN p_date_birth DATE,
+    IN p_profile_image VARCHAR(500),
+
+    IN p_employee_id VARCHAR(10),
+    IN p_corporate_email VARCHAR(100),
+    IN p_specialty VARCHAR(50),
+    IN p_cert_level VARCHAR(20)
+
+)
+BEGIN
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+    END;
+
+    START TRANSACTION;
+
+    UPDATE users
+    SET
+        name = p_name,
+        id = p_identification,
+        email = p_email,
+        password = p_password,
+        phone_number = p_phone_number,
+        date_birth = p_date_birth,
+        profile_image = p_profile_image
+    WHERE id_user = p_id_user
+      AND is_active = TRUE;
+
+    UPDATE mechanic
+    SET
+        employee_id = p_employee_id,
+        corporate_email = p_corporate_email,
+        specialty = p_specialty,
+        cert_level = p_cert_level
+    WHERE id_user = p_id_user;
+
+    COMMIT;
+
+END$$
+
+DELIMITER ;
+
+-- 07/05/26 Creacion de procedimientos para la tabla client (Allan)
+
+-- Insertar cliente
+
+DROP PROCEDURE IF EXISTS insertClient;
+
+DELIMITER $$
+
+CREATE PROCEDURE insertClient(
+
+    IN p_name VARCHAR(100),
+    IN p_identification INT,
+    IN p_email VARCHAR(100),
+    IN p_password VARCHAR(255),
+    IN p_phone_number VARCHAR(15),
+    IN p_date_birth DATE,
+    IN p_profile_image VARCHAR(500),
+
+    IN p_comm_interest VARCHAR(50),
+    IN p_physical_address VARCHAR(255),
+    IN p_occupation VARCHAR(100)
+
+)
+BEGIN
+
+    DECLARE v_id_user INT;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+    END;
+
+    START TRANSACTION;
+
+    INSERT INTO users(
+        name,
+        id,
+        email,
+        password,
+        phone_number,
+        date_birth,
+        profile_image,
+        is_active
+    )
+    VALUES(
+        p_name,
+        p_identification,
+        p_email,
+        p_password,
+        p_phone_number,
+        p_date_birth,
+        p_profile_image,
+        TRUE
+    );
+
+    SET v_id_user = LAST_INSERT_ID();
+
+    INSERT INTO client(
+        id_user,
+        comm_interest,
+        physical_address,
+        occupation
+    )
+    VALUES(
+        v_id_user,
+        p_comm_interest,
+        p_physical_address,
+        p_occupation
+    );
+
+    COMMIT;
+
+END$$
+
+DELIMITER ;
+
+-- Obtener clientes
+
+DROP PROCEDURE IF EXISTS getAllClients;
+
+DELIMITER $$
+
+CREATE PROCEDURE getAllClients()
+BEGIN
+
+    SELECT
+        u.id_user,
+        u.name,
+        u.id,
+        u.email,
+        u.phone_number,
+        u.date_birth,
+        u.profile_image,
+
+        c.comm_interest,
+        c.physical_address,
+        c.occupation
+
+    FROM users u
+    INNER JOIN client c
+        ON u.id_user = c.id_user
+
+    WHERE u.is_active = TRUE;
+
+END$$
+
+DELIMITER ;
+
+-- Buscar cliente por id
+
+DROP PROCEDURE IF EXISTS findClientById;
+
+DELIMITER $$
+
+CREATE PROCEDURE findClientById(
+    IN p_id_user INT
+)
+BEGIN
+
+    SELECT
+        u.id_user,
+        u.name,
+        u.id,
+        u.email,
+        u.phone_number,
+        u.date_birth,
+        u.profile_image,
+
+        c.comm_interest,
+        c.physical_address,
+        c.occupation
+
+    FROM users u
+    INNER JOIN client c
+        ON u.id_user = c.id_user
+
+    WHERE u.id_user = p_id_user
+      AND u.is_active = TRUE;
+
+END$$
+
+DELIMITER ;
+
+-- Actualizar cliente
+
+DROP PROCEDURE IF EXISTS updateClient;
+
+DELIMITER $$
+
+CREATE PROCEDURE updateClient(
+
+    IN p_id_user INT,
+
+    IN p_name VARCHAR(100),
+    IN p_identification INT,
+    IN p_email VARCHAR(100),
+    IN p_password VARCHAR(255),
+    IN p_phone_number VARCHAR(15),
+    IN p_date_birth DATE,
+    IN p_profile_image VARCHAR(500),
+
+    IN p_comm_interest VARCHAR(50),
+    IN p_physical_address VARCHAR(255),
+    IN p_occupation VARCHAR(100)
+
+)
+BEGIN
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+    END;
+
+    START TRANSACTION;
+
+    UPDATE users
+    SET
+        name = p_name,
+        id = p_identification,
+        email = p_email,
+        password = p_password,
+        phone_number = p_phone_number,
+        date_birth = p_date_birth,
+        profile_image = p_profile_image
+    WHERE id_user = p_id_user
+      AND is_active = TRUE;
+
+    UPDATE client
+    SET
+        comm_interest = p_comm_interest,
+        physical_address = p_physical_address,
+        occupation = p_occupation
+    WHERE id_user = p_id_user;
+
+    COMMIT;
+
+END$$
+
+DELIMITER ;
+
+
 -- 02/05/2026 - Creación de la tabla supplier(proveedores) Nolan
 CREATE TABLE supplier (
     id_supplier INT PRIMARY KEY AUTO_INCREMENT,
@@ -488,7 +1111,215 @@ END$$
 
 DELIMITER ;
 
+-- 09/05/2026 - Creación de la tabla Branch (Ilian)
+
+CREATE TABLE `db_fast506`.`branch` (
+  `id_Branch` INT(11) NOT NULL,
+  `name` VARCHAR(50) NOT NULL,
+  `ubication` VARCHAR(100) NOT NULL,
+  `direction` VARCHAR(100) NOT NULL,
+  `branch_Phone_Number` VARCHAR(15) NOT NULL,
+  `operation_Schedule` VARCHAR(200) NOT NULL,
+  `id_Active` TINYINT NOT NULL,
+  `id_user` INT NULL DEFAULT NULL,
+  PRIMARY KEY (`id_Branch`),
+  INDEX `fk_branch_users_id_idx` (`id_user` ASC) ,
+  CONSTRAINT `fk_branch_users_id`
+    FOREIGN KEY (`id_user`)
+    REFERENCES `db_fast506`.`users` (`id_user`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+-- Procedimiento almacenado obtener Branch
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE `getAllBranch` ()
+BEGIN
+SELECT id_Branch ,name ,ubication , direction ,branch_Phone_Number , operation_Schedule ,id_user FROM Branch Where id_Active = 1;
+END$$
+
+DELIMITER ;
+
+-- Funcionamiento de auto incremento
+
+ALTER TABLE `db_fast506`.`branch` 
+CHANGE COLUMN `id_Branch` `id_Branch` INT(11) NOT NULL AUTO_INCREMENT ;
 
 
 
+-- creacion de procedimiento para agregar sucursales
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE `createBranch` (
+in nameB varchar(50),
+in ubicationb varchar(100),
+in directionB varchar (100),
+in branch_Phone_NumberB varchar(15),
+in operation_ScheduleB varchar(200),
+in id_UserB int )
+BEGIN
+INSERT INTO branch ( name, ubication, direction, branch_Phone_Number, operation_Schedule, id_Active, id_user) VALUES(
+nameB, ubicationb, directionB, branch_Phone_NumberB, operation_ScheduleB, 1, id_UserB);
+END$$
+
+DELIMITER ;
+
+-- procedimiento almacenado Actualizar Sucursal
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE `updateBranch` (
+in id_BranchB int,
+in nameB varchar(50),
+in ubicationb varchar(100),
+in directionB varchar (100),
+in branch_Phone_NumberB varchar(15),
+in operation_ScheduleB varchar(200),
+in id_userB int )
+BEGIN
+update branch set 
+name= nameb,
+ ubication=ubicationb,
+ direction= directionb,
+ branch_Phone_Number= branch_Phone_NumberB,
+ operation_Schedule= operation_ScheduleB,
+ id_user= id_userB
+ WHERE id_Branch = id_BranchB
+ AND id_Active =1;
+END$$
+
+DELIMITER ;
+
+-- procedimiento almacenado eliminar sucursal 
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE `deleteBranch` (in id_BranchB INT)
+BEGIN
+UPDATE branch
+	SET id_active = 0
+    WHERE id_Branch = id_BranchB;
+END$$
+
+DELIMITER ;
+
+-- 10/5/2026 (Ajustes para ingresar un nuevo atributo a Branch (Coordinates))
+
+-- Nueva columna coordenadas
+ALTER TABLE `db_fast506`.`branch` 
+ADD COLUMN `coordinates` VARCHAR(40) NOT NULL AFTER `id_Active`;
+
+-- PA guardar Branch
+
+USE `db_fast506`;
+DROP procedure IF EXISTS `createBranch`;
+
+USE `db_fast506`;
+DROP procedure IF EXISTS `db_fast506`.`createBranch`;
+;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `createBranch`(
+in nameB varchar(50),
+in ubicationb varchar(100),
+in directionB varchar (100),
+in branch_Phone_NumberB varchar(15),
+in operation_ScheduleB varchar(200),
+in coordinatesB varchar(40),
+in id_UserB int )
+BEGIN
+INSERT INTO branch ( name, ubication, direction, branch_Phone_Number, operation_Schedule, id_Active, coordinates, id_user) VALUES(
+nameB, ubicationb, directionB, branch_Phone_NumberB, operation_ScheduleB, 1, coordinatesB ,id_UserB);
+END$$
+
+DELIMITER ;
+;
+
+-- PA Obtener todas las Sucursales
+
+USE `db_fast506`;
+DROP procedure IF EXISTS `getAllBranch`;
+
+USE `db_fast506`;
+DROP procedure IF EXISTS `db_fast506`.`getAllBranch`;
+;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getAllBranch`()
+BEGIN
+SELECT id_Branch ,name ,ubication , direction ,branch_Phone_Number , operation_Schedule, coordinates ,id_user FROM Branch Where id_Active = 1;
+END$$
+
+DELIMITER ;
+;
+
+-- PA Actualizar Sucursal
+
+USE `db_fast506`;
+DROP procedure IF EXISTS `updateBranch`;
+
+USE `db_fast506`;
+DROP procedure IF EXISTS `db_fast506`.`updateBranch`;
+;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `updateBranch`(
+in id_BranchB int,
+in nameB varchar(50),
+in ubicationb varchar(100),
+in directionB varchar (100),
+in branch_Phone_NumberB varchar(15),
+in operation_ScheduleB varchar(200),
+in coordinatesB varchar(40),
+in id_userB int )
+BEGIN
+update branch set 
+name= nameb,
+ ubication=ubicationb,
+ direction= directionb,
+ branch_Phone_Number= branch_Phone_NumberB,
+ operation_Schedule= operation_ScheduleB,
+ coordinates = coordinatesB,
+ id_user= id_userB
+ WHERE id_Branch = id_BranchB
+ AND id_Active =1;
+END$$
+
+DELIMITER ;
+;
+
+-- Eliminacion de datos de prueba
+DELETE FROM branch where id_Branch=1;
+DELETE FROM branch where id_Branch=2;
+DELETE FROM branch where id_Branch=3;
+DELETE FROM branch where id_Branch=4;
+DELETE FROM branch where id_Branch=5;
+DELETE FROM branch where id_Branch=6;
+DELETE FROM branch where id_Branch=7;
+DELETE FROM branch where id_Branch=8;
+DELETE FROM branch where id_Branch=9;
+DELETE FROM branch where id_Branch=10;
+DELETE FROM branch where id_Branch=11;
+DELETE FROM branch where id_Branch=12;
+DELETE FROM branch where id_Branch=13;
+DELETE FROM branch where id_Branch=14;
+DELETE FROM branch where id_Branch=15;
+DELETE FROM branch where id_Branch=16;
+DELETE FROM branch where id_Branch=17;
+DELETE FROM branch where id_Branch=18;
+DELETE FROM branch where id_Branch=19;
+DELETE FROM branch where id_Branch=20;
+
+-- Datos con 'coordinates' después de 'id_Active' y antes de 'id_user'
+INSERT INTO branch (name, ubication, direction, branch_Phone_Number, operation_Schedule, id_Active, coordinates, id_user) VALUES
+('Fast506 Guápiles', 'Limón, Pococí', 'Frente a la UCR Recinto de Guápiles', '+506 2710 1234', 'L-V: 8:00am-6:00pm, S: 9:00am-2:00pm', '1', '10.211306686307188, -83.77130550738062', NULL),
+('Fast506 San José', 'San José, La Uruca', 'Frente a las instalaciones de Repretel', '+506 2222 5678', 'L-V: 7:30am-5:30pm, S: 8:00am-12:00pm', '1', '9.955604275880729, -84.1164932910103', NULL),
+('Fast506 Grecia', 'Alajuela, Grecia', '600 metros Oeste del Hospital de Grecia', '+506 2494 0011', 'L-V: 8:00am-5:00pm, S: Cerrado', '1', '10.070330987790673, -84.32156284301192', NULL),
+('Fast506 Escazú', 'San José, Escazú', 'Centro Comercial Escazu Village', '+506 2288 9900', 'L-D: 10:00am-8:00pm', '1', '9.933832242947375, -84.12909517764673', NULL),
+('Fast506 Pérez Zeledón', 'San José, San Isidro', 'Contiguo a la gasolinera El Jorón', '+506 2771 4433', 'L-V: 8:00am-6:00pm, S: 9:00am-4:00pm', '1', '9.330757708994817, -83.669410048738', NULL),
+('Fast506 Liberia', 'Guanacaste, Liberia', 'Frente a la entrada al Aeropuerto Daniel Oduber', '+506 2665 9000', 'L-V: 8:00am-5:30pm, S: 9:00am-1:00pm', '1', '10.596253373403933, -85.52703150704106', NULL);
 

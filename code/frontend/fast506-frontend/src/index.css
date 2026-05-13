@@ -11,3 +11,92 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+/* Cambia el color del hover al poner el cursor encima */
+.dropdown-item:hover {
+  background-color: #2C3E50 !important;
+  color: #EEF1EF !important;
+}
+/* Cambia el color de la tabla*/
+.table {
+  background-color: #EEF1EF !important;
+}
+/* Cambia el color de los td y tr*/
+.table td, .table tr {
+  background-color: #EEF1EF !important;
+}
+
+.responsive-swal {
+  border-radius: 16px;
+  padding: 1.2rem;
+}
+
+.responsive-swal-title {
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  font-weight: 600;
+  text-align: center;
+}
+
+.responsive-swal-text {
+  font-size: clamp(0.9rem, 1.5vw, 1rem);
+  text-align: center;
+}
+
+.responsive-swal-btn {
+  font-size: clamp(0.8rem, 1.2vw, 1rem) !important;
+  padding: 0.6rem 1rem !important;
+  border-radius: 10px !important;
+}
+
+.swal-success-responsive {
+  border-radius: 16px;
+  padding: 1.2rem;
+}
+
+.swal-success-text {
+  font-size: clamp(0.9rem, 1.5vw, 1rem);
+  text-align: center;
+}
+
+.swal-warning-responsive {
+  border-radius: 16px;
+  padding: 1.2rem;
+}
+
+.swal-warning-text {
+  font-size: clamp(0.9rem, 1.5vw, 1rem);
+  text-align: center;
+}
+
+@media (max-width: 576px) {
+
+  .swal2-popup {
+    width: 90% !important;
+    padding: 1rem !important;
+  }
+
+  .swal2-icon {
+    transform: scale(0.85);
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .swal2-title {
+    font-size: 1.1rem !important;
+  }
+
+  .swal2-html-container {
+    font-size: 0.9rem !important;
+  }
+
+  .swal2-actions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .swal2-actions button {
+    width: 100%;
+    margin: 0 !important;
+  }
+}

@@ -1,9 +1,19 @@
+import React from "react";
+
 interface TableGenericProps<T> {
   data: T[];
   columns: { key: keyof T; label: string }[];
   onDelete?: (item: T) => void;
   onEdit?: (item: T) => void;
 }
+
+const stickyRight = (bg = "#EEF1EF"): React.CSSProperties => ({
+  position: "sticky",
+  right: 0,
+  backgroundColor: bg,
+  whiteSpace: "nowrap",
+  borderLeft: "2px solid #A9B4C2",
+});
 
 const TableGeneric = <T extends object>({
   data,
@@ -12,20 +22,40 @@ const TableGeneric = <T extends object>({
   onEdit,
 }: TableGenericProps<T>) => {
   return (
-    <div style={{ padding: "1rem" }}>
-      <table className="table table-striped-columns" border={1} cellPadding={8} style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead style={{ backgroundColor: "#f0f0f0" }}>
+    <div className="table-responsive" style={{ maxHeight: "400px", overflowY: "auto", overflowX: "auto", borderRadius: "10px",}}>
+      <table className="table table-hover align-middle" style={{ minWidth: "750px", backgroundColor: "#EEF1EF", borderCollapse: "separate", borderSpacing: 0,}}>
+        <thead style={{ position: "sticky", top: 0, zIndex: 2 }}>
           <tr>
             {columns.map((col) => (
-              <th key={String(col.key)}>{col.label}</th>
+              <th
+                key={String(col.key)}
+                style={{
+                  backgroundColor: "#A9B4C2",
+                  whiteSpace: "nowrap",
+                  fontSize: "clamp(0.8rem, 1vw, 1rem)",
+                }}
+              >
+                {col.label}
+              </th>
             ))}
-            <th>Acciones</th>
+
+            <th
+              style={{
+                ...stickyRight("#A9B4C2"),
+                zIndex: 3,
+                width: "1%",
+                fontSize: "clamp(0.8rem, 1vw, 1rem)",
+              }}
+            >
+              Acciones
+            </th>
           </tr>
         </thead>
+
         <tbody>
           {data.length === 0 ? (
             <tr>
-              <td colSpan={columns.length + 1} style={{ textAlign: "center" }}>
+              <td colSpan={columns.length + 1} className="text-center">
                 No hay datos
               </td>
             </tr>
@@ -33,23 +63,39 @@ const TableGeneric = <T extends object>({
             data.map((item, index) => (
               <tr key={index}>
                 {columns.map((col) => (
-                   <td key={String(col.key)}>
+                  <td
+                    key={String(col.key)}
+                    style={{
+                      whiteSpace: "nowrap",
+                      fontSize: "clamp(0.8rem, 1vw, 0.95rem)",
+                    }}
+                  >
                     {typeof item[col.key] === "boolean"
-                      ? item[col.key] ? "Sí" : "No" 
+                      ? item[col.key]
+                        ? "Sí"
+                        : "No"
                       : String(item[col.key])}
                   </td>
                 ))}
-                <td>
-                  <button
-                    onClick={() => onEdit?.(item)}
-                    style={{ marginRight: "0.5rem" }}>
-                    Editar
-                  </button>
-                  <button
-                    onClick={() => onDelete?.(item)}
-                    style={{ color: "red" }}>
-                    Eliminar
-                  </button>
+
+                <td style={{ ...stickyRight(), width: "1%" }}>
+                  <div className="d-flex flex-column flex-sm-row gap-2">
+                    <button
+                      className="btn btn-outline-warning btn-sm"
+                      onClick={() => onEdit?.(item)}
+                    >
+                      <i className="bi bi-pencil-square"></i>
+                      <span className="d-none d-md-inline ms-1">Editar</span>
+                    </button>
+
+                    <button
+                      className="btn btn-outline-danger btn-sm"
+                      onClick={() => onDelete?.(item)}
+                    >
+                      <i className="bi bi-trash3"></i>
+                      <span className="d-none d-md-inline ms-1">Eliminar</span>
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))

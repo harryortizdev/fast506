@@ -21,7 +21,7 @@ public class UnitDAOImplement implements UnitDAO {
     public LinkedList<Unit> getAll() {
         LinkedList<Unit> list = new LinkedList<>();
 
-        String sql = "call db_fast506.getAllUnits();";
+        String sql = "{call db_fast506.getAllUnits()}";
 
         try (Connection cn = DBConnection.getConnection(); PreparedStatement ps = cn.prepareStatement(sql); ResultSet rs = ps.executeQuery();) {
             System.out.println("Conexión exitosa");
@@ -54,10 +54,8 @@ public class UnitDAOImplement implements UnitDAO {
 
     @Override
     public void add(Unit unit) {
-        String sql = "CALL insertUnit(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null);";
+        String sql = "CALL insertUnit(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         try (Connection cn = DBConnection.getConnection(); PreparedStatement ps = cn.prepareStatement(sql);) {
-
-            System.out.println("Llegó al add: " + unit.getVIN()); // ← agrega esto
 
             ps.setString(1, unit.getVIN());
             ps.setString(2, unit.getEngineNumber());
@@ -72,7 +70,7 @@ public class UnitDAOImplement implements UnitDAO {
             ps.setString(11, unit.getEngineSize());
             ps.setString(12, unit.getFuelType());
             ps.setBoolean(13, unit.isStockStatus());
-            // ps.setInt(14, unit.getIdSupplier());
+            ps.setInt(14, unit.getIdSupplier());
 
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -82,7 +80,7 @@ public class UnitDAOImplement implements UnitDAO {
 
     @Override
     public void update(Unit unit) {
-        String sql = "call db_fast506.updateUnit(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null);";
+        String sql = "call db_fast506.updateUnit(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
         try (Connection cn = DBConnection.getConnection(); PreparedStatement ps = cn.prepareStatement(sql)) {
 
@@ -99,8 +97,8 @@ public class UnitDAOImplement implements UnitDAO {
             ps.setString(11, unit.getBodyWork());
             ps.setString(12, unit.getEngineSize());
             ps.setString(13, unit.getFuelType());
-            ps.setBoolean(14, unit.isStockStatus()); // TINYINT → boolean
-           // ps.setInt(15, unit.getIdSupplier());
+            ps.setBoolean(14, unit.isStockStatus());
+            ps.setInt(15, unit.getIdSupplier());
 
             ps.executeUpdate();
 
@@ -125,4 +123,18 @@ public class UnitDAOImplement implements UnitDAO {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
+    public boolean existsByVIN(String vin) {
+        Unit unit = null;
+        String sql = "call db_fast506.findUnitByVIN(?);";
+        try (Connection cn = DBConnection.getConnection(); PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setString(1, vin);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                unit = new Unit();
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al buscar la unidad" + e.getMessage());
+        }
+        return unit != null;
+    }
 }
