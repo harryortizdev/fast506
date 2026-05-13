@@ -4,6 +4,9 @@ import AdministratorForm from "../components/AdministratorForm";
 import TableGeneric from "../components/TableGeneric";
 import { getAll, deleteAdministrator } from "../services/AdministratorService";
 import { Administrator } from "../models/Administrator";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import AlertConfirm from "../components/AlertConfirm";
 
 const AdministratorPage = () => {
 
@@ -14,7 +17,8 @@ const AdministratorPage = () => {
     const loadAdministrators = async () => {
 
         const data = await getAll();
-        setAdministrators(data);
+        console.log("Administrators data:", data);
+        setAdministrators(Array.isArray(data) ? data : []);
 
     };
 
@@ -41,10 +45,10 @@ const AdministratorPage = () => {
     };
 
     const handleDelete = async (administrator: Administrator) => {
-        if (!administrator.employeeId) return;
+        if (!administrator.idUser) return;
         const confirmar = window.confirm(`¿Desea eliminar el administrador ${administrator.name}?`);
         if (!confirmar) return;
-        await deleteAdministrator(administrator.employeeId!);
+        await deleteAdministrator(administrator.idUser);
         await loadAdministrators();
     };
 
@@ -61,25 +65,52 @@ const AdministratorPage = () => {
 
     return (
 
-        <div>
-            {!showForm ? (
-                <>
-                    <ButtonNew label="Nuevo Administrador" onClick={() => setShowForm(true)} />
-                    <TableGeneric
-                        data={administrators}
-                        columns={columns}
-                        onDelete={handleDelete}
-                        onEdit={handleEdit}
-                    />
-                </>
-            ) : (
-                <AdministratorForm
-                    onClose={handleClose}
-                    onRefresh={handleSaveAndClose}
-                    administratorToEdit={administratorToEdit}
+       <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", backgroundColor: "#EEF1EF", }}>
+
+      <Navbar />
+
+      <main style={{ flex: 1 }}>
+        <div className="container-fluid container-md mt-3 mt-md-4 mb-4 px-2 px-md-4">
+          <div className="card shadow-sm border-0">
+            <div
+              className="card-header d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center gap-2"
+              style={{ backgroundColor: "#2C3E50" }}
+            >
+              <h5 className="mb-0 text-center text-md-start" style={{ color: "#EEF1EF" }}>
+                Gestión de Administradores
+              </h5>
+
+              <div className="d-flex justify-content-center justify-content-md-end">
+                <ButtonNew label="Nuevo" onClick={() => setShowForm(true)} />
+              </div>
+            </div>
+
+            <div
+              className="card-body p-2 p-md-4"
+              style={{ backgroundColor: "#EEF1EF" }}
+            >
+              {!showForm ? (
+                <TableGeneric
+                  data={administrators}
+                  columns={columns}
+                  onDelete={handleDelete}
+                  onEdit={handleEdit}
                 />
-            )}
+              ) : (
+                <AdministratorForm
+                  onClose={handleClose}
+                  onRefresh={handleSaveAndClose}
+                  administratorToEdit={administratorToEdit}
+                  administrators={administrators}
+                />
+              )}
+            </div>
+          </div>
         </div>
+      </main>
+
+      <Footer />
+    </div>
 
     );
 
