@@ -35,8 +35,7 @@ const SupplierForm = ({ onClose, onRefresh, supplierToEdit }: SupplierFormProps)
 
   return (
     
-    <center>
-      <h1></h1>
+    
 
     <div className="container d-flex justify-content-center">
       <div className="card p-4 shadow-sm" style={{ maxWidth: '500px', width: '100%' }}>
@@ -97,7 +96,6 @@ const SupplierForm = ({ onClose, onRefresh, supplierToEdit }: SupplierFormProps)
         </div>
       </div>
     </div>
-    </center>
   );
 };
 

@@ -71,19 +71,20 @@ CREATE TABLE client (
 
 -- lo puso Nolan para probar
 -- Insertar un usuario en la tabla users
-INSERT INTO `db_fast506`.`users`  (name, id, email, password, phone_number, date_birth, profile_image)
-VALUES 
-('Administrador de Prueba', 123456, 'admin@prueba.com', 'password123', '800-123-4567', '1985-10-15', 'profile.jpg');
+
+-- INSERT INTO `db_fast506`.`users`  (name, id, email, password, phone_number, date_birth, profile_image)
+-- VALUES 
+-- ('Administrador de Prueba', 123456, 'admin@prueba.com', 'password123', '800-123-4567', '1985-10-15', 'profile.jpg');
 -- -----------------------------------------------------------------------------------------
 
 -- 07/05/26 Creacion de procedimientos para la tabla Administrator (Allan)
 
 -- Obtener administradores
 
-DELIMITER $$
 
 DROP PROCEDURE IF EXISTS getAllAdministrators;
 
+DELIMITER $$
 CREATE PROCEDURE getAllAdministrators()
 BEGIN
 

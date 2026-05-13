@@ -48,7 +48,7 @@ public class SupplierDAOImplement implements SupplierDAO {
             ps.setString(5, supplier.getBussinesContactName());
             ps.setString(6, supplier.getEmail());
             ps.setString(7, supplier.getUbicacion());
-            ps.setInt(8, supplier.getAdminId());
+           // ps.setInt(8, supplier.getAdminId());
 
             ps.executeUpdate();
         } catch (SQLException e) {
