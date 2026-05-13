@@ -52,7 +52,7 @@ public class BranchDAOImplement implements BranchDAO {
 
     @Override
     public void add(Branch branch) {
-        String sql = "call db_fast506.createBranch(?, ?, ?, ?, ?, ?, null);";
+        String sql = "call db_fast506.createBranch(?, ?, ?, ?, ?, ?, ?);";
 
         try (Connection cn = DBConnection.getConnection(); PreparedStatement ps = cn.prepareStatement(sql);) {
 
@@ -62,8 +62,7 @@ public class BranchDAOImplement implements BranchDAO {
             ps.setString(4, branch.getBranchPhoneNumber());
             ps.setString(5, branch.getOperationSchedule());
             ps.setString(6, branch.getCoordinates());
-
-            //ps.setInt(6, branch.getIdUser());
+            ps.setInt(7, branch.getIdUser());
             ps.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Error al crear sucursal " + e.getMessage());
@@ -72,7 +71,7 @@ public class BranchDAOImplement implements BranchDAO {
 
     @Override
     public void update(Branch branch) {
-        String sql = "call db_fast506.updateBranch(?, ?, ?, ?, ?, ?, ?, null);";
+        String sql = "call db_fast506.updateBranch(?, ?, ?, ?, ?, ?, ?, ?);";
 
         try (Connection cn = DBConnection.getConnection(); PreparedStatement ps = cn.prepareStatement(sql);) {
 
@@ -83,7 +82,7 @@ public class BranchDAOImplement implements BranchDAO {
             ps.setString(5, branch.getBranchPhoneNumber());
             ps.setString(6, branch.getOperationSchedule());
             ps.setString(7, branch.getCoordinates());
-            //ps.setInt(7, branch.getIdUser());
+            ps.setInt(8, branch.getIdUser());
 
             ps.executeUpdate();
         } catch (SQLException e) {

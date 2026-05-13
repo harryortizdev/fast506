@@ -13,46 +13,46 @@ import AlertWarning from "../components/AlertWarning";
 
 
 const BranchPage = () => {
-  const [branch, setBranch] = useState<Branch[]>([]);
-  const [showForm, setShowForm] = useState(false);
-  const [branchToEdit, setBranchToEdit] = useState<Branch | undefined>(undefined);
+  const [branch, setBranch] = useState<Branch[]>([]); //guarda la lista de Sucursales
+  const [showForm, setShowForm] = useState(false); //formulario off
+  const [branchToEdit, setBranchToEdit] = useState<Branch | undefined>(undefined); //resguarda la sucursal a ediaatr
 
 
   const loadBranch = async () => {
-    const data = await getAll();
-    setBranch(data);
+    const data = await getAll();//pide lista Sucursales
+    setBranch(data);//las setea
   };
 
-  useEffect(() => {
+  useEffect(() => { //Carga la lista una sola vez al iniciar el programa
     loadBranch();
   }, []);
 
   const handleSaveAndClose = async () => {
-    await loadBranch();
-    setBranchToEdit(undefined);
-    setShowForm(false);
+    await loadBranch(); //lista de sucursales
+    setBranchToEdit(undefined); //limpia la unidad de editar
+    setShowForm(false); //limpia formulario
   };
 
-  const handleClose = () => {
-    setBranchToEdit(undefined);
-    setShowForm(false);
+  const handleClose = () => { //cancelar 
+    setBranchToEdit(undefined); //limpia los datos de sucursal
+    setShowForm(false);//esconde el formulario
   };
 
-  const handleEdit = (branch: Branch) => {
-    setBranchToEdit(branch);
-    setShowForm(true);
+  const handleEdit = (branch: Branch) => { //editar
+    setBranchToEdit(branch);//pone los datos de la sucursal en sus respectivas casillas
+    setShowForm(true);//abre el formulario
   };
 
-  const handleDelete = async (branch: Branch) => {
-    if (!branch.idBranch) return;
-    const confirmar = await AlertConfirm(`¿Desea eliminar la sucursal ${branch.name}?`);
-    if (!confirmar) return;
-    await deleteBranch(branch.idBranch!);
-    AlertWarning("Sucursal eliminada correctamente.");
-    await loadBranch();
+  const handleDelete = async (branch: Branch) => {//eliminar
+    if (!branch.idBranch) return;// sin id no trabaja
+    const confirmar = await AlertConfirm(`¿Desea eliminar la sucursal ${branch.name}?`); //alerta de confirmacion
+    if (!confirmar) return;//si no selecciona confirmar cancela 
+    await deleteBranch(branch.idBranch!); //señal de eliminar
+    AlertWarning("Sucursal eliminada correctamente."); //alert de eliminado correctamente
+    await loadBranch();//recargar la lista
   };
 
-  const columns: { key: keyof Branch; label: string }[] = [
+  const columns: { key: keyof Branch; label: string }[] = [ //columnas
     { key: "idBranch", label: "ID" },
     { key: "name", label: "Nombre" },
     { key: "ubication", label: "Ubicacion" },

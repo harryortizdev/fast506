@@ -1,19 +1,24 @@
 import { useState } from "react";
 import { Administrator } from "../models/Administrator";
 import { create, updateAdministrator } from "../services/AdministratorService";
+
 import AlertSuccess from "./AlertSuccess";
 import AlertWarning from "./AlertWarning";
+
 
 interface AdministratorFormProps {
 
     onClose: () => void;
     onRefresh: () => void;
     administratorToEdit?: Administrator;
+
     administrators: Administrator[];
 
 }
 
-const AdministratorForm = ({ onClose, onRefresh, administratorToEdit, administrators }: AdministratorFormProps) => {
+
+const AdministratorForm = ({ onClose, onRefresh, administratorToEdit }: AdministratorFormProps) => {
+
     const [form, setForm] = useState<Partial<Administrator>>(
         administratorToEdit || { isActive: true }  // Asignar valor por defecto si no hay administrador a editar
     );
@@ -26,8 +31,12 @@ const AdministratorForm = ({ onClose, onRefresh, administratorToEdit, administra
 
         try {
             if (administratorToEdit) {
+
                 const { profileImage, ...formWithoutImage } = form;
                 await updateAdministrator(formWithoutImage as Administrator);
+
+                await updateAdministrator(form as Administrator);
+
                 alert("Administrador actualizado correctamente");
             } else {
                 await create(form as Administrator);
@@ -89,7 +98,11 @@ const AdministratorForm = ({ onClose, onRefresh, administratorToEdit, administra
                         <label>Imagen de perfil:</label>
                         <h1 />
                         <input className="form-control" name="profileImage" placeholder="Imagen de perfil" type="file" accept="image/*"
+
                             onChange={handleChange} />
+
+
+
                     </div>
                     <h1 />
                     <div className="mb-3">

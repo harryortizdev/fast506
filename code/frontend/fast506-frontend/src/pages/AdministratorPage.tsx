@@ -4,9 +4,11 @@ import AdministratorForm from "../components/AdministratorForm";
 import TableGeneric from "../components/TableGeneric";
 import { getAll, deleteAdministrator } from "../services/AdministratorService";
 import { Administrator } from "../models/Administrator";
+
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import AlertConfirm from "../components/AlertConfirm";
+
 
 const AdministratorPage = () => {
 
