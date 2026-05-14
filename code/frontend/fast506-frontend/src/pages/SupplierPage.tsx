@@ -17,7 +17,8 @@ const SupplierPage = () => {
 
   const loadSuppliers = async () => {
     const data = await getAll();
-    setSuppliers(data);
+    const mapped = data.map((s: any) => ({ ...s, isActive: s.active }));
+    setSuppliers(mapped);
   };
 
   useEffect(() => {

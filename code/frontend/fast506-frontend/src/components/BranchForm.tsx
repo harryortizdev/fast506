@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Branch } from "../models/Branch";
-import { Supplier } from "../models/Supplier"; //cambiar
+import { Administrator } from "../models/Administrator"; 
 import { create, updateBranch } from "../services/BranchService";
-import { getAll } from "../services/SupplierService"; //cambiar
+import { getAll } from "../services/AdministratorService"; 
 import AlertSuccess from "./AlertSuccess";
 
 interface BranchFormProps { //componentes a recibir
@@ -14,19 +14,19 @@ interface BranchFormProps { //componentes a recibir
 const BranchForm = ({ onClose, onRefresh, branchToEdit }: BranchFormProps) => {
 
     const [form, setForm] = useState<Partial<Branch>>(branchToEdit || {});
-    const [suppliers, setSuppliers] = useState<Supplier[]>([]); //cargar en el Branch los datos de formulario
+    const [Administrator, setAdministrator] = useState<Administrator[]>([]); //cargar en el Branch los datos de formulario
     const [errors, setErrors] = useState<Partial<Record<keyof Branch, string>>>({}); //guarda errores para mostrarlos respectivamente para cada dato
 
 
     useEffect(() => {
-        getAll().then(setSuppliers);//cuando carga llama al API de user y guarda el resultado
+        getAll().then(setAdministrator);//cuando carga llama al API de user y guarda el resultado
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {//cada vez que se selecciona algo,
         const { name, value } = e.target;
         setForm({
             ...form,
-            [name]: name === "idSupplier" ? Number(value) : value //actualiza el campo que cambió y convierte idUser a número
+            [name]: name === "idUser" ? Number(value) : value //actualiza el campo que cambió y convierte idUser a número
         });
     };
 
@@ -153,8 +153,8 @@ const BranchForm = ({ onClose, onRefresh, branchToEdit }: BranchFormProps) => {
                     >
                         <option value="">Seleccione un encargado</option>
 
-                        {suppliers.map((s) => ( //cambiar
-                            <option key={s.idSupplier} value={s.idSupplier}>
+                        {Administrator.map((s) => ( //cambiar
+                            <option key={s.idUser} value={s.idUser}>
                                 {s.name}
                             </option>
                         ))}

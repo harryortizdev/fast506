@@ -14,20 +14,7 @@ public class Supplier {
     private boolean isActive;
     private int adminId;
 
-    public Supplier(int idSupplier, String name, String companyName, String legalName, 
-                    String supportPhone, String bussinesContactName, String email, 
-                    String ubicacion, boolean isActive, int adminId) {
-        this.idSupplier = idSupplier;
-        this.name = name;
-        this.companyName = companyName;
-        this.legalName = legalName;
-        this.supportPhone = supportPhone;
-        this.bussinesContactName = bussinesContactName;
-        this.email = email;
-        this.ubicacion = ubicacion;
-        this.isActive = isActive;
-        this.adminId = adminId;
-    }
+   
 
      public Supplier(){}
 
