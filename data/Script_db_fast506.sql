@@ -734,6 +734,20 @@ VALUES
     ('Auto Parts S.A.', 'Auto Parts S.A.', 'Auto Parts S.A.', 
     '800-123-4567', 'Carlos González', 'cgonzalez@autoparts.com', 'San José, Costa Rica', 1);
   
+  
+  CALL insertAdministrator(
+    'Administrador de Prueba',
+    1983737,
+    'admin@prueba.com',
+    'password123',
+    '800-123-4567',
+    '1990-01-01',
+    'profile_picture.jpg',
+    'EMP001',
+    'admin@fast506.com'
+);
+
+  
 -- 07/05/2026 - Crear procedimientos de la tabla proveedor (Nolan)
 -- Procedimiento para agregar un supplier (Nolan)
 
