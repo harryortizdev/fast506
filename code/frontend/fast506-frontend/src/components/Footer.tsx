@@ -87,25 +87,25 @@ const Footer = () => {
 
       <div className="col-12 d-flex justify-content-center gap-4 flex-wrap">
 
-        <a href="#" className="text-decoration-none d-flex align-items-center gap-2"
+        <a href="https://www.facebook.com/share/17GtqQyedy/" target="_blank" rel="noopener noreferrer" className="text-decoration-none d-flex align-items-center gap-2"
           style={{ color: "#EEF1EF" }}>
           <i className="bi bi-facebook fs-5"></i>
           <span className="small fw-bold">FACEBOOK</span>
         </a>
 
-        <a href="#" className="text-decoration-none d-flex align-items-center gap-2"
+        <a href="https://www.instagram.com/agenciafast506?igsh=dWQ4eXZkdjdtdG9h" target="_blank" rel="noopener noreferrer" className="text-decoration-none d-flex align-items-center gap-2"
           style={{ color: "#EEF1EF" }}>
           <i className="bi bi-instagram fs-5"></i>
           <span className="small fw-bold">INSTAGRAM</span>
         </a>
 
-        <a href="#" className="text-decoration-none d-flex align-items-center gap-2"
+        <a href="mailto:agenciafast506@gmail.com" className="text-decoration-none d-flex align-items-center gap-2"
           style={{ color: "#EEF1EF" }}>
           <i className="bi bi-envelope-at-fill fs-5"></i>
           <span className="small fw-bold">EMAIL</span>
         </a>
 
-        <a href="#" className="text-decoration-none d-flex align-items-center gap-2"
+        <a href="https://wa.me/50661186130" target="_blank" rel="noopener noreferrer" className="text-decoration-none d-flex align-items-center gap-2"
           style={{ color: "#EEF1EF" }}>
           <i className="bi bi-whatsapp fs-5"></i>
           <span className="small fw-bold">WHATSAPP</span>
