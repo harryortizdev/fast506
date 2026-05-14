@@ -114,95 +114,90 @@ const AdministratorForm = ({ onClose, onRefresh, administratorToEdit, administra
 
     return (
 
-        <center>
-            <h1></h1>
+        <div className="container d-flex justify-content-center">
+            <div className="card p-4 shadow-sm" style={{ maxWidth: '500px', width: '100%' }}>
+                <h3 className="text-center mb-4">{administratorToEdit ? "Editar Administrador" : "Nuevo Administrador"}</h3>
 
-            <div className="container d-flex justify-content-center">
-                <div className="card p-4 shadow-sm" style={{ maxWidth: '500px', width: '100%' }}>
-                    <h3 className="text-center mb-4">{administratorToEdit ? "Editar Administrador" : "Nuevo Administrador"}</h3>
+                <div className="mb-3">
+                    <label>Nombre:</label>
+                    <h1 />
+                    <input className={`form-control ${errors.name ? "is-invalid" : ""}`} name="name" placeholder="Nombre"
+                        value={form.name || ""} onChange={handleChange} />
+                    {errors.name && <div className="invalid-feedback">{errors.name}</div>}
+                </div>
+                <div className="mb-3">
+                    <label>Cedula:</label>
+                    <h1 />
+                    <input className={`form-control ${errors.id ? "is-invalid" : ""}`} name="id" placeholder="Cedula"
+                        value={form.id || ""} onChange={handleChange} />
+                    {errors.id && <div className="invalid-feedback">{errors.id}</div>}
+                </div>
+                <h1 />
+                <h1 />
+                <div className="mb-3">
+                    <label>Email:</label>
+                    <h1 />
+                    <input className={`form-control ${errors.email ? "is-invalid" : ""}`} name="email" placeholder="Email" type="email"
+                        value={form.email || ""} onChange={handleChange} />
+                    {errors.email && <div className="invalid-feedback">{errors.email}</div>}
+                </div>
+                <h1 />
+                <div className="mb-3">
+                    <label>Contraseña:</label>
+                    <h1 />
+                    <input className={`form-control ${errors.password ? "is-invalid" : ""}`} name="password" placeholder="Contraseña" type="password"
+                        value={form.password || ""} onChange={handleChange} />
+                    {errors.password && <div className="invalid-feedback">{errors.password}</div>}
+                </div>
+                <h1 />
+                <div className="mb-3">
+                    <label>Número de telefono:</label>
+                    <h1 />
+                    <input className={`form-control ${errors.phoneNumber ? "is-invalid" : ""}`} name="phoneNumber" placeholder="Número de teléfono" type="tel"
+                        value={form.phoneNumber || ""} onChange={handleChange} />
+                    {errors.phoneNumber && <div className="invalid-feedback">{errors.phoneNumber}</div>}
+                </div>
+                <h1 />
+                <div className="mb-3">
+                    <label>Fecha de Nacimiento:</label>
+                    <h1 />
+                    <input className={`form-control ${errors.dateBirth ? "is-invalid" : ""}`} name="dateBirth" placeholder="Fecha de Nacimiento" type="date"
+                        value={form.dateBirth instanceof Date ? form.dateBirth.toISOString().split("T")[0] : form.dateBirth || ""} onChange={handleChange} />
+                    {errors.dateBirth && <div className="invalid-feedback">{errors.dateBirth}</div>}
+                </div>
+                <h1 />
+                <div className="mb-3">
+                    <label>Imagen de perfil:</label>
+                    <h1 />
+                    <input className={`form-control ${errors.profileImage ? "is-invalid" : ""}`} name="profileImage" placeholder="Imagen de perfil" type="text"
+                        value={form.profileImage || ""} onChange={handleChange} />
+                    {errors.profileImage && <div className="invalid-feedback">{errors.profileImage}</div>}
+                </div>
+                <h1 />
+                <div className="mb-3">
+                    <label>Identificación de Empleado:</label>
+                    <h1 />
+                    <input className={`form-control ${errors.employeeId ? "is-invalid" : ""}`} name="employeeId" placeholder="Identificación de Empleado"
+                        value={form.employeeId || ""} onChange={handleChange} />
+                    {errors.employeeId && <div className="invalid-feedback">{errors.employeeId}</div>}
+                </div>
+                <h1 />
 
-                    <div className="mb-3">
-                        <label>Nombre:</label>
-                        <h1 />
-                        <input className={`form-control ${errors.name ? "is-invalid" : ""}`} name="name" placeholder="Nombre"
-                            value={form.name || ""} onChange={handleChange} />
-                        {errors.name && <div className="invalid-feedback">{errors.name}</div>}
-                    </div>
-                    <div className="mb-3">
-                        <label>Cedula:</label>
-                        <h1 />
-                        <input className={`form-control ${errors.id ? "is-invalid" : ""}`} name="id" placeholder="Cedula"
-                            value={form.id || ""} onChange={handleChange} />
-                        {errors.id && <div className="invalid-feedback">{errors.id}</div>}
-                    </div>
+                <h1 />
+                <div className="mb-3">
+                    <label>Email Corporativo:</label>
                     <h1 />
-                    <h1 />
-                    <div className="mb-3">
-                        <label>Email:</label>
-                        <h1 />
-                        <input className={`form-control ${errors.email ? "is-invalid" : ""}`} name="email" placeholder="Email" type="email"
-                            value={form.email || ""} onChange={handleChange} />
-                        {errors.email && <div className="invalid-feedback">{errors.email}</div>}
-                    </div>
-                    <h1 />
-                    <div className="mb-3">
-                        <label>Contraseña:</label>
-                        <h1 />
-                        <input className={`form-control ${errors.password ? "is-invalid" : ""}`} name="password" placeholder="Contraseña" type="password"
-                            value={form.password || ""} onChange={handleChange} />
-                        {errors.password && <div className="invalid-feedback">{errors.password}</div>}
-                    </div>
-                    <h1 />
-                    <div className="mb-3">
-                        <label>Número de telefono:</label>
-                        <h1 />
-                        <input className={`form-control ${errors.phoneNumber ? "is-invalid" : ""}`} name="phoneNumber" placeholder="Número de teléfono" type="tel"
-                            value={form.phoneNumber || ""} onChange={handleChange} />
-                        {errors.phoneNumber && <div className="invalid-feedback">{errors.phoneNumber}</div>}
-                    </div>
-                    <h1 />
-                    <div className="mb-3">
-                        <label>Fecha de Nacimiento:</label>
-                        <h1 />
-                        <input className={`form-control ${errors.dateBirth ? "is-invalid" : ""}`} name="dateBirth" placeholder="Fecha de Nacimiento" type="date"
-                            value={form.dateBirth instanceof Date ? form.dateBirth.toISOString().split("T")[0] : form.dateBirth || ""} onChange={handleChange} />
-                        {errors.dateBirth && <div className="invalid-feedback">{errors.dateBirth}</div>}
-                    </div>
-                    <h1 />
-                    <div className="mb-3">
-                        <label>Imagen de perfil:</label>
-                        <h1 />
-                        <input className={`form-control ${errors.profileImage ? "is-invalid" : ""}`} name="profileImage" placeholder="Imagen de perfil" type="text"
-                            value={form.profileImage || ""} onChange={handleChange} />
-                        {errors.profileImage && <div className="invalid-feedback">{errors.profileImage}</div>}
-                    </div>
-                    <h1 />
-                    <div className="mb-3">
-                        <label>Identificación de Empleado:</label>
-                        <h1 />
-                        <input className={`form-control ${errors.employeeId ? "is-invalid" : ""}`} name="employeeId" placeholder="Identificación de Empleado"
-                            value={form.employeeId || ""} onChange={handleChange} />
-                        {errors.employeeId && <div className="invalid-feedback">{errors.employeeId}</div>}
-                    </div>
-                    <h1 />
-
-                    <h1 />
-                    <div className="mb-3">
-                        <label>Email Corporativo:</label>
-                        <h1 />
-                        <input className={`form-control ${errors.corporateEmail ? "is-invalid" : ""}`} name="corporateEmail" placeholder="Email Corporativo" type="email"
-                            value={form.corporateEmail || ""} onChange={handleChange} />
-                        {errors.corporateEmail && <div className="invalid-feedback">{errors.corporateEmail}</div>}
-                    </div>
-                    <h1 />
-                    <div className="text-center mt-4">
-                        <button className="btn btn-success me-2" onClick={handleSubmit}>Guardar</button>
-                        <button className="btn btn-secondary" onClick={onClose}>Cancelar</button>
-                    </div>
+                    <input className={`form-control ${errors.corporateEmail ? "is-invalid" : ""}`} name="corporateEmail" placeholder="Email Corporativo" type="email"
+                        value={form.corporateEmail || ""} onChange={handleChange} />
+                    {errors.corporateEmail && <div className="invalid-feedback">{errors.corporateEmail}</div>}
+                </div>
+                <h1 />
+                <div className="text-center mt-4">
+                    <button className="btn btn-success me-2" onClick={handleSubmit}>Guardar</button>
+                    <button className="btn btn-secondary" onClick={onClose}>Cancelar</button>
                 </div>
             </div>
-        </center>
-
+        </div>
     );
 
 };

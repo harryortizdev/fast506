@@ -100,9 +100,6 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
 
     return (
 
-        <center>
-            <h1></h1>
-
             <div className="container d-flex justify-content-center">
                 <div className="card p-4 shadow-sm" style={{ maxWidth: '500px', width: '100%' }}>
                     <h3 className="text-center mb-4">{clientToEdit ? "Editar Cliente" : "Nuevo Cliente"}</h3>
@@ -203,8 +200,6 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
                     </div>
                 </div>
             </div>
-        </center>
-
     );
 
 };
