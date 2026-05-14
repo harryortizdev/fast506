@@ -3,7 +3,7 @@ package cr.ac.ucr.ie.fast506.domain;
 public class Client extends User {
 
     private String commInterest;
-    private String physicalAdress;
+    private String physicalAddress;
     private String occupation;
 
     public String getCommInterest() {
@@ -14,12 +14,12 @@ public class Client extends User {
         this.commInterest = commInterest;
     }
 
-    public String getPhysicalAdress() {
-        return physicalAdress;
+    public String getPhysicalAddress() {
+        return physicalAddress;
     }
 
-    public void setPhysicalAdress(String physicalAdress) {
-        this.physicalAdress = physicalAdress;
+    public void setPhysicalAddress(String physicalAddress) {
+        this.physicalAddress = physicalAddress;
     }
 
     public String getOccupation() {
@@ -29,7 +29,5 @@ public class Client extends User {
     public void setOccupation(String occupation) {
         this.occupation = occupation;
     }
-
-   
 
 }

@@ -36,7 +36,7 @@ public class ClientDAOImplement implements ClientDAO {
                 client.setProfileImage(rs.getString("profile_image"));
 
                 client.setCommInterest(rs.getString("comm_interest"));
-                client.setPhysicalAdress(rs.getString("physical_address"));
+                client.setPhysicalAddress(rs.getString("physical_address"));
                 client.setOccupation(rs.getString("occupation"));
                 list.add(client);
 
@@ -67,7 +67,7 @@ public class ClientDAOImplement implements ClientDAO {
             ps.setString(7, client.getProfileImage());
 
             ps.setString(8, client.getCommInterest());
-            ps.setString(9, client.getPhysicalAdress());
+            ps.setString(9, client.getPhysicalAddress());
             ps.setString(10, client.getOccupation());
             int rows = ps.executeUpdate();
 
@@ -97,7 +97,7 @@ public class ClientDAOImplement implements ClientDAO {
             ps.setString(8, client.getProfileImage());
 
             ps.setString(9, client.getCommInterest());
-            ps.setString(10, client.getPhysicalAdress());
+            ps.setString(10, client.getPhysicalAddress());
             ps.setString(11, client.getOccupation());
             ps.executeUpdate();
 
@@ -151,7 +151,7 @@ public class ClientDAOImplement implements ClientDAO {
                     client.setProfileImage(rs.getString("profile_image"));
 
                     client.setCommInterest(rs.getString("comm_insterest"));
-                    client.setPhysicalAdress(rs.getString("physical_address"));
+                    client.setPhysicalAddress(rs.getString("physical_address"));
                     client.setOccupation(rs.getString("occupation"));
 
                 }

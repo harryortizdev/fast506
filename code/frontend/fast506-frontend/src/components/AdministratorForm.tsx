@@ -17,40 +17,99 @@ interface AdministratorFormProps {
 }
 
 
-const AdministratorForm = ({ onClose, onRefresh, administratorToEdit }: AdministratorFormProps) => {
+const AdministratorForm = ({ onClose, onRefresh, administratorToEdit, administrators }: AdministratorFormProps) => {
 
     const [form, setForm] = useState<Partial<Administrator>>(
         administratorToEdit || { isActive: true }  // Asignar valor por defecto si no hay administrador a editar
     );
+    const [errors, setErrors] = useState<Partial<Record<keyof Administrator, string>>>({});
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const value = e.target.name === "dateBirth"
-            ? new Date(e.target.value)
-            : e.target.value;
-        setForm({ ...form, [e.target.name]: value });
+        const { name, value } = e.target;
+        const parsedValue = name === "dateBirth"
+            ? new Date(value)
+            : name === "id"
+                ? (value === "" ? "" : Number(value))
+                : value;
+        setForm({
+            ...form,
+            [name]: parsedValue,
+        });
+    };
+
+    const validate = (): boolean => {
+        const newErrors: Partial<Record<keyof Administrator, string>> = {};
+        const lettersOnly = /^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]+$/;
+        const alphanumeric = /^[a-zA-Z0-9]+$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const numericOnly = /^[0-9]+$/;
+        const today = new Date();
+
+        if (!form.name || !lettersOnly.test(form.name) || form.name.length > 50) {
+            newErrors.name = "Nombre inválido: solo letras y espacios, máximo 50 caracteres.";
+        }
+
+        if (form.id === undefined || form.id === null || !numericOnly.test(form.id.toString()) || form.id.toString().length < 5 || form.id.toString().length > 20) {
+            newErrors.id = "Cédula inválida: debe ser numérica, entre 5 y 20 dígitos.";
+        }
+
+        if (!form.email || !emailRegex.test(form.email) || form.email.length > 100) {
+            newErrors.email = "Email inválido: ingrese un email válido, máximo 100 caracteres.";
+        }
+
+        if (!form.password || form.password.length < 8 || form.password.length > 100) {
+            newErrors.password = "Contraseña inválida: debe tener entre 8 y 100 caracteres.";
+        }
+
+        if (form.phoneNumber && (!numericOnly.test(form.phoneNumber.toString()) || form.phoneNumber.toString().length > 15)) {
+            newErrors.phoneNumber = "El número de teléfono debe ser numérico y tener máximo 15 dígitos.";
+        }
+
+        if (!form.dateBirth || !(form.dateBirth instanceof Date) || isNaN(form.dateBirth.valueOf()) || form.dateBirth > today) {
+            newErrors.dateBirth = "Fecha de nacimiento inválida.";
+        }
+
+        if (form.profileImage && form.profileImage.length > 200) {
+            newErrors.profileImage = "La URL de la imagen debe tener máximo 200 caracteres.";
+        }
+
+        if (!form.employeeId || !alphanumeric.test(form.employeeId.toString()) || form.employeeId.toString().length > 20) {
+            newErrors.employeeId = "Identificación de empleado inválida: solo letras y números, máximo 20 caracteres.";
+        }
+
+        const corporateEmailRegex = /^[^\s@]+@agenciafast\.cr$/;
+        if (form.corporateEmail && (!corporateEmailRegex.test(form.corporateEmail) || form.corporateEmail.length > 100)) {
+            newErrors.corporateEmail = "Email corporativo inválido: debe terminar en @agenciafast.cr y tener máximo 100 caracteres.";
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = async () => {
+        if (!validate()) return;
+
+        if (!administratorToEdit) {
+            const idExists = administrators.some((a) => a.id === form.id);
+            if (idExists) {
+                AlertWarning("La cédula ya está registrada.");
+                return;
+            }
+        }
 
         try {
             if (administratorToEdit) {
-
-                const { profileImage, ...formWithoutImage } = form;
-                await updateAdministrator(formWithoutImage as Administrator);
-
                 await updateAdministrator(form as Administrator);
-
-                alert("Administrador actualizado correctamente");
+                AlertSuccess("Administrador actualizado correctamente");
             } else {
                 await create(form as Administrator);
-                alert("Administrador creado correctamente");
+                AlertSuccess("Administrador creado correctamente");
             }
             onRefresh();
             onClose();
         } catch (error) {
-            console.error("Error al guardar:", error);
+            AlertWarning("Error al guardar el administrador");
         }
-
     };
 
     return (
@@ -65,57 +124,65 @@ const AdministratorForm = ({ onClose, onRefresh, administratorToEdit }: Administ
                     <div className="mb-3">
                         <label>Nombre:</label>
                         <h1 />
-                        <input className="form-control" name="name" placeholder="Nombre"
+                        <input className={`form-control ${errors.name ? "is-invalid" : ""}`} name="name" placeholder="Nombre"
                             value={form.name || ""} onChange={handleChange} />
+                        {errors.name && <div className="invalid-feedback">{errors.name}</div>}
                     </div>
                     <div className="mb-3">
                         <label>Cedula:</label>
                         <h1 />
-                        <input className="form-control" name="id" placeholder="Cedula"
+                        <input className={`form-control ${errors.id ? "is-invalid" : ""}`} name="id" placeholder="Cedula"
                             value={form.id || ""} onChange={handleChange} />
+                        {errors.id && <div className="invalid-feedback">{errors.id}</div>}
                     </div>
                     <h1 />
                     <h1 />
                     <div className="mb-3">
                         <label>Email:</label>
                         <h1 />
-                        <input className="form-control" name="email" placeholder="Email" type="email"
+                        <input className={`form-control ${errors.email ? "is-invalid" : ""}`} name="email" placeholder="Email" type="email"
                             value={form.email || ""} onChange={handleChange} />
+                        {errors.email && <div className="invalid-feedback">{errors.email}</div>}
                     </div>
                     <h1 />
                     <div className="mb-3">
                         <label>Contraseña:</label>
                         <h1 />
-                        <input className="form-control" name="password" placeholder="Contraseña" type="password"
+                        <input className={`form-control ${errors.password ? "is-invalid" : ""}`} name="password" placeholder="Contraseña" type="password"
                             value={form.password || ""} onChange={handleChange} />
+                        {errors.password && <div className="invalid-feedback">{errors.password}</div>}
                     </div>
                     <h1 />
                     <div className="mb-3">
                         <label>Número de telefono:</label>
                         <h1 />
-                        <input className="form-control" name="phoneNumber" placeholder="Número de teléfono" type="tel"
+                        <input className={`form-control ${errors.phoneNumber ? "is-invalid" : ""}`} name="phoneNumber" placeholder="Número de teléfono" type="tel"
                             value={form.phoneNumber || ""} onChange={handleChange} />
+                        {errors.phoneNumber && <div className="invalid-feedback">{errors.phoneNumber}</div>}
                     </div>
                     <h1 />
                     <div className="mb-3">
                         <label>Fecha de Nacimiento:</label>
                         <h1 />
-                        <input className="form-control" name="dateBirth" placeholder="Fecha de Nacimiento" type="date"
+                        <input className={`form-control ${errors.dateBirth ? "is-invalid" : ""}`} name="dateBirth" placeholder="Fecha de Nacimiento" type="date"
                             value={form.dateBirth instanceof Date ? form.dateBirth.toISOString().split("T")[0] : form.dateBirth || ""} onChange={handleChange} />
+                        {errors.dateBirth && <div className="invalid-feedback">{errors.dateBirth}</div>}
                     </div>
                     <h1 />
                     <div className="mb-3">
                         <label>Imagen de perfil:</label>
                         <h1 />
-                        <input className="form-control" name="profileImage" placeholder="Imagen de perfil" type="text"
+                        <input className={`form-control ${errors.profileImage ? "is-invalid" : ""}`} name="profileImage" placeholder="Imagen de perfil" type="text"
                             value={form.profileImage || ""} onChange={handleChange} />
+                        {errors.profileImage && <div className="invalid-feedback">{errors.profileImage}</div>}
                     </div>
                     <h1 />
                     <div className="mb-3">
                         <label>Identificación de Empleado:</label>
                         <h1 />
-                        <input className="form-control" name="employeeId" placeholder="Identificación de Empleado"
+                        <input className={`form-control ${errors.employeeId ? "is-invalid" : ""}`} name="employeeId" placeholder="Identificación de Empleado"
                             value={form.employeeId || ""} onChange={handleChange} />
+                        {errors.employeeId && <div className="invalid-feedback">{errors.employeeId}</div>}
                     </div>
                     <h1 />
 
@@ -123,8 +190,9 @@ const AdministratorForm = ({ onClose, onRefresh, administratorToEdit }: Administ
                     <div className="mb-3">
                         <label>Email Corporativo:</label>
                         <h1 />
-                        <input className="form-control" name="corporateEmail" placeholder="Email Corporativo" type="email"
+                        <input className={`form-control ${errors.corporateEmail ? "is-invalid" : ""}`} name="corporateEmail" placeholder="Email Corporativo" type="email"
                             value={form.corporateEmail || ""} onChange={handleChange} />
+                        {errors.corporateEmail && <div className="invalid-feedback">{errors.corporateEmail}</div>}
                     </div>
                     <h1 />
                     <div className="text-center mt-4">
