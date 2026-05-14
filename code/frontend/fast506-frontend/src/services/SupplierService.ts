@@ -15,6 +15,11 @@ export const create = async (supplier: Partial<Supplier>) => { // llamada asincr
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(supplier),
   });
+  if (!res.ok) {
+    const error = await res.text();
+    console.error("Error del backend:", error);
+    throw new Error(`Error creating supplier: ${error}`);
+  }
   return res.text();
 };
 

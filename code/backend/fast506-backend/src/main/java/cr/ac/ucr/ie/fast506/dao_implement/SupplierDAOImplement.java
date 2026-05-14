@@ -48,9 +48,12 @@ public class SupplierDAOImplement implements SupplierDAO {
             ps.setString(5, supplier.getBussinesContactName());
             ps.setString(6, supplier.getEmail());
             ps.setString(7, supplier.getUbicacion());
-           // ps.setInt(8, supplier.getAdminId());
+            ps.setInt(8, supplier.getAdminId());
+
+            System.out.println("Datos recibidos para agregar proveedor: " + supplier);
 
             ps.executeUpdate();
+
         } catch (SQLException e) {
             System.err.println("Error al crear proveedor " + e.getMessage());
         }
@@ -70,7 +73,7 @@ public class SupplierDAOImplement implements SupplierDAO {
             ps.setString(6, supplier.getBussinesContactName());
             ps.setString(7, supplier.getEmail());
             ps.setString(8, supplier.getUbicacion());
-            //ps.setInt(9, supplier.getAdminId());
+            ps.setInt(9, supplier.getAdminId());
 
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -107,7 +110,7 @@ public class SupplierDAOImplement implements SupplierDAO {
                     supplier.setBussinesContactName(rs.getString("bussines_contact_name"));
                     supplier.setEmail(rs.getString("email"));
                     supplier.setUbicacion(rs.getString("ubicacion"));
-                   // supplier.setAdminId(rs.getInt("admin_id"));
+                    supplier.setAdminId(rs.getInt("admin_id"));
                 }
             }
         } catch (SQLException e) {
