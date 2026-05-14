@@ -10,60 +10,61 @@ import Footer from "../components/Footer";
 
 const ClientPage = () => {
 
-    const [clients, setClients] = useState<Client[]>([]);
-    const [showForm, setShowForm] = useState(false);
-    const [clientToEdit, setClientToEdit] = useState<Client | undefined>(undefined);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  const [clientToEdit, setClientToEdit] = useState<Client | undefined>(undefined);
 
-    const loadClients = async () => {
+  const loadClients = async () => {
 
-        const data = await getAll();
-        setClients(data);
+    const data = await getAll();
+    setClients(data);
 
-    };
+  };
 
-    useEffect(() => {
+  useEffect(() => {
 
-        loadClients();
+    loadClients();
 
-    }, []);
+  }, []);
 
-    const handleSaveAndClose = async () => {
-        await loadClients();
-        setClientToEdit(undefined);
-        setShowForm(false);
-    };
+  const handleSaveAndClose = async () => {
+    await loadClients();
+    setClientToEdit(undefined);
+    setShowForm(false);
+  };
 
-    const handleClose = () => {
-        setClientToEdit(undefined);
-        setShowForm(false);
-    };
+  const handleClose = () => {
+    setClientToEdit(undefined);
+    setShowForm(false);
+  };
 
-    const handleEdit = (client: Client) => {
-        setClientToEdit(client);
-        setShowForm(true);
-    };
+  const handleEdit = (client: Client) => {
+    setClientToEdit(client);
+    setShowForm(true);
+  };
 
-    const handleDelete = async (client: Client) => {
-        if (!client.idUser) return;
-        const confirmar = window.confirm(`¿Desea eliminar el cliente ${client.name}?`);
-        if (!confirmar) return;
-        await deleteClient(client.idUser!);
-        await loadClients();
-    };
+  const handleDelete = async (client: Client) => {
+    if (!client.idUser) return;
+    const confirmar = window.confirm(`¿Desea eliminar el cliente ${client.name}?`);
+    if (!confirmar) return;
+    await deleteClient(client.idUser!);
+    await loadClients();
+  };
 
-    const columns: { key: keyof Client; label: string }[] = [
-        { key: "name", label: "Nombre" },
-        { key: "email", label: "Email" },
-        { key: "phoneNumber", label: "Telefono" },
-        { key: "dateBirth", label: "Fecha de Nacimiento" },
-        { key: "profileImage", label: "Imagen de Perfil" },
-        { key: "commInterest", label: "Intereses" },
-        { key: "physicalAddress", label: "Dirección Física" },
-    ];
+  const columns: { key: keyof Client; label: string }[] = [
+    { key: "name", label: "Nombre" },
+    { key: "id", label: "Cedula" },
+    { key: "email", label: "Email" },
+    { key: "phoneNumber", label: "Telefono" },
+    { key: "dateBirth", label: "Fecha de Nacimiento" },
+    { key: "profileImage", label: "Imagen de Perfil" },
+    { key: "commInterest", label: "Intereses" },
+    { key: "physicalAddress", label: "Dirección Física" },
+  ];
 
-    return (
+  return (
 
-      <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", backgroundColor: "#EEF1EF", }}>
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", backgroundColor: "#EEF1EF", }}>
 
       <Navbar />
 
@@ -99,7 +100,7 @@ const ClientPage = () => {
                   onClose={handleClose}
                   onRefresh={handleSaveAndClose}
                   clientToEdit={clientToEdit}
-                  //clients={clients}
+                //clients={clients}
                 />
               )}
             </div>
@@ -110,7 +111,7 @@ const ClientPage = () => {
       <Footer />
     </div>
 
-    );
+  );
 
 }
 

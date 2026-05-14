@@ -24,44 +24,31 @@ const AdministratorForm = ({ onClose, onRefresh, administratorToEdit }: Administ
     );
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+        const value = e.target.name === "dateBirth"
+            ? new Date(e.target.value)
+            : e.target.value;
+        setForm({ ...form, [e.target.name]: value });
     };
 
     const handleSubmit = async () => {
 
         try {
             if (administratorToEdit) {
-                // Merge original data with form changes
-                const dataToSend = {
-                    ...administratorToEdit,
-                    ...form,
-                    dateBirth: form.dateBirth 
-                        ? new Date(form.dateBirth).toISOString().split('T')[0]
-                        : administratorToEdit.dateBirth,
-                    profileImage: administratorToEdit.profileImage || ""
-                };
-                console.log("Enviando datos de actualización:", dataToSend);
-                await updateAdministrator(dataToSend as unknown as Administrator);
+
+                const { profileImage, ...formWithoutImage } = form;
+                await updateAdministrator(formWithoutImage as Administrator);
+
+                await updateAdministrator(form as Administrator);
+
                 alert("Administrador actualizado correctamente");
             } else {
-                // Create new administrator with form data
-                const dataToSend = {
-                    ...form,
-                    dateBirth: form.dateBirth 
-                        ? new Date(form.dateBirth).toISOString().split('T')[0]
-                        : null,
-                    profileImage: form.profileImage || "",
-                    isActive: form.isActive !== undefined ? form.isActive : true
-                };
-                console.log("Enviando datos de creación:", dataToSend);
-                await create(dataToSend as unknown as Administrator);
+                await create(form as Administrator);
                 alert("Administrador creado correctamente");
             }
             onRefresh();
             onClose();
         } catch (error) {
             console.error("Error al guardar:", error);
-            alert(`Error al guardar: ${error instanceof Error ? error.message : 'Error desconocido'}`);
         }
 
     };
@@ -81,6 +68,13 @@ const AdministratorForm = ({ onClose, onRefresh, administratorToEdit }: Administ
                         <input className="form-control" name="name" placeholder="Nombre"
                             value={form.name || ""} onChange={handleChange} />
                     </div>
+                    <div className="mb-3">
+                        <label>Cedula:</label>
+                        <h1 />
+                        <input className="form-control" name="id" placeholder="Cedula"
+                            value={form.id || ""} onChange={handleChange} />
+                    </div>
+                    <h1 />
                     <h1 />
                     <div className="mb-3">
                         <label>Email:</label>
@@ -107,18 +101,14 @@ const AdministratorForm = ({ onClose, onRefresh, administratorToEdit }: Administ
                         <label>Fecha de Nacimiento:</label>
                         <h1 />
                         <input className="form-control" name="dateBirth" placeholder="Fecha de Nacimiento" type="date"
-                            value={form.dateBirth instanceof Date ? form.dateBirth.toISOString().split('T')[0] : form.dateBirth || ""} onChange={handleChange} />
+                            value={form.dateBirth instanceof Date ? form.dateBirth.toISOString().split("T")[0] : form.dateBirth || ""} onChange={handleChange} />
                     </div>
                     <h1 />
                     <div className="mb-3">
                         <label>Imagen de perfil:</label>
                         <h1 />
-                        <input className="form-control" name="profileImage" placeholder="Imagen de perfil" type="file" accept="image/*"
-
-                            onChange={handleChange} />
-
-
-
+                        <input className="form-control" name="profileImage" placeholder="Imagen de perfil" type="text"
+                            value={form.profileImage || ""} onChange={handleChange} />
                     </div>
                     <h1 />
                     <div className="mb-3">

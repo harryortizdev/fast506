@@ -1,6 +1,7 @@
 export interface Client {
 
     idUser: number;
+    id: number;
     name: string;
     email: string;
     password: string;

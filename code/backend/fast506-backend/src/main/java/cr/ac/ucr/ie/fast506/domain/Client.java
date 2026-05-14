@@ -4,7 +4,7 @@ public class Client extends User {
 
     private String commInterest;
     private String physicalAdress;
-    private String ocupation;
+    private String occupation;
 
     public String getCommInterest() {
         return commInterest;
@@ -22,12 +22,14 @@ public class Client extends User {
         this.physicalAdress = physicalAdress;
     }
 
-    public String getOcupation() {
-        return ocupation;
+    public String getOccupation() {
+        return occupation;
     }
 
-    public void setOcupation(String ocupation) {
-        this.ocupation = ocupation;
+    public void setOccupation(String occupation) {
+        this.occupation = occupation;
     }
+
+   
 
 }

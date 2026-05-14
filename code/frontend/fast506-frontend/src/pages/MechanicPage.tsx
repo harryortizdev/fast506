@@ -53,6 +53,7 @@ const MechanicPage = () => {
 
     const columns: { key: keyof Mechanic; label: string }[] = [
         { key: "name", label: "Nombre" },
+        { key: "id", label: "Cedula" },
         { key: "email", label: "Email" },
         { key: "phoneNumber", label: "Telefono" },
         { key: "dateBirth", label: "Fecha de Nacimiento" },

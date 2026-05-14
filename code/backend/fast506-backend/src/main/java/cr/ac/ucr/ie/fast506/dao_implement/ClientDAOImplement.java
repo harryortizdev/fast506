@@ -4,7 +4,6 @@ import cr.ac.ucr.ie.fast506.connection.DBConnection;
 import cr.ac.ucr.ie.fast506.dao.ClientDAO;
 import cr.ac.ucr.ie.fast506.domain.Client;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,8 +12,6 @@ import java.util.LinkedList;
 import org.springframework.stereotype.Repository;
 
 @Repository
-
-
 
 public class ClientDAOImplement implements ClientDAO {
 
@@ -35,12 +32,12 @@ public class ClientDAOImplement implements ClientDAO {
                 client.setId(rs.getInt("id"));
                 client.setEmail(rs.getString("email"));
                 client.setPhoneNumber(rs.getString("phone_number"));
-                client.setDateBirth(rs.getDate("date_birth"));
+                client.setDateBirth(rs.getDate("date_birth").toLocalDate());
                 client.setProfileImage(rs.getString("profile_image"));
 
-                client.setCommInterest(rs.getString("comm_insterest"));
+                client.setCommInterest(rs.getString("comm_interest"));
                 client.setPhysicalAdress(rs.getString("physical_address"));
-                client.setOcupation(rs.getString("occupation"));
+                client.setOccupation(rs.getString("occupation"));
                 list.add(client);
 
             }
@@ -66,13 +63,15 @@ public class ClientDAOImplement implements ClientDAO {
             ps.setString(3, client.getEmail());
             ps.setString(4, client.getPassword());
             ps.setString(5, client.getPhoneNumber());
-            ps.setDate(6, (Date) client.getDateBirth());
+            ps.setDate(6, java.sql.Date.valueOf(client.getDateBirth()));
             ps.setString(7, client.getProfileImage());
 
             ps.setString(8, client.getCommInterest());
             ps.setString(9, client.getPhysicalAdress());
-            ps.setString(10, client.getOcupation());
-            ps.executeUpdate();
+            ps.setString(10, client.getOccupation());
+            int rows = ps.executeUpdate();
+
+            System.out.println("Filas insertadas: " + rows);
 
         } catch (SQLException e) {
 
@@ -88,17 +87,18 @@ public class ClientDAOImplement implements ClientDAO {
 
         try (Connection cn = DBConnection.getConnection(); PreparedStatement ps = cn.prepareStatement(sql)) {
 
-            ps.setString(1, client.getName());
-            ps.setInt(2, client.getId());
-            ps.setString(3, client.getEmail());
-            ps.setString(4, client.getPassword());
-            ps.setString(5, client.getPhoneNumber());
-            ps.setDate(6, (Date) client.getDateBirth());
-            ps.setString(7, client.getProfileImage());
+            ps.setInt(1, client.getIdUser());
+            ps.setString(2, client.getName());
+            ps.setInt(3, client.getId());
+            ps.setString(4, client.getEmail());
+            ps.setString(5, client.getPassword());
+            ps.setString(6, client.getPhoneNumber());
+            ps.setDate(7, java.sql.Date.valueOf(client.getDateBirth()));
+            ps.setString(8, client.getProfileImage());
 
-            ps.setString(8, client.getCommInterest());
-            ps.setString(9, client.getPhysicalAdress());
-            ps.setString(10, client.getOcupation());
+            ps.setString(9, client.getCommInterest());
+            ps.setString(10, client.getPhysicalAdress());
+            ps.setString(11, client.getOccupation());
             ps.executeUpdate();
 
         } catch (Exception e) {
@@ -147,12 +147,12 @@ public class ClientDAOImplement implements ClientDAO {
                     client.setId(rs.getInt("id"));
                     client.setEmail(rs.getString("email"));
                     client.setPhoneNumber(rs.getString("phone_number"));
-                    client.setDateBirth(rs.getDate("date_birth"));
+                    client.setDateBirth(rs.getDate("date_birth").toLocalDate());
                     client.setProfileImage(rs.getString("profile_image"));
 
                     client.setCommInterest(rs.getString("comm_insterest"));
                     client.setPhysicalAdress(rs.getString("physical_address"));
-                    client.setOcupation(rs.getString("occupation"));
+                    client.setOccupation(rs.getString("occupation"));
 
                 }
 

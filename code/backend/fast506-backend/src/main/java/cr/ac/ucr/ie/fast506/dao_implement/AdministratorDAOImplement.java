@@ -4,7 +4,6 @@ import cr.ac.ucr.ie.fast506.connection.DBConnection;
 import cr.ac.ucr.ie.fast506.dao.AdministratorDAO;
 import cr.ac.ucr.ie.fast506.domain.Administrator;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -34,7 +33,7 @@ public class AdministratorDAOImplement implements AdministratorDAO {
                 admin.setId(rs.getInt("id"));
                 admin.setEmail(rs.getString("email"));
                 admin.setPhoneNumber(rs.getString("phone_number"));
-                admin.setDateBirth(rs.getDate("date_birth"));
+                admin.setDateBirth(rs.getDate("date_birth").toLocalDate());
                 admin.setProfileImage(rs.getString("profile_image"));
                 admin.setEmployeeId(rs.getString("employee_id"));
                 admin.setCorporateEmail(rs.getString("corporate_email"));
@@ -64,15 +63,18 @@ public class AdministratorDAOImplement implements AdministratorDAO {
             ps.setString(3, admin.getEmail());
             ps.setString(4, admin.getPassword());
             ps.setString(5, admin.getPhoneNumber());
-            ps.setDate(6, (Date) admin.getDateBirth());
+            ps.setDate(6, java.sql.Date.valueOf(admin.getDateBirth()));
             ps.setString(7, admin.getProfileImage());
             ps.setString(8, admin.getEmployeeId());
             ps.setString(9, admin.getCorporateEmail());
-            ps.executeUpdate();
+            int rows = ps.executeUpdate();
+
+            System.out.println("Filas insertadas: " + rows);
 
         } catch (SQLException e) {
 
             System.err.println("Error al crear administrador " + e.getMessage());
+            throw new RuntimeException(e);
 
         }
 
@@ -86,15 +88,15 @@ public class AdministratorDAOImplement implements AdministratorDAO {
         try (Connection cn = DBConnection.getConnection(); PreparedStatement ps = cn.prepareStatement(sql)) {
 
             ps.setInt(1, admin.getIdUser());
-            ps.setString(1, admin.getName());
-            ps.setInt(2, admin.getId());
-            ps.setString(3, admin.getEmail());
-            ps.setString(4, admin.getPassword());
-            ps.setString(5, admin.getPhoneNumber());
-            ps.setDate(6, (Date) admin.getDateBirth());
-            ps.setString(7, admin.getProfileImage());
-            ps.setString(8, admin.getEmployeeId());
-            ps.setString(9, admin.getCorporateEmail());
+            ps.setString(2, admin.getName());
+            ps.setInt(3, admin.getId());
+            ps.setString(4, admin.getEmail());
+            ps.setString(5, admin.getPassword());
+            ps.setString(6, admin.getPhoneNumber());
+            ps.setDate(7, java.sql.Date.valueOf(admin.getDateBirth()));
+            ps.setString(8, admin.getProfileImage());
+            ps.setString(9, admin.getEmployeeId());
+            ps.setString(10, admin.getCorporateEmail());
             ps.executeUpdate();
 
         } catch (SQLException e) {
@@ -143,7 +145,7 @@ public class AdministratorDAOImplement implements AdministratorDAO {
                     admin.setId(rs.getInt("id"));
                     admin.setEmail(rs.getString("email"));
                     admin.setPhoneNumber(rs.getString("phone_number"));
-                    admin.setDateBirth(rs.getDate("date_birth"));
+                    admin.setDateBirth(rs.getDate("date_birth").toLocalDate());
                     admin.setProfileImage(rs.getString("profile_image"));
                     admin.setEmployeeId(rs.getString("employee_id"));
                     admin.setCorporateEmail(rs.getString("corporate_email"));

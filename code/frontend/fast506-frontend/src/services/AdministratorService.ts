@@ -12,6 +12,8 @@ export const getAll = async () => {
 // Fetch add
 
 export const create = async (administrator: Partial<Administrator>) => {
+   
+
 
     const res = await fetch(`${API_URL}/create`, {
         method: 'POST',
@@ -19,6 +21,7 @@ export const create = async (administrator: Partial<Administrator>) => {
         body: JSON.stringify(administrator),
     });
     if (!res.ok) {
+        console.error("Respuesta del servidor:", res.status, res.statusText);
         throw new Error(`Error creating administrator: ${res.statusText}`);
     }
     return res.text();

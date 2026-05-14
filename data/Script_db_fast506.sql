@@ -198,6 +198,8 @@ BEGIN
         p_corporate_email
     );
 
+	COMMIT;
+
 END $$
 
 DELIMITER ;
@@ -298,7 +300,7 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS insertMechanic;
 
 DELIMITER $$
-
+USE `db_fast506`$$
 CREATE PROCEDURE insertMechanic(
 
     IN p_name VARCHAR(100),
@@ -322,6 +324,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         ROLLBACK;
+        RESIGNAL;
     END;
 
     START TRANSACTION;
@@ -369,6 +372,27 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+-- Datos de prueba mecanico
+
+CALL insertMechanic(
+
+    -- users
+    'Carlos Rodriguez',
+    987654321,
+    'carlos@gmail.com',
+    '12345',
+    '87776666',
+    '1998-06-20',
+    'carlos.png',
+
+    -- mechanic
+    'MEC001',
+    'carlos@fast506.com',
+    'Motor y Transmisión',
+    'Nivel Avanzado'
+
+);
 
 -- Obtener mecanicos
 
@@ -505,7 +529,7 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS insertClient;
 
 DELIMITER $$
-
+USE `db_fast506`$$
 CREATE PROCEDURE insertClient(
 
     IN p_name VARCHAR(100),
@@ -528,6 +552,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         ROLLBACK;
+        RESIGNAL;
     END;
 
     START TRANSACTION;
@@ -573,6 +598,27 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+-- Datos de prueba clientes
+
+
+CALL insertClient(
+
+    -- users
+    'Maria Fernandez',
+    456789123,
+    'maria@gmail.com',
+    '12345',
+    '86665555',
+    '2001-03-12',
+    'maria.png',
+
+    -- client
+    'Vehículos Deportivos',
+    'Guápiles, Limón, Costa Rica',
+    'Ingeniera de Software'
+
+);
 
 -- Obtener clientes
 

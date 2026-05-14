@@ -53,6 +53,15 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
                             value={form.name || ""} onChange={handleChange} />
                     </div>
                     <h1 />
+
+                    <div className="mb-3">
+                        <label>Cedula:</label>
+                        <h1 />
+                        <input className="form-control" name="id" placeholder="Cedula"
+                            value={form.id || ""} onChange={handleChange} />
+                    </div>
+                    <h1 />
+
                     <div className="mb-3">
                         <label>Email:</label>
                         <h1 />
@@ -84,14 +93,14 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
                     <div className="mb-3">
                         <label>Imagen de perfil:</label>
                         <h1 />
-                        <input className="form-control" name="profileImage" placeholder="Imagen de perfil" type="file" accept="image/*"
+                        <input className="form-control" name="profileImage" placeholder="Imagen de perfil" 
                             value={form.profileImage || ""} onChange={handleChange} />
                     </div>
                     <h1 />
                     <div className="mb-3">
                         <label>Intereses:</label>
                         <h1 />
-                        <input className="form-control" name="interests" placeholder="Intereses"
+                        <input className="form-control" name="commInterest" placeholder="Intereses" type="text"
                             value={form.commInterest || ""} onChange={handleChange} />
                     </div>
                     <h1 />

@@ -1,6 +1,6 @@
 package cr.ac.ucr.ie.fast506.domain;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public class User {
 
@@ -10,7 +10,7 @@ public class User {
     private String email;
     private String password;
     private String phoneNumber;
-    private Date dateBirth;
+    private LocalDate dateBirth;
     private String profileImage;
     private boolean isActive;
 
@@ -62,13 +62,15 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    public Date getDateBirth() {
+    public LocalDate getDateBirth() {
         return dateBirth;
     }
 
-    public void setDateBirth(Date dateBirth) {
+    public void setDateBirth(LocalDate dateBirth) {
         this.dateBirth = dateBirth;
     }
+
+    
 
     public String getProfileImage() {
         return profileImage;

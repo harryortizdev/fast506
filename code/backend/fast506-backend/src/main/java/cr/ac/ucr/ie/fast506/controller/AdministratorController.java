@@ -40,7 +40,7 @@ public class AdministratorController {
 
         } catch (Exception e) {
 
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Error al registrar el administrador " + e.getMessage());
+            return ResponseEntity.status(500).body("Error al registrar el administrador " + e.getMessage());
 
         }
 

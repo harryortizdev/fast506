@@ -4,7 +4,6 @@ import cr.ac.ucr.ie.fast506.connection.DBConnection;
 import cr.ac.ucr.ie.fast506.dao.MechanicDAO;
 import cr.ac.ucr.ie.fast506.domain.Mechanic;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,8 +12,6 @@ import java.util.LinkedList;
 import org.springframework.stereotype.Repository;
 
 @Repository
-
-
 
 public class MechanicDAOImplement implements MechanicDAO {
 
@@ -37,7 +34,7 @@ public class MechanicDAOImplement implements MechanicDAO {
                 mechanic.setId(rs.getInt("id"));
                 mechanic.setEmail(rs.getString("email"));
                 mechanic.setPhoneNumber(rs.getString("phone_number"));
-                mechanic.setDateBirth(rs.getDate("date_birth"));
+                mechanic.setDateBirth(rs.getDate("date_birth").toLocalDate());
                 mechanic.setProfileImage(rs.getString("profile_image"));
 
                 mechanic.setEmployeeId(rs.getString("employee_id"));
@@ -69,13 +66,15 @@ public class MechanicDAOImplement implements MechanicDAO {
             ps.setString(3, mechanic.getEmail());
             ps.setString(4, mechanic.getPassword());
             ps.setString(5, mechanic.getPhoneNumber());
-            ps.setDate(6, (Date) mechanic.getDateBirth());
+            ps.setDate(6, java.sql.Date.valueOf(mechanic.getDateBirth()));
             ps.setString(7, mechanic.getProfileImage());
             ps.setString(8, mechanic.getEmployeeId());
             ps.setString(9, mechanic.getCorporateEmail());
             ps.setString(10, mechanic.getSpecialty());
             ps.setString(11, mechanic.getCertLevel());
-            ps.executeUpdate();
+            int rows = ps.executeUpdate();
+
+            System.out.println("Filas insertadas: " + rows);
 
         } catch (SQLException e) {
 
@@ -88,21 +87,22 @@ public class MechanicDAOImplement implements MechanicDAO {
     @Override
     public void update(Mechanic mechanic) {
 
-        String sql = "CALL db_fast506.updateMechanic(?,?,?,?,?,?,?,?,?,?,?);";
+        String sql = "CALL db_fast506.updateMechanic(?,?,?,?,?,?,?,?,?,?,?,?);";
 
         try (Connection cn = DBConnection.getConnection(); PreparedStatement ps = cn.prepareStatement(sql)) {
 
-            ps.setString(1, mechanic.getName());
-            ps.setInt(2, mechanic.getId());
-            ps.setString(3, mechanic.getEmail());
-            ps.setString(4, mechanic.getPassword());
-            ps.setString(5, mechanic.getPhoneNumber());
-            ps.setDate(6, (Date) mechanic.getDateBirth());
-            ps.setString(7, mechanic.getProfileImage());
-            ps.setString(8, mechanic.getEmployeeId());
-            ps.setString(9, mechanic.getCorporateEmail());
-            ps.setString(10, mechanic.getSpecialty());
-            ps.setString(11, mechanic.getCertLevel());
+            ps.setInt(1, mechanic.getIdUser());
+            ps.setString(2, mechanic.getName());
+            ps.setInt(3, mechanic.getId());
+            ps.setString(4, mechanic.getEmail());
+            ps.setString(5, mechanic.getPassword());
+            ps.setString(6, mechanic.getPhoneNumber());
+            ps.setDate(7, java.sql.Date.valueOf(mechanic.getDateBirth()));
+            ps.setString(8, mechanic.getProfileImage());
+            ps.setString(9, mechanic.getEmployeeId());
+            ps.setString(10, mechanic.getCorporateEmail());
+            ps.setString(11, mechanic.getSpecialty());
+            ps.setString(12, mechanic.getCertLevel());
             ps.executeUpdate();
 
         } catch (SQLException e) {
@@ -151,7 +151,7 @@ public class MechanicDAOImplement implements MechanicDAO {
                     mechanic.setId(rs.getInt("id"));
                     mechanic.setEmail(rs.getString("email"));
                     mechanic.setPhoneNumber(rs.getString("phone_number"));
-                    mechanic.setDateBirth(rs.getDate("date_birth"));
+                    mechanic.setDateBirth(rs.getDate("date_birth").toLocalDate());
                     mechanic.setProfileImage(rs.getString("profile_image"));
 
                     mechanic.setEmployeeId(rs.getString("employee_id"));
