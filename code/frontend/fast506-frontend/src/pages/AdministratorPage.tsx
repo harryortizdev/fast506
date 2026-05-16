@@ -1,73 +1,73 @@
 import { useEffect, useState } from "react";
 import ButtonNew from "../components/ButtonNew";
-import AdministratorForm from "../components/AdministratorForm";
-import TableGeneric from "../components/TableGeneric";
+import AdministratorForm from "../components/organisms/AdministratorForm";
+import TableGeneric from "../components/organisms/TableGeneric";
 import { getAll, deleteAdministrator } from "../services/AdministratorService";
 import { Administrator } from "../models/Administrator";
-
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import AlertConfirm from "../components/AlertConfirm";
+import Navbar from "../components/organisms/Navbar";
+import Footer from "../components/organisms/Footer";
+import AlertConfirm from "../components/atoms/AlertConfirm";
+import ButtonIcon from "../components/molecules/ButtonIcon";
 
 
 const AdministratorPage = () => {
 
-    const [administrators, setAdministrators] = useState<Administrator[]>([]);
-    const [showForm, setShowForm] = useState(false);
-    const [administratorToEdit, setAdministratorToEdit] = useState<Administrator | undefined>(undefined);
+  const [administrators, setAdministrators] = useState<Administrator[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  const [administratorToEdit, setAdministratorToEdit] = useState<Administrator | undefined>(undefined);
 
-    const loadAdministrators = async () => {
+  const loadAdministrators = async () => {
 
-        const data = await getAll();
-        console.log("Administrators data:", data);
-        setAdministrators(Array.isArray(data) ? data : []);
+    const data = await getAll();
+    console.log("Administrators data:", data);
+    setAdministrators(Array.isArray(data) ? data : []);
 
-    };
+  };
 
-    useEffect(() => {
+  useEffect(() => {
 
-        loadAdministrators();
+    loadAdministrators();
 
-    }, []);
+  }, []);
 
-    const handleSaveAndClose = async () => {
-        await loadAdministrators();
-        setAdministratorToEdit(undefined);
-        setShowForm(false);
-    };
+  const handleSaveAndClose = async () => {
+    await loadAdministrators();
+    setAdministratorToEdit(undefined);
+    setShowForm(false);
+  };
 
-    const handleClose = () => {
-        setAdministratorToEdit(undefined);
-        setShowForm(false);
-    };
+  const handleClose = () => {
+    setAdministratorToEdit(undefined);
+    setShowForm(false);
+  };
 
-    const handleEdit = (administrator: Administrator) => {
-        setAdministratorToEdit(administrator);
-        setShowForm(true);
-    };
+  const handleEdit = (administrator: Administrator) => {
+    setAdministratorToEdit(administrator);
+    setShowForm(true);
+  };
 
-    const handleDelete = async (administrator: Administrator) => {
-        if (!administrator.idUser) return;
-        const confirmar = window.confirm(`¿Desea eliminar el administrador ${administrator.name}?`);
-        if (!confirmar) return;
-        await deleteAdministrator(administrator.idUser);
-        await loadAdministrators();
-    };
+  const handleDelete = async (administrator: Administrator) => {
+    if (!administrator.idUser) return;
+    const confirmar = await AlertConfirm(`¿Desea eliminar el administrador ${administrator.name}?`);
+    if (!confirmar) return;
+    await deleteAdministrator(administrator.idUser);
+    await loadAdministrators();
+  };
 
-    const columns: { key: keyof Administrator; label: string }[] = [
-        { key: "name", label: "Nombre" },
-        { key: "id", label: "Cedula" },
-        { key: "email", label: "Email" },
-        { key: "phoneNumber", label: "Telefono" },
-        { key: "dateBirth", label: "Fecha de Nacimiento" },
-        { key: "profileImage", label: "Imagen de Perfil" },
-        { key: "employeeId", label: "ID de Empleado" },
-        { key: "corporateEmail", label: "Email Corporativo" },
-    ];
+  const columns: { key: keyof Administrator; label: string }[] = [
+    { key: "name", label: "Nombre" },
+    { key: "id", label: "Cedula" },
+    { key: "email", label: "Email" },
+    { key: "phoneNumber", label: "Telefono" },
+    { key: "dateBirth", label: "Fecha de Nacimiento" },
+    { key: "profileImage", label: "Imagen de Perfil" },
+    { key: "employeeId", label: "ID de Empleado" },
+    { key: "corporateEmail", label: "Email Corporativo" },
+  ];
 
-    return (
+  return (
 
-       <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", backgroundColor: "#EEF1EF", }}>
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", backgroundColor: "#EEF1EF", }}>
 
       <Navbar />
 
@@ -83,7 +83,20 @@ const AdministratorPage = () => {
               </h5>
 
               <div className="d-flex justify-content-center justify-content-md-end">
-                <ButtonNew label="Nuevo" onClick={() => setShowForm(true)} />
+                <ButtonIcon
+                  label="Nuevo"
+                  onClick={() => setShowForm(true)}
+                  icon={<i className="bi bi-plus-circle" />}
+                  className="btn mb-3 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2"
+                  backgroundColor="#5E6572"
+                  hoverColor="#2C3E50"
+                  color="#EEF1EF"
+                  style={{
+                    backgroundColor: "#5E6572",
+                    color: "#EEF1EF",
+                    border: "none"
+                  }}
+                />
               </div>
             </div>
 
@@ -114,7 +127,7 @@ const AdministratorPage = () => {
       <Footer />
     </div>
 
-    );
+  );
 
 }
 

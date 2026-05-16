@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import ButtonNew from "../components/ButtonNew";
-import ClientForm from "../components/ClientForm";
-import TableGeneric from "../components/TableGeneric";
+import ClientForm from "../components/organisms/ClientForm";
+import TableGeneric from "../components/organisms/TableGeneric";
 import { getAll, deleteClient } from "../services/ClientService";
 import { Client } from "../models/Client";
-
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import ButtonIcon from "../components/molecules/ButtonIcon";
+import Navbar from "../components/organisms/Navbar";
+import Footer from "../components/organisms/Footer";
+import AlertConfirm from "../components/atoms/AlertConfirm";
 
 const ClientPage = () => {
 
@@ -45,7 +46,7 @@ const ClientPage = () => {
 
   const handleDelete = async (client: Client) => {
     if (!client.idUser) return;
-    const confirmar = window.confirm(`¿Desea eliminar el cliente ${client.name}?`);
+    const confirmar = await AlertConfirm(`¿Desea eliminar el cliente ${client.name}?`);
     if (!confirmar) return;
     await deleteClient(client.idUser!);
     await loadClients();
@@ -80,7 +81,20 @@ const ClientPage = () => {
               </h5>
 
               <div className="d-flex justify-content-center justify-content-md-end">
-                <ButtonNew label="Nuevo" onClick={() => setShowForm(true)} />
+                <ButtonIcon
+                  label="Nuevo"
+                  onClick={() => setShowForm(true)}
+                  icon={<i className="bi bi-plus-circle" />}
+                  className="btn mb-3 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2"
+                  backgroundColor="#5E6572"
+                  hoverColor="#2C3E50"
+                  color="#EEF1EF"
+                  style={{
+                    backgroundColor: "#5E6572",
+                    color: "#EEF1EF",
+                    border: "none"
+                  }}
+                />
               </div>
             </div>
 

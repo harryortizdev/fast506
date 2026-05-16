@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import ButtonNew from "../components/ButtonNew";
-import BranchForm from "../components/BranchForm";
-import TableGeneric from "../components/TableGeneric";
+import BranchForm from "../components/organisms/BranchForm";
+import TableGeneric from "../components/organisms/TableGeneric";
 import { getAll, deleteBranch } from "../services/BranchService";
 import { Branch } from "../models/Branch";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import AlertConfirm from "../components/AlertConfirm";
-import AlertWarning from "../components/AlertWarning";
+import Navbar from "../components/organisms/Navbar";
+import Footer from "../components/organisms/Footer";
+import AlertConfirm from "../components/atoms/AlertConfirm";
+import AlertWarning from "../components/atoms/AlertWarning";
+import ButtonIcon from "../components/molecules/ButtonIcon";
 
 
 
@@ -84,9 +85,19 @@ const BranchPage = () => {
               </h5>
 
               <div className="d-flex justify-content-center justify-content-md-end">
-                <ButtonNew
+                <ButtonIcon
                   label="Nuevo"
                   onClick={() => setShowForm(true)}
+                  icon={<i className="bi bi-plus-circle" />}
+                  className="btn mb-3 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2"
+                  backgroundColor="#5E6572"
+                  hoverColor="#2C3E50"
+                  color="#EEF1EF"
+                  style={{
+                    backgroundColor: "#5E6572",
+                    color: "#EEF1EF",
+                    border: "none"
+                  }}
                 />
               </div>
             </div>

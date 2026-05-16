@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
-import { Supplier } from "../models/Supplier";
-import { Administrator } from "../models/Administrator";
-import { create, updateSupplier } from "../services/SupplierService";
-import { getAll as getAdmins } from "../services/AdministratorService";
-import AlertSuccess from "./AlertSuccess";
-import AlertWarning from "./AlertWarning";
+import { Supplier } from "../../models/Supplier";
+import { Administrator } from "../../models/Administrator";
+import { create, updateSupplier } from "../../services/SupplierService";
+import { getAll as getAdmins } from "../../services/AdministratorService";
+import AlertSuccess from "../atoms/AlertSuccess";
+import AlertWarning from "../atoms/AlertWarning";
+import FormField from "../molecules/FormField";
+import Button from "../atoms/Button";
 
 interface SupplierFormProps {
   onClose: () => void;
@@ -17,12 +19,10 @@ const SupplierForm = ({ onClose, onRefresh, supplierToEdit }: SupplierFormProps)
   const [admins, setAdmins] = useState<Administrator[]>([]);
   const [errors, setErrors] = useState<Partial<Record<keyof Supplier, string>>>({});
 
-  // Cargar administradores al iniciar
   useEffect(() => {
     const fetchAdmins = async () => {
       try {
         const data = await getAdmins();
-        // Asegurar que idUser sea número
         const list = data.map((a: any) => ({ ...a, idUser: Number(a.idUser) }));
         setAdmins(list);
       } catch (error) {
@@ -32,7 +32,6 @@ const SupplierForm = ({ onClose, onRefresh, supplierToEdit }: SupplierFormProps)
     fetchAdmins();
   }, []);
 
-  // Manejo de cambios en inputs y select
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setForm({
@@ -41,12 +40,10 @@ const SupplierForm = ({ onClose, onRefresh, supplierToEdit }: SupplierFormProps)
     });
   };
 
-  // Validación de formulario
   const validate = (): boolean => {
     const newErrors: Partial<Record<keyof Supplier, string>> = {};
-    const phoneRegex = /^[0-9\-\+\s()]{7,20}$/; // Teléfono válido
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Email válido
-    const lettersOnly = /^[a-záéíóúüñA-ZÁÉÍÓÚÜÑ\s]+$/; // Solo letras
+    const phoneRegex = /^[0-9\-\+\s()]{7,20}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!form.name || form.name.trim().length === 0 || form.name.length > 50) {
       newErrors.name = "Nombre inválido: no puede estar vacío, máximo 50 caracteres.";
@@ -77,12 +74,10 @@ const SupplierForm = ({ onClose, onRefresh, supplierToEdit }: SupplierFormProps)
     return Object.keys(newErrors).length === 0;
   };
 
-  // Guardar formulario
   const handleSubmit = async () => {
     if (!validate()) return;
 
     try {
-      // Construir objeto a enviar dependiendo si es crear o actualizar
       let dataToSend: any;
 
       if (supplierToEdit) {
@@ -112,8 +107,6 @@ const SupplierForm = ({ onClose, onRefresh, supplierToEdit }: SupplierFormProps)
         };
       }
 
-      console.log("Formulario a enviar al backend:", dataToSend);
-
       if (supplierToEdit) {
         await updateSupplier(dataToSend as Supplier);
         AlertSuccess("Proveedor actualizado correctamente.");
@@ -136,109 +129,112 @@ const SupplierForm = ({ onClose, onRefresh, supplierToEdit }: SupplierFormProps)
         <h3 className="text-center mb-4">{supplierToEdit ? "Editar Proveedor" : "Nuevo Proveedor"}</h3>
 
         <div className="mb-3">
-          <label>Nombre:</label>
-          <input
-            className={`form-control ${errors.name ? "is-invalid" : ""}`}
+          <FormField
+            label="Nombre:"
             name="name"
             value={form.name || ""}
             onChange={handleChange}
           />
-          {errors.name && <div className="invalid-feedback">{errors.name}</div>}
+          {errors.name && <div className="invalid-feedback d-block">{errors.name}</div>}
         </div>
 
         <div className="mb-3">
-          <label>Compañía:</label>
-          <input
-            className={`form-control ${errors.companyName ? "is-invalid" : ""}`}
+          <FormField
+            label="Compañía:"
             name="companyName"
             value={form.companyName || ""}
             onChange={handleChange}
           />
-          {errors.companyName && <div className="invalid-feedback">{errors.companyName}</div>}
+          {errors.companyName && <div className="invalid-feedback d-block">{errors.companyName}</div>}
         </div>
 
         <div className="mb-3">
-          <label>Nombre Legal:</label>
-          <input
-            className={`form-control ${errors.legalName ? "is-invalid" : ""}`}
+          <FormField
+            label="Nombre Legal:"
             name="legalName"
             value={form.legalName || ""}
             onChange={handleChange}
           />
-          {errors.legalName && <div className="invalid-feedback">{errors.legalName}</div>}
+          {errors.legalName && <div className="invalid-feedback d-block">{errors.legalName}</div>}
         </div>
 
         <div className="mb-3">
-          <label>Teléfono de Soporte:</label>
-          <input
-            className={`form-control ${errors.supportPhone ? "is-invalid" : ""}`}
+          <FormField
+            label="Teléfono de Soporte:"
             name="supportPhone"
             value={form.supportPhone || ""}
             onChange={handleChange}
           />
-          {errors.supportPhone && <div className="invalid-feedback">{errors.supportPhone}</div>}
+          {errors.supportPhone && <div className="invalid-feedback d-block">{errors.supportPhone}</div>}
         </div>
 
         <div className="mb-3">
-          <label>Nombre de Contacto de Negocios:</label>
-          <input
-            className={`form-control ${errors.bussinesContactName ? "is-invalid" : ""}`}
+          <FormField
+            label="Nombre de Contacto de Negocios:"
             name="bussinesContactName"
             value={form.bussinesContactName || ""}
             onChange={handleChange}
           />
-          {errors.bussinesContactName && <div className="invalid-feedback">{errors.bussinesContactName}</div>}
+          {errors.bussinesContactName && <div className="invalid-feedback d-block">{errors.bussinesContactName}</div>}
         </div>
 
         <div className="mb-3">
-          <label>Correo Electrónico:</label>
-          <input
-            className={`form-control ${errors.email ? "is-invalid" : ""}`}
+          <FormField
+            label="Correo Electrónico:"
             name="email"
             value={form.email || ""}
             onChange={handleChange}
+            type="email"
           />
-          {errors.email && <div className="invalid-feedback">{errors.email}</div>}
+          {errors.email && <div className="invalid-feedback d-block">{errors.email}</div>}
         </div>
 
         <div className="mb-3">
-          <label>Ubicación:</label>
-          <input
-            className={`form-control ${errors.ubicacion ? "is-invalid" : ""}`}
+          <FormField
+            label="Ubicación:"
             name="ubicacion"
             value={form.ubicacion || ""}
             onChange={handleChange}
           />
-          {errors.ubicacion && <div className="invalid-feedback">{errors.ubicacion}</div>}
+          {errors.ubicacion && <div className="invalid-feedback d-block">{errors.ubicacion}</div>}
         </div>
 
         <div className="mb-3">
           <label>Seleccionar Administrador:</label>
           <select
             className={`form-select ${errors.adminId ? "is-invalid" : ""}`}
-            name="adminId" // debe coincidir con tu modelo Supplier
+            name="adminId"
             value={form.adminId ?? ""}
             onChange={handleChange}
           >
             <option value="">Seleccione un administrador</option>
-            {admins
-
-              .map((a) => (
-                <option key={a.idUser} value={a.idUser}>
-                  {a.name}
-                </option>
-              ))}
+            {admins.map((a) => (
+              <option key={a.idUser} value={a.idUser}>
+                {a.name}
+              </option>
+            ))}
           </select>
           {errors.adminId && <div className="invalid-feedback">{errors.adminId}</div>}
         </div>
 
         <div className="text-center mt-4">
-          <button className="btn btn-success me-2" onClick={handleSubmit}>
-            Guardar
-          </button>
-          <button className="btn btn-secondary" onClick={onClose}>
-            Cancelar
-          </button>
+            <Button
+            label="Guardar"
+            onClick={handleSubmit}
+            backgroundColor="#198754"    
+            hoverColor="#145c32"         
+            color="#fff"     
+            className="btn btn-success me-2"            
+          />
+
+          <Button
+            label="Cancelar"
+            onClick={onClose}
+            backgroundColor="#6c757d"    
+            hoverColor="#495057"         
+            color="#fff"
+            className="btn btn-secondary"
+          />
         </div>
       </div>
     </div>

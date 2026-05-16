@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { getAll } from "../services/BranchService";
 import { Branch } from "../models/Branch";
-import ButtonNew from "../components/ButtonIcon";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import ButtonIcon from "../components/molecules/ButtonIcon";
+import Navbar from "../components/organisms/Navbar";
+import Footer from "../components/organisms/Footer";
 
 const SucursalesSencillas = () => {
   const [sucursales, setSucursales] = useState<Branch[]>([]);
@@ -26,10 +26,9 @@ const SucursalesSencillas = () => {
             <div className="card-body" style={{ backgroundColor: "#1A2633" }}>
               <h2 className="text-center" style={{ color: "#EEF1EF" }}>Sucursales</h2>
             </div>
-            
+
             <div className="accordion" id="listaSucursales">
               {sucursales.map((s) => {
-
                 const coords = s.coordinates ? s.coordinates.split(',') : ["10.2117", "-83.7847"];
                 const lat = coords[0].trim();
                 const lon = coords[1].trim();
@@ -63,27 +62,32 @@ const SucursalesSencillas = () => {
                         </p>
                         <hr />
 
-                        {/* BOTONES DINÁMICOS */}
                         <div className="mt-3 d-flex justify-content-center gap-2">
-                          <ButtonNew
+                          <ButtonIcon
                             label="Abrir Waze"
+                            color="#EEF1EF"
+                            backgroundColor="#5E6572"
+                            hoverColor="#2C3E50"
                             onClick={() => window.open(`https://waze.com/ul?ll=${lat},${lon}&navigate=yes`, "_blank")}
-                            icon="bi-car-front-fill"
+                            icon={<i className="bi bi-car-front-fill" />}
+                            className=""
                           />
-                          <ButtonNew
+                          <ButtonIcon
                             label="Abrir Google Maps"
+                            color="#EEF1EF"
+                            backgroundColor="#5E6572"
+                            hoverColor="#2C3E50"
                             onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lon}`, "_blank")}
-                            icon="bi-map-fill"
+                            icon={<i className="bi bi-map-fill" />}
+                            className=""
                           />
                         </div>
 
-                        {/* MAPA DINÁMICO */}
                         <div className="mt-3 d-flex justify-content-center">
                           <iframe
                             width="75%"
                             height="350"
                             title={`Mapa de ${s.name}`}
-                            // Usamos parseFloat para el cálculo del bbox
                             src={`https://www.openstreetmap.org/export/embed.html?bbox=${parseFloat(lon) - 0.005}%2C${parseFloat(lat) - 0.005}%2C${parseFloat(lon) + 0.005}%2C${parseFloat(lat) + 0.005}&layer=mapnik&marker=${lat}%2C${lon}`}
                             style={{ border: 0, borderRadius: '8px' }}
                           ></iframe>

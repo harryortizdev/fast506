@@ -1,13 +1,14 @@
 
 import { useEffect, useState } from "react";
 import ButtonNew from "../components/ButtonNew";
-import SupplierForm from "../components/SupplierForm";
-import TableGeneric from "../components/TableGeneric";
+import SupplierForm from "../components/organisms/SupplierForm";
+import TableGeneric from "../components/organisms/TableGeneric";
 import { getAll, deleteSupplier } from "../services/SupplierService";
 import { Supplier } from "../models/Supplier";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import AlertConfirm from "../components/AlertConfirm";
+import Navbar from "../components/organisms/Navbar";
+import Footer from "../components/organisms/Footer";
+import AlertConfirm from "../components/atoms/AlertConfirm";
+import ButtonIcon from "../components/molecules/ButtonIcon";
 
 
 const SupplierPage = () => {
@@ -91,9 +92,19 @@ const SupplierPage = () => {
               </h5>
 
               <div className="d-flex justify-content-center justify-content-md-end">
-                <ButtonNew
+                <ButtonIcon
                   label="Nuevo"
                   onClick={() => setShowForm(true)}
+                  icon={<i className="bi bi-plus-circle" />}
+                  className="btn mb-3 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2"
+                  backgroundColor="#5E6572"
+                  hoverColor="#2C3E50"
+                  color="#EEF1EF"
+                  style={{
+                    backgroundColor: "#5E6572",
+                    color: "#EEF1EF",
+                    border: "none"
+                  }}
                 />
               </div>
             </div>

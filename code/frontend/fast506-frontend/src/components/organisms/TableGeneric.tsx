@@ -1,4 +1,5 @@
 import React from "react";
+import ButtonIcon from "../molecules/ButtonIcon";
 
 interface TableGenericProps<T> {
   data: T[];
@@ -22,8 +23,8 @@ const TableGeneric = <T extends object>({
   onEdit,
 }: TableGenericProps<T>) => {
   return (
-    <div className="table-responsive" style={{ maxHeight: "400px", overflowY: "auto", overflowX: "auto", borderRadius: "10px",}}>
-      <table className="table table-hover align-middle" style={{ minWidth: "750px", backgroundColor: "#EEF1EF", borderCollapse: "separate", borderSpacing: 0,}}>
+    <div className="table-responsive" style={{ maxHeight: "400px", overflowY: "auto", overflowX: "auto", borderRadius: "10px", }}>
+      <table className="table table-hover align-middle" style={{ minWidth: "750px", backgroundColor: "#EEF1EF", borderCollapse: "separate", borderSpacing: 0, }}>
         <thead style={{ position: "sticky", top: 0, zIndex: 2 }}>
           <tr>
             {columns.map((col) => (
@@ -80,21 +81,34 @@ const TableGeneric = <T extends object>({
 
                 <td style={{ ...stickyRight(), width: "1%" }}>
                   <div className="d-flex flex-column flex-sm-row gap-2">
-                    <button
-                      className="btn btn-outline-warning btn-sm"
-                      onClick={() => onEdit?.(item)}
-                    >
-                      <i className="bi bi-pencil-square"></i>
-                      <span className="d-none d-md-inline ms-1">Editar</span>
-                    </button>
 
-                    <button
-                      className="btn btn-outline-danger btn-sm"
+                    <ButtonIcon
+                      label="Editar"
+                      onClick={() => onEdit?.(item)}
+                      backgroundColor="transparent"
+                      hoverColor="#ffc107"
+                      color="#ffc107"
+                      icon={<i className="bi bi-pencil-square" />}
+                      className="btn btn-outline-warning btn-sm d-flex align-items-center justify-content-center gap-2"
+                        style={{
+                        backgroundColor: "transparent",
+                        border: "1px solid #ffc107"
+                      }}
+                    />
+
+                    <ButtonIcon
+                      label="Eliminar"
                       onClick={() => onDelete?.(item)}
-                    >
-                      <i className="bi bi-trash3"></i>
-                      <span className="d-none d-md-inline ms-1">Eliminar</span>
-                    </button>
+                      backgroundColor="transparent"
+                      hoverColor="#dc3545"
+                      color="#dc3545"
+                      icon={<i className="bi bi-trash3" />}
+                      className="btn btn-outline-danger btn-sm d-flex align-items-center justify-content-center gap-2"
+                      style={{
+                        backgroundColor: "transparent",
+                        border: "1px solid #dc3545"
+                      }}
+                    />
                   </div>
                 </td>
               </tr>

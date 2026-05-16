@@ -1,6 +1,6 @@
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import WhatsAppButton from "../components/WhatsAppButton";
+import Navbar from "../components/organisms/Navbar";
+import Footer from "../components/organisms/Footer";
+import WhatsAppButton from "../components/atoms/WhatsAppButton";
 
 const HomePage = () => {
   return (
@@ -8,7 +8,7 @@ const HomePage = () => {
       <Navbar />
       
       <main style={{ flex: 1 }}>
-        {/* tu contenido aquí */}
+        
       </main>
 
       <Footer />
