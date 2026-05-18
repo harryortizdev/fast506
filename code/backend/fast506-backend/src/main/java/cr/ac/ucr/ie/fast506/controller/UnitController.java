@@ -6,11 +6,9 @@ package cr.ac.ucr.ie.fast506.controller;
 
 import cr.ac.ucr.ie.fast506.domain.Unit;
 import cr.ac.ucr.ie.fast506.service.UnitService;
-import java.util.LinkedList;
-import org.hibernate.annotations.UpdateTimestamp;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +27,7 @@ public class UnitController {
     private UnitService unitService;
 
     @GetMapping("/all")
-    public LinkedList<Unit> getAll() {
+    public List<Unit> getAll() {
         return unitService.getAll();
     }
 

@@ -962,7 +962,7 @@ DROP procedure IF EXISTS `getAllUnits`;
 -- Procedimiento para obtener todas las units donde is_active = 1
 DELIMITER $$
 USE `db_fast506`$$
-CREATE PROCEDURE `getAllUnits` ()
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getAllUnits`()
 BEGIN
 	SELECT 
         id_car,
@@ -979,13 +979,12 @@ BEGIN
         engine_size,
         fuel_type,
         stock_status,
+        is_active,
         id_supplier
     FROM units
     WHERE is_active = 1;
 END$$
-
 DELIMITER ;
-
 -- Procedimiento para insertar en la tabla units
 
 -- Se elimina el procedimiento si ya existe
@@ -1070,7 +1069,7 @@ DROP procedure IF EXISTS `findUnitByVIN`;
 
 DELIMITER $$
 USE `db_fast506`$$
-CREATE PROCEDURE `findUnitByVIN` (IN p_VIN VARCHAR(17))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `findUnitByVIN`(IN p_VIN VARCHAR(17))
 BEGIN
 	SELECT 
         id_car,
@@ -1087,6 +1086,7 @@ BEGIN
         engine_size,
         fuel_type,
         stock_status,
+        is_active,
         id_supplier
     FROM units
     WHERE VIN = p_VIN
@@ -1094,6 +1094,7 @@ BEGIN
 END$$
 
 DELIMITER ;
+
 
 -- Procedimiento para buscar una unidad con el ID
 

@@ -2,27 +2,68 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-
 package cr.ac.ucr.ie.fast506.domain;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity //la vuelve una entidad en jpa
+@Table(name = "units") //el nombre de la tabla en la base de datos
 public class Unit {
-  
+
+    @Id //la llave primaria
+    @GeneratedValue(strategy = GenerationType.IDENTITY) //genera el id
+    @Column(name = "id_Car") //el nombre de la columna en la db
     private int idCar;
+
+    @Column(name = "VIN")
     private String VIN;
+
+    @Column(name = "engine_number")
     private String engineNumber;
+
+    @Column(name = "car_brand")
     private String carBrand;
+
+    @Column(name = "car_name")
     private String carName;
+
+    @Column(name = "legal_brand_name")
     private String legalBrandName;
+
+    @Column(name = "year_manufacture")
     private int yearManufacture;
+
+    @Column(name = "color")
     private String color;
+
+    @Column(name = "transmission")
     private String transmission;
+
+    @Column(name = "traction")
     private String traction;
+
+    @Column(name = "body_work")
     private String bodyWork;
+
+    @Column(name = "engine_size")
     private String engineSize;
+
+    @Column(name = "fuel_type")
     private String fuelType;
+
+    @Column(name = "stock_status")
     private boolean stockStatus;
-    private boolean isActive;
+
+    @Column(name = "id_supplier")
     private Integer idSupplier;
+
+    @Column(name = "is_active")
+    private boolean isActive = true;
 
     public int getIdCar() {
         return idCar;
@@ -30,6 +71,14 @@ public class Unit {
 
     public void setIdCar(int idCar) {
         this.idCar = idCar;
+    }
+
+    public boolean isIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
     }
 
     public String getVIN() {
@@ -134,14 +183,6 @@ public class Unit {
 
     public void setStockStatus(boolean stockStatus) {
         this.stockStatus = stockStatus;
-    }
-
-    public boolean isIsActive() {
-        return isActive;
-    }
-
-    public void setIsActive(boolean isActive) {
-        this.isActive = isActive;
     }
 
     public Integer getIdSupplier() {

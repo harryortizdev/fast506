@@ -4,21 +4,20 @@
  */
 package cr.ac.ucr.ie.fast506.service;
 
-import cr.ac.ucr.ie.fast506.dao_implement.UnitDAOImplement;
 import cr.ac.ucr.ie.fast506.domain.Unit;
-import java.util.Calendar;
-import java.util.LinkedList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import cr.ac.ucr.ie.fast506.repository.UnitRepository;
 
 @Service
 public class UnitService {
 
     @Autowired
-    private UnitDAOImplement unitDAO;
+    private UnitRepository unitRepository;
 
-    public LinkedList<Unit> getAll() {
-        return unitDAO.getAll();
+    public List<Unit> getAll() {
+        return unitRepository.getAll();
     }
 
     public void add(Unit unit) {
@@ -26,20 +25,21 @@ public class UnitService {
             throw new IllegalArgumentException("El VIN ya está registrado.");
         }
         validate(unit);
-        unitDAO.add(unit);
+        unit.setIsActive(true);
+        unitRepository.save(unit);
     }
 
     public void deleteById(int id) {
-        unitDAO.deleteById(id);
+        unitRepository.deleteById(id);
     }
 
     public void update(Unit unit) {
         validate(unit);
-        unitDAO.update(unit);
+        unitRepository.save(unit);
     }
 
     public boolean existsByVIN(String vin) {
-        return unitDAO.existsByVIN(vin);
+        return unitRepository.existsByVIN(vin) != null; 
     }
 
     private void validate(Unit unit) {
@@ -96,4 +96,5 @@ public class UnitService {
             throw new IllegalArgumentException("Debe seleccionar un proveedor.");
         }
     }
+
 }
