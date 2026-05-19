@@ -7,7 +7,11 @@ import ShowBranches from "./pages/ShowBranches";
 import AdministratorPage from "./pages/AdministratorPage";
 import ClientPage from "./pages/ClientPage";
 import MechanicPage from "./pages/MechanicPage";
+<<<<<<< HEAD
 import TestdrivePage from "./pages/TestdrivePage";
+=======
+import CatalogPage from "./pages/CatalogPage";
+>>>>>>> moduleCatalog-harry
 
 function App() {
   return (
@@ -22,6 +26,7 @@ function App() {
         <Route path="/admin/administrators" element={<AdministratorPage />} />
         <Route path="/admin/clients" element={<ClientPage />} />
         <Route path="/admin/mechanics" element={<MechanicPage />} />
+         <Route path="/admin/catalogs" element={<CatalogPage />} />
 
       </Routes>
     </BrowserRouter>

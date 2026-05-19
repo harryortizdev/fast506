@@ -461,6 +461,8 @@ BEGIN
 
 END$$
 
+--
+
 DELIMITER ;
 
 -- Actualizar mecanico
@@ -1364,6 +1366,7 @@ INSERT INTO branch (name, ubication, direction, branch_Phone_Number, operation_S
 ('Fast506 Pérez Zeledón', 'San José, San Isidro', 'Contiguo a la gasolinera El Jorón', '+506 2771 4433', 'L-V: 8:00am-6:00pm, S: 9:00am-4:00pm', '1', '9.330757708994817, -83.669410048738', 1),
 ('Fast506 Liberia', 'Guanacaste, Liberia', 'Frente a la entrada al Aeropuerto Daniel Oduber', '+506 2665 9000', 'L-V: 8:00am-5:30pm, S: 9:00am-1:00pm', '1', '10.596253373403933, -85.52703150704106', 1);
 
+<<<<<<< HEAD
 
 
 
@@ -1436,10 +1439,94 @@ BEGIN
 UPDATE testdrive
 	SET is_Active = 0
     WHERE id_Test = id_TestT;
+=======
+-- 18/05/2026 Tabla de catalogos (Harry)
+
+CREATE TABLE `db_fast506`.`catalogs` (
+  `id_catalogs` INT NOT NULL AUTO_INCREMENT,
+  `car_name` VARCHAR(100) NULL,
+  `brand_name` VARCHAR(100) NULL,
+  `body_work` VARCHAR(100) NULL,
+  `technical_description` VARCHAR(500) NULL,
+  `base_price` DOUBLE NULL,
+  `image` VARCHAR(500) NULL,
+  `year_manufacture` INT NULL,
+  `transmission` VARCHAR(10) NULL,
+  `fuel_type` VARCHAR(10) NULL,
+  `engine_size` VARCHAR(20) NULL,
+  `is_active` TINYINT NULL,
+  PRIMARY KEY (`id_catalogs`),
+  UNIQUE INDEX `id_catalogs_UNIQUE` (`id_catalogs` ASC) );
+-- cambios en la tabla  
+  ALTER TABLE `db_fast506`.`catalogs` 
+CHANGE COLUMN `id_catalogs` `id_catalog` INT(11) NOT NULL AUTO_INCREMENT ,
+CHANGE COLUMN `car_name` `car_name` VARCHAR(255) NOT NULL ,
+CHANGE COLUMN `brand_name` `brand_name` VARCHAR(255) NOT NULL ,
+CHANGE COLUMN `body_work` `body_work` VARCHAR(255) NOT NULL ,
+CHANGE COLUMN `technical_description` `technical_description` VARCHAR(255) NOT NULL ,
+CHANGE COLUMN `base_price` `base_price` DOUBLE NOT NULL ,
+CHANGE COLUMN `image` `image` VARCHAR(255) NOT NULL ,
+CHANGE COLUMN `year_manufacture` `year_manufacture` INT(11) NOT NULL ,
+CHANGE COLUMN `transmission` `transmission` VARCHAR(255) NOT NULL ,
+CHANGE COLUMN `fuel_type` `fuel_type` VARCHAR(255) NOT NULL ,
+CHANGE COLUMN `engine_size` `engine_size` VARCHAR(255) NOT NULL ;
+
+  -- pruebas
+  
+  INSERT INTO db_fast506.catalogs (
+    car_name,
+    brand_name,
+    body_work,
+    technical_description,
+    base_price,
+    image,
+    year_manufacture,
+    transmission,
+    fuel_type,
+    engine_size,
+    is_active
+) VALUES (
+    'Corolla',
+    'Toyota',
+    'Sedan',
+    'Sedan compacto con motor 1.8L, ideal para ciudad y carretera, bajo consumo de combustible.',
+    25000.00,
+    'corolla.jpg',
+    2022,
+    'Automático',
+    'Gasolina',
+    '1.8L',
+    1
+);
+
+select * from catalogs;
+
+-- sp getAllCatalog 
+DELIMITER $$
+USE `db_fast506`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getAllCatalogs`()
+BEGIN
+    SELECT 
+        id_catalog,
+        car_name,
+        brand_name,
+        body_work,
+        technical_description,
+        base_price,
+        image,
+        year_manufacture,
+        transmission,
+        fuel_type,
+        engine_size,
+        is_active
+    FROM db_fast506.catalogs
+    WHERE is_active = 1;
+>>>>>>> moduleCatalog-harry
 END$$
 
 DELIMITER ;
 
+<<<<<<< HEAD
 -- PA GETALLTESTDRIVE
 
 USE `db_fast506`;
@@ -1471,3 +1558,102 @@ BEGIN
 END;$$
 
 DELIMITER ;
+=======
+DELIMITER $$
+USE `db_fast506`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `deleteCatalog`(
+    IN p_idCatalog INT
+)
+BEGIN
+    UPDATE catalogs
+    SET is_active = 0
+    WHERE id_catalog = p_idCatalog;
+END$$
+DELIMITER ;
+
+--  19/05/2026 - datos de prueba en la tabla units 
+
+INSERT INTO units (VIN, engine_number, car_brand, car_name, legal_brand_name, year_Manufacture, color, transmission, traction, body_work, engine_size, fuel_type, stock_status, is_active, id_supplier) VALUES
+-- Bloque de Nissan Sentra (10 unidades ficticias, metemos 2 de prueba con misma transmisión)
+('3N1AB8APXL111111', 'MR20-111111A', 'Nissan', 'Sentra S', 'Nissan Motor Co.', 2026, 'Gris Platino', 'Automática', 'FWD', 'Sedán', '2.0L', 'Gasolina', 1, 1, NULL),
+('3N1AB8APXL222222', 'MR20-222222B', 'Nissan', 'Sentra S', 'Nissan Motor Co.', 2026, 'Negro', 'Automática', 'FWD', 'Sedán', '2.0L', 'Gasolina', 1, 1, NULL),
+
+-- Bloque de Toyota Hilux vs Hilux Gazoo Racing (Deben salir separados)
+('8AJHA8DCX1111111', '1GD-1111111', 'Toyota', 'Hilux elct', 'Toyota Motor Corp.', 2026, 'Blanco', 'Manual', '4x4', 'Pick-up', '2.8L', 'Diésel', 1, 1, NULL),
+('8AJHA8DCX2222222', '1GD-2222222', 'Toyota', 'Hilux Gazoo Racing', 'Toyota Motor Corp.', 2026, 'Blanco/Negro GR', 'Automática', '4x4', 'Pick-up', '2.8L', 'Diésel', 1, 1, NULL),
+
+-- Bloque de Toyota RAV4 (Diferentes transmisiones y motores, deben salir las 4 por separado)
+('JTMDFRFV11111111', 'A25A-1111111', 'Toyota', 'RAV4', 'Toyota Motor Corp.', 2026, 'Azul Metálico', 'Manual', 'AWD', 'SUV', '2.5L', 'Gasolina', 1, 1, NULL),
+('JTMDFRFV22222222', 'A25A-2222222', 'Toyota', 'RAV4', 'Toyota Motor Corp.', 2026, 'Rojo', 'Automático', 'AWD', 'SUV', '2.5L', 'Gasolina', 1, 1, NULL),
+('JTMDFRFV33333333', 'A25A-3333333', 'Toyota', 'RAV4', 'Toyota Motor Corp.', 2026, 'Plata', 'Automático', 'AWD', 'SUV', '2.5L Híbrido', 'Híbrido', 1, 1, NULL),
+('JTMDFRFV44444444', '365V-4444444', 'Toyota', 'RAV4', 'Toyota Motor Corp.', 2026, 'Blanco Perla', 'Automático', 'AWD', 'SUV', 'Batería 150kW', 'Eléctrico', 1, 1, NULL),
+-- Una segunda RAV4 automática híbrida para probar que la ignore y solo deje una
+('JTMDFRFV55555555', 'A25A-5555555', 'Toyota', 'RAV4', 'Toyota Motor Corp.', 2026, 'Gris', 'Automático', 'AWD', 'SUV', '2.5L Híbrido', 'Híbrido', 1, 1, NULL);
+
+INSERT INTO units (VIN, engine_number, car_brand, car_name, legal_brand_name, year_Manufacture, color, transmission, traction, body_work, engine_size, fuel_type, stock_status, is_active, id_supplier) VALUES
+('3N1AB8APXL333333', 'MR20-222222C', 'Nissan', 'Sentra S', 'Nissan Motor Co.', 2026, 'Negro', 'CVT', 'FWD', 'Sedán', '2.0L', 'Gasolina', 1, 1, NULL),
+('JTMDFRFV66666666', 'A25A-222222B', 'Toyota', 'RAV4', 'Toyota Motor Corp.', 2026, 'Rojo', 'Automático', 'AWD', 'SUV', '2.5L', 'Diesel', 1, 1, NULL);
+
+-- datos prueba de catalogos
+
+INSERT INTO db_fast506.catalogs 
+(car_name, brand_name, body_work, technical_description, base_price, image, year_manufacture, transmission, fuel_type, engine_size, is_active) 
+VALUES
+-- 1. Bloqueamos el Nissan Sentra S Automático
+('Sentra S', 'Nissan', 'Sedán', 'Versión base con excelente consumo', 24000, 'nissan_sentra.png', 2026, 'Automático', 'Combustible', '2.0L', 1),
+
+-- 2. Bloqueamos la Toyota RAV4 Híbrida
+('RAV4', 'Toyota', 'SUV', 'Eficiencia híbrida para todo terreno', 42000, 'toyota_rav4_hybrid.png', 2026, 'Automático', 'Híbrido', '2.5L Híbrido', 1);
+
+-- procedimiento para agrupar y comparar catalogos on unidades disponibles, este une las unidades por ciertos atributos y facilita para hacer un catalogo
+DELIMITER $$
+USE `db_fast506`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `units_groud_exists`()
+BEGIN
+    SELECT 
+        u.car_brand,
+        u.car_name,
+        u.year_Manufacture,
+        CASE 
+            WHEN u.transmission IN ('Automática', 'CVT') THEN 'Automático'
+            ELSE u.transmission 
+        END AS transmission_group,
+        u.body_work,
+        CASE 
+            WHEN u.fuel_type IN ('Gasolina', 'Diesel') THEN 'Combustible'
+            ELSE u.fuel_type 
+        END AS fuel_group
+    FROM units u
+    LEFT JOIN db_fast506.catalogs c ON 
+        u.car_brand = c.brand_name 
+        AND u.car_name = c.car_name 
+        AND u.year_Manufacture = c.year_manufacture
+        AND u.body_work = c.body_work
+        AND (CASE 
+                WHEN u.transmission IN ('Automática', 'CVT') THEN 'Automático'
+                ELSE u.transmission 
+             END) = c.transmission
+        AND (CASE 
+                WHEN u.fuel_type IN ('Gasolina', 'Diesel') THEN 'Combustible'
+                ELSE u.fuel_type 
+             END) = c.fuel_type
+    WHERE 
+        u.is_active = 1 
+        AND u.stock_status = 1 
+        AND c.id_catalog IS NULL 
+    GROUP BY 
+        u.car_brand,
+        u.car_name,
+        u.year_Manufacture,
+        CASE 
+            WHEN u.transmission IN ('Automática', 'CVT') THEN 'Automático'
+            ELSE u.transmission 
+        END,
+        u.body_work,
+        CASE 
+            WHEN u.fuel_type IN ('Gasolina', 'Diesel') THEN 'Combustible'
+            ELSE u.fuel_type 
+        END;
+END$$
+DELIMITER ;
+>>>>>>> moduleCatalog-harry

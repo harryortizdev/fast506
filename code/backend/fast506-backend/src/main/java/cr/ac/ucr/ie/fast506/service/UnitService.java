@@ -30,7 +30,7 @@ public class UnitService {
     }
 
     public void deleteById(int id) {
-        unitRepository.deleteById(id);
+        unitRepository.deleteUnit(id);
     }
 
     public void update(Unit unit) {
