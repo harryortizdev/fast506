@@ -66,6 +66,7 @@ const Navbar = () => {
               </a>
               <ul className="dropdown-menu custom-dropdown text-center">
                 <li><Link className="dropdown-item" to="/admin/units">UNIDADES</Link></li>
+                <li><Link className="dropdown-item" to="/admin/testdrive">TESTDRIVE</Link></li>
                 <li><Link className="dropdown-item" to="/admin/branches">SUCURSALES</Link></li>
                 <li><Link className="dropdown-item" to="/admin/suppliers">PROVEEDORES</Link></li>
                 <li><Link className="dropdown-item" to="/admin/administrators">ADMINISTRADORES</Link></li>

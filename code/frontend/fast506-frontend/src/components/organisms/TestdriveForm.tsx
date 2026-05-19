@@ -3,8 +3,8 @@ import { Branch } from "../../models/Branch";
 import { Client } from "../../models/Client";
 import { Testdrive } from "../../models/Testdrive";
 import { Unit } from "../../models/Unit";
-import { create, getOccupiedHoursByDate } from "../../services/TestdriveService"; // Asumiendo que aquí pondrás el fetch de ocupadas
-import { getAll as getAllClients } from "../../services/ClientService"; // Ajustado a sus respectivos servicios
+import { create, getOccupiedHoursByDate } from "../../services/TestdriveService"; 
+import { getAll as getAllClients } from "../../services/ClientService"; 
 import { getAll as getAllUnits } from "../../services/UnitService";
 import { getAll as getAllBranches } from "../../services/BranchService";
 import AlertSuccess from "../atoms/AlertSuccess";
@@ -18,8 +18,6 @@ interface TestdriveFormProps {
     testdriveToEdit?: Testdrive;
 }
 
-const RANGO_HORAS = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00"];
-
 const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormProps) => {
 
     const [form, setForm] = useState<Partial<Testdrive>>(testdriveToEdit || {});
@@ -28,6 +26,24 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
     const [branches, setBranch] = useState<Branch[]>([]);
     const [occupiedHours, setOccupiedHours] = useState<string[]>([]); // Estado para almacenar horas ocupadas del día
     const [errors, setErrors] = useState<Partial<Record<keyof Testdrive, string>>>({});
+
+
+    const RANGO_HORAS = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00"];
+    const hoy = new Date();
+    const anio = hoy.getFullYear();
+    const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoy.getDate()).padStart(2, '0');
+    const fechaMinima = `${anio}-${mes}-${dia}`;
+
+    const proximoMes = new Date();
+    proximoMes.setMonth(hoy.getMonth() + 1);
+    const anioMax = proximoMes.getFullYear();
+    const mesMax = String(proximoMes.getMonth() + 1).padStart(2, '0');
+    const diaMax = String(proximoMes.getDate()).padStart(2, '0');
+
+    const fechaMaxima = `${anioMax}-${mesMax}-${diaMax}`;
+
+    const horaActual = `${String(hoy.getHours()).padStart(2, '0')}:${String(hoy.getMinutes()).padStart(2, '0')}`;
 
     // Carga inicial de catálogos
     useEffect(() => {
@@ -53,28 +69,19 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
     // Manejador de cambios en los inputs y selects
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        
-        let updatedForm = {
-            ...form,
-            [name]: name === "idUser" || name === "idCar" || name === "idBranch" ? Number(value) : value
+
+        let updatedForm = {...form,[name]: name === "idUser" || name === "idCar" || name === "idBranch" ? Number(value) : value
         };
 
         // Lógica de automatización de la hora de finalización
         if (name === "initiationTime") {
             if (value) {
-                // Separamos horas y minutos
                 const [horas, minutos] = value.split(":").map(Number);
-                // Le sumamos una hora a la hora de inicio de forma automática
                 const horaFinCalculada = `${String(horas + 1).padStart(2, '0')}:${String(minutos).padStart(2, '0')}`;
-                
-                updatedForm = {
-                    ...updatedForm,
-                    finalizationTime: horaFinCalculada
-                };
+
+                updatedForm = {...updatedForm, finalizationTime: horaFinCalculada};
             } else {
-                updatedForm = {
-                    ...updatedForm,
-                    finalizationTime: ""
+                updatedForm = {...updatedForm, finalizationTime: ""
                 };
             }
         }
@@ -113,16 +120,13 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
                 await updateTestdrive({ ...form } as Testdrive);
                 AlertSuccess("Los cambios fueron guardados.");
             } else {
-                // Formateamos la fecha actual en formato limpio ISO YYYY-MM-DD
-                const todayISO = new Date().toISOString().split('T')[0];
-
                 const newTestdrive = {
                     ...form,
-                    creationDate: todayISO,
-                    statusAppointment: "Agendada", 
-                    isActive: 1 // Usamos el número entero correspondiente al tinyint del backend
+                    creationDate: fechaMinima,
+                    statusAppointment: "Agendada",
+                    isActive: 1 
                 } as Testdrive;
-                
+
                 await create(newTestdrive);
                 AlertSuccess("Testdrive creada correctamente.");
             }
@@ -138,14 +142,16 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
             <div className="card p-4 shadow-sm" style={{ maxWidth: '500px', width: '100%' }}>
                 <h3 className="mb-4">{testdriveToEdit ? "Editar Testdrive" : "Nuevo Testdrive"}</h3>
 
-                {/* 1. SELECCIÓN DE FECHA */}
                 <div className="mb-2">
-                    <FormField
-                        label="Fecha de la cita"
+                    <label className="form-label">Fecha de la cita</label>
+                    <input
+                        type="date"
+                        className={`form-control ${errors.scheduledDate ? "is-invalid" : ""}`}
                         name="scheduledDate"
                         value={form.scheduledDate || ""}
                         onChange={handleChange}
-                        type="date"
+                        min={fechaMinima}
+                        max={fechaMaxima}
                     />
                     {errors.scheduledDate && <div className="invalid-feedback d-block">{errors.scheduledDate}</div>}
                 </div>
@@ -157,14 +163,22 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
                         name="initiationTime"
                         value={form.initiationTime || ""}
                         onChange={handleChange}
-                        disabled={!form.scheduledDate} // No deja elegir hora hasta que ponga una fecha
+                        disabled={!form.scheduledDate}
                     >
                         <option value="">
                             {!form.scheduledDate ? "Primero seleccione una fecha" : "Seleccione una hora"}
                         </option>
                         {RANGO_HORAS
-                            // Filtramos dejando fuera las horas devueltas por el Backend para este día
-                            .filter(hora => !occupiedHours.includes(hora))
+                            .filter(hora => {
+                                //  Filtro del backend: Si la hora ya está ocupada en la base de datos, se descarta
+                                if (occupiedHours.includes(hora)) return false;
+                                //  Filtro de tiempo real: Si la fecha elegida es HOY, ocultamos las horas menores o iguales a la actual
+                                if (form.scheduledDate === fechaMinima) {
+                                    return hora > horaActual;
+                                }
+                                // Si es para otro día pasa la validación 
+                                return true;
+                            })
                             .map((hora) => (
                                 <option key={hora} value={hora}>
                                     {hora}
@@ -175,19 +189,17 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
                     {errors.initiationTime && <div className="invalid-feedback d-block">{errors.initiationTime}</div>}
                 </div>
 
-                {/* 3. HORA DE FINALIZACIÓN (Desactivada y automática) */}
                 <div className="mb-2">
                     <FormField
                         label="Hora de Finalización (1 hora de duración)"
                         name="finalizationTime"
                         value={form.finalizationTime || ""}
-                        onChange={() => {}} // No requiere acción manual
+                        onChange={() => { }}
                         type="time"
-                        disabled={true} // <-- ESTRICTAMENTE BLOQUEADO
+                        disabled={true} 
                     />
                 </div>
 
-                {/* 4. CLIENTE */}
                 <div className="mb-2">
                     <label className="form-label">Cliente</label>
                     <select
@@ -206,7 +218,6 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
                     {errors.idUser && <div className="invalid-feedback d-block">{errors.idUser}</div>}
                 </div>
 
-                {/* 5. VEHÍCULO */}
                 <div className="mb-2">
                     <label className="form-label">Vehículo</label>
                     <select
@@ -225,7 +236,6 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
                     {errors.idCar && <div className="invalid-feedback d-block">{errors.idCar}</div>}
                 </div>
 
-                {/* 6. SUCURSAL */}
                 <div className="mb-3">
                     <label className="form-label">Sucursal</label>
                     <select

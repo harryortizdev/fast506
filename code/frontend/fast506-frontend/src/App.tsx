@@ -7,6 +7,7 @@ import ShowBranches from "./pages/ShowBranches";
 import AdministratorPage from "./pages/AdministratorPage";
 import ClientPage from "./pages/ClientPage";
 import MechanicPage from "./pages/MechanicPage";
+import TestdrivePage from "./pages/TestdrivePage";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/admin/units" element={<UnitPage />} />
+        <Route path="/admin/testdrive" element={<TestdrivePage />} />
         <Route path="/admin/branches" element={<BranchPage />} />
         <Route path="/admin/suppliers" element={<SupplierPage />} />
         <Route path="/branches" element={<ShowBranches />} />

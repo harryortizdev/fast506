@@ -1,6 +1,6 @@
 export interface Testdrive {
 
-idTestdrive?: number;
+idTest?: number;
 numberReference? : number;
 creationDate : string;
 scheduledDate : string;

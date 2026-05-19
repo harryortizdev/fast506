@@ -3,12 +3,11 @@ import { Testdrive } from "../models/Testdrive";
 import AlertConfirm from "../components/atoms/AlertConfirm";
 import AlertWarning from "../components/atoms/AlertWarning";
 import ButtonIcon from "../components/molecules/ButtonIcon";
-import BranchForm from "../components/organisms/BranchForm";
 import Footer from "../components/organisms/Footer";
 import Navbar from "../components/organisms/Navbar";
 import TableGeneric from "../components/organisms/TableGeneric";
 import { deleteTestdrive } from "../services/TestdriveService";
-import { getAll } from "../services/UnitService";
+import { getAll } from "../services/TestdriveService";
 import TestdriveForm from "../components/organisms/TestdriveForm";
 
 const TestdrivePage = () => {
@@ -44,17 +43,17 @@ const TestdrivePage = () => {
     };
 
     const handleDelete = async (testdrive: Testdrive) => {//eliminar
-        if (!testdrive.idTestdrive) return;// sin id no trabaja
+        if (!testdrive.idTest) return;// sin id no trabaja
         const confirmar = await AlertConfirm(`¿Desea eliminar el Testdrive ${testdrive.numberReference}?`); //alerta de confirmacion
         if (!confirmar) return;//si no selecciona confirmar cancela 
-        await deleteTestdrive(testdrive.idTestdrive!); //señal de eliminar
+        await deleteTestdrive(testdrive.idTest!); //señal de eliminar
         AlertWarning("Testdrive eliminada correctamente."); //alert de eliminado correctamente
         await loadTestdrive();//recargar la lista
     };
 
 
     const columns: { key: keyof Testdrive; label: string }[] = [ //columnas
-        { key: "idTestdrive", label: "ID" },
+        { key: "idTest", label: "ID" },
         { key: "numberReference", label: "Num.Referencia" },
         { key: "creationDate", label: "Fecha de creación" },
         { key: "scheduledDate", label: "Fecha cita agendada" },

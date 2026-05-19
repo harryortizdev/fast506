@@ -1,0 +1,325 @@
+import { useEffect, useState } from "react";
+import { Branch } from "../../models/Branch";
+import { Client } from "../../models/Client";
+import { Testdrive } from "../../models/Testdrive";
+import { Unit } from "../../models/Unit";
+import { create, getOccupiedHoursByDate } from "../../services/TestdriveService";
+import { getAll as getAllUnits } from "../../services/UnitService";
+import { getAll as getAllBranches } from "../../services/BranchService";
+import AlertSuccess from "../atoms/AlertSuccess";
+import Button from "../atoms/Button";
+import FormField from "../molecules/FormField";
+import { updateTestdrive } from "../../services/TestdriveService";
+import AlertWarning from "../atoms/AlertWarning";
+import ButtonIcon from "../molecules/ButtonIcon";
+
+interface TestdriveFormProps {
+    onClose: () => void;
+    onRefresh: () => void;
+    testdriveToEdit?: Testdrive;
+}
+
+const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormProps) => {
+
+    const [form, setForm] = useState<Partial<Testdrive>>(testdriveToEdit || {});
+    const [units, setUnits] = useState<Unit[]>([]);
+    const [branches, setBranch] = useState<Branch[]>([]);
+    const [occupiedHours, setOccupiedHours] = useState<string[]>([]);
+    const [errors, setErrors] = useState<Partial<Record<keyof Testdrive, string>>>({});
+
+    const [cedulaInput, setCedulaInput] = useState("");
+    const [isClientVerified, setIsClientVerified] = useState(false);
+    const [clientName, setClientName] = useState("");
+
+    const RANGO_HORAS = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00"];
+    const hoy = new Date();
+    const anio = hoy.getFullYear();
+    const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoy.getDate()).padStart(2, '0');
+    const fechaMinima = `${anio}-${mes}-${dia}`;
+
+    const proximoMes = new Date();
+    proximoMes.setMonth(hoy.getMonth() + 1);
+    const anioMax = proximoMes.getFullYear();
+    const mesMax = String(proximoMes.getMonth() + 1).padStart(2, '0');
+    const diaMax = String(proximoMes.getDate()).padStart(2, '0');
+
+    const fechaMaxima = `${anioMax}-${mesMax}-${diaMax}`;
+    const horaActual = `${String(hoy.getHours()).padStart(2, '0')}:${String(hoy.getMinutes()).padStart(2, '0')}`;
+
+    useEffect(() => {
+        getAllUnits().then(setUnits).catch(() => console.error("Error cargando vehículos"));
+        getAllBranches().then(setBranch).catch(() => console.error("Error cargando sucursales"));
+    }, []);
+
+    useEffect(() => {
+        if (form.scheduledDate) {
+            getOccupiedHoursByDate(form.scheduledDate)
+                .then((horas) => {
+                    setOccupiedHours(horas);
+                })
+                .catch(() => setOccupiedHours([]));
+        } else {
+            setOccupiedHours([]);
+        }
+    }, [form.scheduledDate]);
+
+    const handleVerifyClient = async () => {
+        if (!cedulaInput.trim()) {
+            alert("Por favor, ingrese un número de cédula.");
+            return;
+        }
+
+        try {
+            // AQUÍ HARÁS EL FETCH A TU BACKEND, EJ:
+            // const res = await fetch(`http://localhost:8080/api/client/search?identification=${cedulaInput}`);
+            // const client: Client = await res.json();
+
+            // Simulación de prueba para que verifiques la lógica:
+            const clientMock = { idUser: 101, name: "Ilian Ramírez", identification: "12345" };
+
+            if (cedulaInput === clientMock.identification) {
+                setIsClientVerified(true);
+                setClientName(clientMock.name);
+                setForm(f => ({ ...f, idUser: clientMock.idUser })); // Setea la llave foránea automáticamente
+
+            } else {
+                setIsClientVerified(false);
+                setClientName("");
+                AlertWarning("Cédula incorrecta o cliente no registrado.");
+            }
+        } catch (error) {
+            alert("Error al conectar con el servidor de clientes.");
+        }
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+
+        let updatedForm = {
+            ...form,
+            [name]: name === "idUser" || name === "idCar" || name === "idBranch" ? Number(value) : value
+        };
+
+        if (name === "initiationTime") {
+            if (value) {
+                const [horas, minutos] = value.split(":").map(Number);
+                const horaFinCalculada = `${String(horas + 1).padStart(2, '0')}:${String(minutos).padStart(2, '0')}`;
+                updatedForm = { ...updatedForm, finalizationTime: horaFinCalculada };
+            } else {
+                updatedForm = { ...updatedForm, finalizationTime: "" };
+            }
+        }
+
+        setForm(updatedForm);
+    };
+
+    const validate = (): boolean => {
+        const newErrors: Partial<Record<keyof Testdrive, string>> = {};
+
+        if (!form.idUser) {
+            alert("Falta la validación de usuario.");
+            return false;
+        }
+        if (!form.scheduledDate) {
+            newErrors.scheduledDate = "Debe seleccionar la fecha de la cita.";
+        }
+        if (!form.initiationTime) {
+            newErrors.initiationTime = "Debe seleccionar una hora de inicio.";
+        }
+        if (!form.idCar) {
+            newErrors.idCar = "Debe seleccionar un vehículo.";
+        }
+        if (!form.idBranch) {
+            newErrors.idBranch = "Debe seleccionar una sucursal.";
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleSubmit = async () => {
+        if (!validate()) return;
+
+        try {
+            if (testdriveToEdit) {
+                await updateTestdrive({ ...form } as Testdrive);
+                AlertSuccess("Los cambios fueron guardados.");
+            } else {
+                const newTestdrive = {
+                    ...form,
+                    creationDate: fechaMinima,
+                    statusAppointment: "Agendada",
+                    isActive: 1
+                } as Testdrive;
+
+                await create(newTestdrive);
+                AlertSuccess("Testdrive creada correctamente.");
+            }
+            onRefresh();
+            onClose();
+        } catch (error) {
+            alert("Error al guardar el Test Drive");
+        }
+    };
+
+    return (
+        <div className="container d-flex justify-content-center">
+            <div className="card p-4 shadow-sm" style={{ maxWidth: '500px', width: '100%' }}>
+                <h3 className="mb-4">{testdriveToEdit ? "Editar Testdrive" : "Solicitar Testdrive"}</h3>
+
+                <div className="mb-4 p-3 border rounded bg-light">
+                    <label className="form-label fw-bold">Verificación de Identidad</label>
+                    <div className="input-group">
+                        <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Ingrese su cédula"
+                            value={cedulaInput}
+                            onChange={(e) => setCedulaInput(e.target.value)}
+                            disabled={isClientVerified} // Si ya está verificado, se bloquea la cédula
+                        />
+                        <ButtonIcon
+                            label="Verificar"
+                            color="#EEF1EF"
+                            backgroundColor="#5E6572"
+                            hoverColor="#2C3E50" 
+                            onClick={handleVerifyClient} 
+                            icon={<i className="bi bi-check-lg"></i>} 
+                            className={""}
+                        />
+
+
+                    </div>
+                    {isClientVerified && (
+                        <div className="text-success small mt-2 fw-bold animate__animated animate__fadeIn">
+                            <i className="bi bi-check-circle-fill me-1"></i> Cliente verificado: {clientName}
+                        </div>
+                    )}
+                </div>
+
+                {/* CAMPO FECHA */}
+                <div className="mb-2">
+                    <label className="form-label">Fecha de la cita</label>
+                    <input
+                        type="date"
+                        className={`form-control ${errors.scheduledDate ? "is-invalid" : ""}`}
+                        name="scheduledDate"
+                        value={form.scheduledDate || ""}
+                        onChange={handleChange}
+                        min={fechaMinima}
+                        max={fechaMaxima}
+                        disabled={!isClientVerified} // Desactivado hasta verificar
+                    />
+                    {errors.scheduledDate && <div className="invalid-feedback d-block">{errors.scheduledDate}</div>}
+                </div>
+
+                {/* CAMPO HORA INICIO */}
+                <div className="mb-2">
+                    <label className="form-label">Hora de Inicio</label>
+                    <select
+                        className={`form-select ${errors.initiationTime ? "is-invalid" : ""}`}
+                        name="initiationTime"
+                        value={form.initiationTime || ""}
+                        onChange={handleChange}
+                        disabled={!isClientVerified || !form.scheduledDate} // Desactivado hasta verificar e ingresar fecha
+                    >
+                        <option value="">
+                            {!form.scheduledDate ? "Primero seleccione una fecha" : "Seleccione una hora"}
+                        </option>
+                        {RANGO_HORAS
+                            .filter(hora => {
+                                if (occupiedHours.includes(hora)) return false;
+                                if (form.scheduledDate === fechaMinima) {
+                                    return hora > horaActual;
+                                }
+                                return true;
+                            })
+                            .map((hora) => (
+                                <option key={hora} value={hora}>
+                                    {hora}
+                                </option>
+                            ))
+                        }
+                    </select>
+                    {errors.initiationTime && <div className="invalid-feedback d-block">{errors.initiationTime}</div>}
+                </div>
+
+                {/* CAMPO HORA FINALIZACIÓN */}
+                <div className="mb-2">
+                    <FormField
+                        label="Hora de Finalización (1 hora de duración)"
+                        name="finalizationTime"
+                        value={form.finalizationTime || ""}
+                        onChange={() => { }}
+                        type="time"
+                        disabled={true}
+                    />
+                </div>
+
+                {/* CAMPO VEHÍCULO */}
+                <div className="mb-2">
+                    <label className="form-label">Vehículo</label>
+                    <select
+                        className={`form-select ${errors.idCar ? "is-invalid" : ""}`}
+                        name="idCar"
+                        value={form.idCar ?? ""}
+                        onChange={handleChange}
+                        disabled={!isClientVerified} // Desactivado hasta verificar
+                    >
+                        <option value="">Seleccione un vehículo</option>
+                        {units.map((u) => (
+                            <option key={u.idCar} value={u.idCar}>
+                                {u.carName}
+                            </option>
+                        ))}
+                    </select>
+                    {errors.idCar && <div className="invalid-feedback d-block">{errors.idCar}</div>}
+                </div>
+
+                {/* CAMPO SUCURSAL */}
+                <div className="mb-3">
+                    <label className="form-label">Sucursal</label>
+                    <select
+                        className={`form-select ${errors.idBranch ? "is-invalid" : ""}`}
+                        name="idBranch"
+                        value={form.idBranch ?? ""}
+                        onChange={handleChange}
+                        disabled={!isClientVerified} // Desactivado hasta verificar
+                    >
+                        <option value="">Seleccione una Sucursal</option>
+                        {branches.map((b) => (
+                            <option key={b.idBranch} value={b.idBranch}>
+                                {b.name}
+                            </option>
+                        ))}
+                    </select>
+                    {errors.idBranch && <div className="invalid-feedback d-block">{errors.idBranch}</div>}
+                </div>
+
+                {/* BOTONES DE ACCIÓN */}
+                <div className="mt-3">
+                    <Button
+                        label="Guardar Cita"
+                        onClick={handleSubmit}
+                        backgroundColor="#198754"
+                        hoverColor="#145c32"
+                        color="#fff"
+                        className="btn btn-success me-2"
+                        disabled={!isClientVerified} // Desactivado hasta verificar
+                    />
+                    <Button
+                        label="Cancelar"
+                        onClick={onClose}
+                        backgroundColor="#6c757d"
+                        hoverColor="#495057"
+                        color="#fff"
+                        className="btn btn-secondary"
+                    />
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default ClientTestdriveForm;

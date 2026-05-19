@@ -1364,6 +1364,10 @@ INSERT INTO branch (name, ubication, direction, branch_Phone_Number, operation_S
 ('Fast506 Pérez Zeledón', 'San José, San Isidro', 'Contiguo a la gasolinera El Jorón', '+506 2771 4433', 'L-V: 8:00am-6:00pm, S: 9:00am-4:00pm', '1', '9.330757708994817, -83.669410048738', 1),
 ('Fast506 Liberia', 'Guanacaste, Liberia', 'Frente a la entrada al Aeropuerto Daniel Oduber', '+506 2665 9000', 'L-V: 8:00am-5:30pm, S: 9:00am-1:00pm', '1', '10.596253373403933, -85.52703150704106', 1);
 
+
+
+
+
 -- ILIAN 18/5/2026
 -- Cambio del PA getAllBranch para agregar isActive
 
@@ -1458,11 +1462,11 @@ DROP procedure IF EXISTS `getOccupiedHoursByDate`;
 
 DELIMITER $$
 USE `db_fast506`$$
-CREATE PROCEDURE `getOccupiedHoursByDate` (IN p_scheduled_date DATE)
+CREATE PROCEDURE `getOccupiedHoursByDate` (IN scheduled_dateS DATE)
 BEGIN
     SELECT DATE_FORMAT(initiation_Time, '%H:%i') AS occupied_hour
     FROM testdrive
-    WHERE scheduled_Date = p_scheduled_date
+    WHERE scheduled_Date = scheduled_dateS
       AND is_Active = 1;
 END;$$
 

@@ -26,6 +26,14 @@ public class TestdriveService {
     }
 
     public void update(Testdrive testdrive) {
+        int anio = testdrive.getScheduledDate().getYear();
+        int mes = testdrive.getScheduledDate().getMonthValue();
+        int dia = testdrive.getScheduledDate().getDayOfMonth();
+        int hora = testdrive.getInitiationTime().getHour();
+        int combination = (anio * 1000000) + (mes * 10000) + (dia * 100) + hora;
+
+        testdrive.setNumberReference(combination);
+
         testdriveRepository.save(testdrive);
     }
 
@@ -35,7 +43,15 @@ public class TestdriveService {
     }
 
     public void add(Testdrive testdrive) {
+        int anio = testdrive.getScheduledDate().getYear();
+        int mes = testdrive.getScheduledDate().getMonthValue();
+        int dia = testdrive.getScheduledDate().getDayOfMonth();
+        int hora = testdrive.getInitiationTime().getHour();
+        int combination = (anio * 1000000) + (mes * 10000) + (dia * 100) + hora;
+
+        testdrive.setNumberReference(combination);
         testdrive.setIsActive(true);
+
         testdriveRepository.save(testdrive);
     }
 
