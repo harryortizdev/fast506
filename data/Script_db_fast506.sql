@@ -1364,3 +1364,106 @@ INSERT INTO branch (name, ubication, direction, branch_Phone_Number, operation_S
 ('Fast506 Pérez Zeledón', 'San José, San Isidro', 'Contiguo a la gasolinera El Jorón', '+506 2771 4433', 'L-V: 8:00am-6:00pm, S: 9:00am-4:00pm', '1', '9.330757708994817, -83.669410048738', 1),
 ('Fast506 Liberia', 'Guanacaste, Liberia', 'Frente a la entrada al Aeropuerto Daniel Oduber', '+506 2665 9000', 'L-V: 8:00am-5:30pm, S: 9:00am-1:00pm', '1', '10.596253373403933, -85.52703150704106', 1);
 
+-- ILIAN 18/5/2026
+-- Cambio del PA getAllBranch para agregar isActive
+
+USE `db_fast506`;
+DROP procedure IF EXISTS `getAllBranch`;
+
+USE `db_fast506`;
+DROP procedure IF EXISTS `db_fast506`.`getAllBranch`;
+;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getAllBranch`()
+BEGIN
+SELECT id_Branch ,name ,ubication , direction ,branch_Phone_Number , operation_Schedule, id_active, coordinates ,id_user FROM Branch Where id_Active = 1;
+END$$
+
+DELIMITER ;
+;
+
+-- TABLA TESTDRIVE
+
+CREATE TABLE `db_fast506`.`testdrive` (
+  `id_Test` INT NOT NULL AUTO_INCREMENT,
+  `number_Reference` INT NOT NULL,
+  `creation_Date` DATE NOT NULL,
+  `scheduled_Date` DATE NOT NULL,
+  `initiation_Time` TIME NOT NULL,
+  `finalization_Time` TIME NOT NULL,
+  `status_Appointment` VARCHAR(45) NOT NULL,
+  `is_Active` TINYINT NOT NULL,
+  `id_user` INT NOT NULL,
+  `id_car` INT NOT NULL,
+  `id_branch` INT NOT NULL,
+  PRIMARY KEY (`id_Test`),
+  INDEX `fk_testdrive_users_id_idx` (`id_user` ASC) ,
+  INDEX `fk_testdrive_units_id_idx` (`id_car` ASC) ,
+  INDEX `fk_testdrive_branch_id_idx` (`id_branch` ASC) ,
+  CONSTRAINT `fk_testdrive_users_id`
+    FOREIGN KEY (`id_user`)
+    REFERENCES `db_fast506`.`users` (`id_user`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_testdrive_units_id`
+    FOREIGN KEY (`id_car`)
+    REFERENCES `db_fast506`.`units` (`id_car`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_testdrive_branch_id`
+    FOREIGN KEY (`id_branch`)
+    REFERENCES `db_fast506`.`branch` (`id_Branch`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+    
+    
+    
+    -- PA ELIMINAR
+    
+    USE `db_fast506`;
+DROP procedure IF EXISTS `deleteTestdrive`;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE `deleteTestdrive` (in id_TestT INT)
+BEGIN
+UPDATE testdrive
+	SET is_Active = 0
+    WHERE id_Test = id_TestT;
+END$$
+
+DELIMITER ;
+
+-- PA GETALLTESTDRIVE
+
+USE `db_fast506`;
+DROP procedure IF EXISTS `getAllTestdrive`;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE `getAllTestdrive` ()
+BEGIN
+SELECT id_Test, number_Reference, creation_Date, scheduled_Date, initiation_Time, finalization_Time, status_Appointment, is_Active, id_user, id_car, id_branch FROM testdrive WHERE is_Active=1;
+
+END$$
+
+DELIMITER ;
+
+-- PA OBTENER HORAS DE CITAS DE DIA ESPECIFICO SOBRE TESTDRIVES
+
+USE `db_fast506`;
+DROP procedure IF EXISTS `getOccupiedHoursByDate`;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE `getOccupiedHoursByDate` (IN p_scheduled_date DATE)
+BEGIN
+    SELECT DATE_FORMAT(initiation_Time, '%H:%i') AS occupied_hour
+    FROM testdrive
+    WHERE scheduled_Date = p_scheduled_date
+      AND is_Active = 1;
+END;$$
+
+DELIMITER ;

@@ -4,9 +4,9 @@
  */
 package cr.ac.ucr.ie.fast506.service;
 
-import cr.ac.ucr.ie.fast506.dao_implement.BranchDAOImplement;
 import cr.ac.ucr.ie.fast506.domain.Branch;
-import java.util.LinkedList;
+import cr.ac.ucr.ie.fast506.repository.BranchRepository;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,22 +18,23 @@ import org.springframework.stereotype.Service;
 public class BranchService {
     
     @Autowired 
-   private BranchDAOImplement branchDAO; 
+   private BranchRepository branchRepository; 
 
-    public LinkedList<Branch> getAll() {
-        return branchDAO.getAll();
+    public List<Branch> getAll() {
+        return branchRepository.getAll();
     }
 
     public void add(Branch branch) {
-        branchDAO.add(branch);
+        branch.setIsActive(true);
+        branchRepository.save(branch);
     }
 
     public void update(Branch branch) {
-        branchDAO.update(branch);
+        branchRepository.save(branch);
     }
     
     public void deleteById(int id) {
-        branchDAO.deleteById(id);
+        branchRepository.deleteBranchByIdPA(id);
     }
     
 }

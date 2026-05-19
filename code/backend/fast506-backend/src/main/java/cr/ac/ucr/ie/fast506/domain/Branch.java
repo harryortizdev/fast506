@@ -4,17 +4,44 @@
  */
 package cr.ac.ucr.ie.fast506.domain;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
+@Entity 
+@Table(name = "branch") 
 public class Branch {
     
+     @Id 
+    @GeneratedValue(strategy = GenerationType.IDENTITY) 
+    @Column(name = "id_Branch") 
     private int idBranch;
+     
+    @Column(name = "name")
     private String name;
+    
+    @Column(name = "ubication")
     private String ubication;
+    
+    @Column(name = "direction")
     private String direction;
+    
+    @Column(name = "branch_Phone_Number")
     private String branchPhoneNumber;
+    
+    @Column(name = "operation_Schedule")
     private String operationSchedule;
+    
+    @Column(name = "id_active")
     private boolean isActive;
+    
+    @Column(name = "id_User")
     private int idUser;
+    
+    @Column(name = "coordinates")
     private String coordinates; 
     
     

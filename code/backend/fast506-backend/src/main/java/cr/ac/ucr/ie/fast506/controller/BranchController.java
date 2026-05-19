@@ -7,6 +7,7 @@ package cr.ac.ucr.ie.fast506.controller;
 import cr.ac.ucr.ie.fast506.domain.Branch;
 import cr.ac.ucr.ie.fast506.service.BranchService;
 import java.util.LinkedList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,7 @@ public class BranchController {
     private BranchService branchService;
     
     @GetMapping("/all")
-    public LinkedList<Branch> getAll() {
+    public List<Branch> getAll() {
         return branchService.getAll();
     }
     
