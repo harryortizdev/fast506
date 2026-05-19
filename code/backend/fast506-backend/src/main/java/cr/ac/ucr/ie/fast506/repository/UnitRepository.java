@@ -22,4 +22,9 @@ public interface UnitRepository extends JpaRepository<Unit, Integer> {
     @Query(value = "CALL db_fast506.findUnitByVIN(:vin)", nativeQuery = true)
     Unit existsByVIN(@Param("vin") String vin); //mapea la unidad encontrada
 
+    @Modifying
+    @Transactional
+    @Query(value = "call db_fast506.deleteUnit(:id_Car)", nativeQuery = true)
+    void deleteUnit(@Param("id_Car") Integer id_Car);
+
 }
