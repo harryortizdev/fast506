@@ -5,6 +5,7 @@
 package cr.ac.ucr.ie.fast506.repository;
 
 import cr.ac.ucr.ie.fast506.domain.Catalog;
+import cr.ac.ucr.ie.fast506.domain.UnitGroup;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,5 +24,8 @@ public interface CatalogRepository extends JpaRepository<Catalog, Integer> {
     @Transactional
     @Query(value = "CALL db_fast506.deleteCatalog(:idCatalog)", nativeQuery = true)
     void deleteCatalog(@Param("idCatalog") Integer idCatalog);
+    
+    @Query(value = "call db_fast506.units_groud_exists()", nativeQuery = true)
+    List<UnitGroup> getUnitsNotInCatalog();
 
 }
