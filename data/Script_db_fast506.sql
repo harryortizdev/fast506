@@ -1425,17 +1425,20 @@ CREATE TABLE `db_fast506`.`testdrive` (
     
 
     -- PA ELIMINAR
-    
-    USE `db_fast506`;
-DROP procedure IF EXISTS `deleteTestdrive`;
+USE `db_fast506`;
+
+DROP PROCEDURE IF EXISTS `deleteTestdrive`;
 
 DELIMITER $$
-USE `db_fast506`$$
-CREATE PROCEDURE `deleteTestdrive` (in id_TestT INT)
+
+CREATE PROCEDURE `deleteTestdrive` (IN id_TestT INT)
 BEGIN
-UPDATE testdrive
-	SET is_Active = 0
+    UPDATE testdrive
+    SET is_Active = 0
     WHERE id_Test = id_TestT;
+END$$
+
+DELIMITER ;
     
 -- 18/05/2026 Tabla de catalogos (Harry)
 
@@ -1553,7 +1556,7 @@ BEGIN
 END;$$
 
 DELIMITER ;
-=======
+
 DELIMITER $$
 USE `db_fast506`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `deleteCatalog`(
@@ -1651,3 +1654,27 @@ BEGIN
         END;
 END$$
 DELIMITER ;
+
+-- (20/5/2026) Ilian PA AJUSTADO PARA VER LAS HORAS DE CITAS DE TESTDRIVES DISPONIBLE POR ICTAS Y SUCURSAL
+
+
+USE `db_fast506`;
+DROP procedure IF EXISTS `getOccupiedHoursByDate`;
+
+USE `db_fast506`;
+DROP procedure IF EXISTS `db_fast506`.`getOccupiedHoursByDate`;
+;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getOccupiedHoursByDate`(IN scheduled_dateS DATE, IN id_branchP INT)
+BEGIN
+    SELECT DATE_FORMAT(initiation_Time, '%H:%i') AS occupied_hour
+    FROM testdrive
+    WHERE scheduled_Date = scheduled_dateS
+      AND id_Branch = id_branchP 
+      AND is_Active = 1;
+END$$
+
+DELIMITER ;
+;

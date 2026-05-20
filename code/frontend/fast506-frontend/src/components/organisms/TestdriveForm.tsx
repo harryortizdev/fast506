@@ -54,9 +54,8 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
 
     // Escucha cambios en la fecha para traer las horas ocupadas desde el backend
     useEffect(() => {
-        if (form.scheduledDate) {
-            // Llamada al backend pasando la fecha elegida (ej: "2026-05-20")
-            getOccupiedHoursByDate(form.scheduledDate)
+        if (form.scheduledDate && form.idBranch) {
+            getOccupiedHoursByDate(form.scheduledDate, form.idBranch)
                 .then((horas) => {
                     setOccupiedHours(horas); // El backend retorna un array tipo: ["12:00", "14:00"]
                 })
@@ -64,7 +63,7 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
         } else {
             setOccupiedHours([]);
         }
-    }, [form.scheduledDate]);
+    }, [form.scheduledDate, form.idBranch]);
 
     // Manejador de cambios en los inputs y selects
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -163,48 +162,22 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
                     {errors.scheduledDate && <div className="invalid-feedback d-block">{errors.scheduledDate}</div>}
                 </div>
 
-                <div className="mb-2">
-                    <label className="form-label">Hora de Inicio</label>
+                <div className="mb-3">
+                    <label className="form-label">Sucursal</label>
                     <select
-                        className={`form-select ${errors.initiationTime ? "is-invalid" : ""}`}
-                        name="initiationTime"
-                        value={form.initiationTime || ""}
+                        className={`form-select ${errors.idBranch ? "is-invalid" : ""}`}
+                        name="idBranch"
+                        value={form.idBranch ?? ""}
                         onChange={handleChange}
-                        disabled={!form.scheduledDate}
                     >
-                        <option value="">
-                            {!form.scheduledDate ? "Primero seleccione una fecha" : "Seleccione una hora"}
-                        </option>
-                        {RANGO_HORAS
-                            .filter(hora => {
-                                //  Filtro del backend: Si la hora ya está ocupada en la base de datos, se descarta
-                                if (occupiedHours.includes(hora)) return false;
-                                //  Filtro de tiempo real: Si la fecha elegida es HOY, ocultamos las horas menores o iguales a la actual
-                                if (form.scheduledDate === fechaMinima) {
-                                    return hora > horaActual;
-                                }
-                                // Si es para otro día pasa la validación 
-                                return true;
-                            })
-                            .map((hora) => (
-                                <option key={hora} value={hora}>
-                                    {hora}
-                                </option>
-                            ))
-                        }
+                        <option value="">Seleccione una Sucursal</option>
+                        {branches.map((b) => (
+                            <option key={b.idBranch} value={b.idBranch}>
+                                {b.name}
+                            </option>
+                        ))}
                     </select>
-                    {errors.initiationTime && <div className="invalid-feedback d-block">{errors.initiationTime}</div>}
-                </div>
-
-                <div className="mb-2">
-                    <FormField
-                        label="Hora de Finalización (1 hora de duración)"
-                        name="finalizationTime"
-                        value={form.finalizationTime || ""}
-                        onChange={() => { }}
-                        type="time"
-                        disabled={true}
-                    />
+                    {errors.idBranch && <div className="invalid-feedback d-block">{errors.idBranch}</div>}
                 </div>
 
                 <div className="mb-2">
@@ -243,23 +216,52 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
                     {errors.idCar && <div className="invalid-feedback d-block">{errors.idCar}</div>}
                 </div>
 
-                <div className="mb-3">
-                    <label className="form-label">Sucursal</label>
+                <div className="mb-2">
+                    <label className="form-label">Hora de Inicio</label>
                     <select
-                        className={`form-select ${errors.idBranch ? "is-invalid" : ""}`}
-                        name="idBranch"
-                        value={form.idBranch ?? ""}
+                        className={`form-select ${errors.initiationTime ? "is-invalid" : ""}`}
+                        name="initiationTime"
+                        value={form.initiationTime || ""}
                         onChange={handleChange}
+                        disabled={!form.scheduledDate || !form.idBranch}
                     >
-                        <option value="">Seleccione una Sucursal</option>
-                        {branches.map((b) => (
-                            <option key={b.idBranch} value={b.idBranch}>
-                                {b.name}
-                            </option>
-                        ))}
+                        <option value="">
+                            {form.scheduledDate && form.idBranch ? "Seleccione una hora": "Primero seleccione una fecha y una sucursal"}
+                        </option>
+                        {RANGO_HORAS
+                            .filter(hora => {
+                                //  Filtro del backend: Si la hora ya está ocupada en la base de datos, se descarta
+                                if (occupiedHours.includes(hora)) return false;
+                                //  Filtro de tiempo real: Si la fecha elegida es HOY, ocultamos las horas menores o iguales a la actual
+                                if (form.scheduledDate === fechaMinima) {
+                                    return hora > horaActual;
+                                }
+                                // Si es para otro día pasa la validación 
+                                return true;
+                            })
+                            .map((hora) => (
+                                <option key={hora} value={hora}>
+                                    {hora}
+                                </option>
+                            ))
+                        }
                     </select>
-                    {errors.idBranch && <div className="invalid-feedback d-block">{errors.idBranch}</div>}
+                    {errors.initiationTime && <div className="invalid-feedback d-block">{errors.initiationTime}</div>}
                 </div>
+
+                <div className="mb-2">
+                    <FormField
+                        label="Hora de Finalización (1 hora de duración)"
+                        name="finalizationTime"
+                        value={form.finalizationTime || ""}
+                        onChange={() => { }}
+                        type="time"
+                        disabled={true}
+                    />
+                </div>
+
+
+
 
                 {/* ESTADO DE LA CITA - SOLO APARECE AL EDITAR */}
                 {testdriveToEdit && (

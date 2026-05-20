@@ -19,16 +19,16 @@ import org.springframework.stereotype.Repository;
  * @author ediso
  */
 @Repository
-public interface TestdriveRepository extends JpaRepository<Testdrive, Integer>{
+public interface TestdriveRepository extends JpaRepository<Testdrive, Integer> {
 
-   @Query(value = "call db_fast506.getAllTestdrive()", nativeQuery = true)
+    @Query(value = "call db_fast506.getAllTestdrive()", nativeQuery = true)
     List<Testdrive> getAll();
-    
+
     @Transactional // Requerido para operaciones de eliminación/modificación
     @Modifying    // Requerido para consultas de tipo DELETE / UPDATE nativas
     @Query(value = "call db_fast506.deleteTestdrive(:id_Testdrive)", nativeQuery = true)
     void deleteTestdriveByIdPA(@Param("id_Testdrive") int id_Testdrive);
 
-    @Query(value = "call db_fast506.getOccupiedHoursByDate(:scheduled_dateS)", nativeQuery = true)
-    List<String> findOccupiedHoursByDate(@Param("scheduled_dateS") LocalDate scheduled_dateS);
+    @Query(value = "call db_fast506.getOccupiedHoursByDate(:scheduled_dateS, :id_branch)", nativeQuery = true)
+    List<String> findOccupiedHoursByDate(@Param("scheduled_dateS") LocalDate scheduled_dateS, @Param("id_branch") Integer idBranch );
 }

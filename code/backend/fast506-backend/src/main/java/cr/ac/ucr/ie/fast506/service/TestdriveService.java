@@ -59,8 +59,8 @@ public class TestdriveService {
         testdriveRepository.save(testdrive);
     }
 
-    public List<String> getOccupiedHoursByDate(LocalDate date) {
-        return testdriveRepository.findOccupiedHoursByDate(date);
+    public List<String> getOccupiedHoursByDate(LocalDate date, int idBranch) {
+        return testdriveRepository.findOccupiedHoursByDate(date, idBranch);
     }
 
     public Client findByIdentity(int id) {

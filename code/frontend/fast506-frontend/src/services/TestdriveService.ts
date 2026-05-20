@@ -33,8 +33,8 @@ export const updateTestdrive = async (Testdrive: Testdrive) => {
   return res.text();
 };
 
-export const getOccupiedHoursByDate = async (date: string): Promise<string[]> => {
-  const res = await fetch(`${API_URL}/occupied-hours?date=${date}`); //hace una petición GET enviando la fecha elegida como parámetro de ruta
+export const getOccupiedHoursByDate = async (date: string, idBranch: number): Promise<string[]> => {
+  const res = await fetch(`${API_URL}/occupied-hours?date=${date}&idBranch=${idBranch}`); //hace una petición GET enviando la fecha elegida como parámetro de ruta
   if (!res.ok) return []; //si el servidor responde con error, devolvemos un arreglo vacío para evitar caídas en el select
   return res.json(); //retorna el arreglo de strings con las horas ocupadas, por ejemplo: ["12:00", "14:00"]
 };

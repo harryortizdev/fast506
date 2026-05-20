@@ -68,16 +68,19 @@ public class TestdriveController {
     }
 
     @GetMapping("/occupied-hours")
-    public ResponseEntity<List<String>> getOccupiedHours(@RequestParam("date") String dateS) {
-        try {
-            LocalDate date = LocalDate.parse(dateS);
+public ResponseEntity<List<String>> getOccupiedHours(
+        @RequestParam("date") String dateS,
+        @RequestParam("idBranch") Integer idBranch) { // 🚀 Atrapar el ID de la sucursal enviado por el fetch
+    try {
+        LocalDate date = LocalDate.parse(dateS);
 
-            List<String> occupiedHours = testdriveService.getOccupiedHoursByDate(date);
-            return ResponseEntity.ok(occupiedHours);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        List<String> occupiedHours = testdriveService.getOccupiedHoursByDate(date, idBranch);
+        
+        return ResponseEntity.ok(occupiedHours);
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
+}
 
     @GetMapping("/search")
     public ResponseEntity<Client> searchByIdentity(@RequestParam("id") int id) {

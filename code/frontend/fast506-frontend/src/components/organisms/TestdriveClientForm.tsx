@@ -11,6 +11,7 @@ import FormField from "../molecules/FormField";
 import { updateTestdrive } from "../../services/TestdriveService";
 import AlertWarning from "../atoms/AlertWarning";
 import ButtonIcon from "../molecules/ButtonIcon";
+import { FORMERR } from "dns";
 
 interface TestdriveFormProps {
     onClose: () => void;
@@ -52,8 +53,8 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveF
     }, []);
 
     useEffect(() => {
-        if (form.scheduledDate) {
-            getOccupiedHoursByDate(form.scheduledDate)
+        if (form.scheduledDate && form.idBranch) {
+            getOccupiedHoursByDate(form.scheduledDate, form.idBranch)
                 .then((horas) => {
                     setOccupiedHours(horas);
                 })
@@ -61,7 +62,7 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveF
         } else {
             setOccupiedHours([]);
         }
-    }, [form.scheduledDate]);
+    }, [form.scheduledDate, form.idBranch]);
 
     const handleVerifyClient = async () => {
         if (!id.trim()) {
@@ -70,23 +71,23 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveF
         }
 
         try {
-    // 1. Llamamos al servicio pasando el texto del input
-    const client = await getClientById(Number(id));
+            // 1. Llamamos al servicio pasando el texto del input
+            const client = await getClientById(Number(id));
 
-    if (client) { 
-        setIsClientVerified(true);
-        setClientName(client.name);
-        
-        // 2. Seteamos idUser que es el identificador único del usuario en el form
-        setForm(f => ({ ...f, idUser: client.idUser })); 
-    } else {
-        setIsClientVerified(false);
-        setClientName("");
-        AlertWarning("Cédula incorrecta o cliente no registrado.");
-    }
-} catch (error) {
-    alert("Error al conectar con el servidor de clientes.");
-}
+            if (client) {
+                setIsClientVerified(true);
+                setClientName(client.name);
+
+                // 2. Seteamos idUser que es el identificador único del usuario en el form
+                setForm(f => ({ ...f, idUser: client.idUser }));
+            } else {
+                setIsClientVerified(false);
+                setClientName("");
+                AlertWarning("Cédula incorrecta o cliente no registrado.");
+            }
+        } catch (error) {
+            alert("Error al conectar con el servidor de clientes.");
+        }
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -114,7 +115,7 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveF
         const newErrors: Partial<Record<keyof Testdrive, string>> = {};
 
         if (!form.idUser) {
-           newErrors.idUser = "Debe registrar un usuario.";
+            newErrors.idUser = "Debe registrar un usuario.";
             return false;
         }
         if (!form.scheduledDate) {
@@ -192,64 +193,6 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveF
                     )}
                 </div>
 
-                {/* CAMPO FECHA */}
-                <div className="mb-2">
-                    <label className="form-label">Fecha de la cita</label>
-                    <input
-                        type="date"
-                        className={`form-control ${errors.scheduledDate ? "is-invalid" : ""}`}
-                        name="scheduledDate"
-                        value={form.scheduledDate || ""}
-                        onChange={handleChange}
-                        min={fechaMinima}
-                        max={fechaMaxima}
-                        disabled={!isClientVerified} // Desactivado hasta verificar
-                    />
-                    {errors.scheduledDate && <div className="invalid-feedback d-block">{errors.scheduledDate}</div>}
-                </div>
-
-                {/* CAMPO HORA INICIO */}
-                <div className="mb-2">
-                    <label className="form-label">Hora de Inicio</label>
-                    <select
-                        className={`form-select ${errors.initiationTime ? "is-invalid" : ""}`}
-                        name="initiationTime"
-                        value={form.initiationTime || ""}
-                        onChange={handleChange}
-                        disabled={!isClientVerified || !form.scheduledDate} // Desactivado hasta verificar e ingresar fecha
-                    >
-                        <option value="">
-                            {!form.scheduledDate ? "Primero seleccione una fecha" : "Seleccione una hora"}
-                        </option>
-                        {RANGO_HORAS
-                            .filter(hora => {
-                                if (occupiedHours.includes(hora)) return false;
-                                if (form.scheduledDate === fechaMinima) {
-                                    return hora > horaActual;
-                                }
-                                return true;
-                            })
-                            .map((hora) => (
-                                <option key={hora} value={hora}>
-                                    {hora}
-                                </option>
-                            ))
-                        }
-                    </select>
-                    {errors.initiationTime && <div className="invalid-feedback d-block">{errors.initiationTime}</div>}
-                </div>
-
-                {/* CAMPO HORA FINALIZACIÓN */}
-                <div className="mb-2">
-                    <FormField
-                        label="Hora de Finalización (1 hora de duración)"
-                        name="finalizationTime"
-                        value={form.finalizationTime || ""}
-                        onChange={() => { }}
-                        type="time"
-                        disabled={true}
-                    />
-                </div>
 
                 {/* CAMPO VEHÍCULO */}
                 <div className="mb-2">
@@ -289,6 +232,64 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveF
                         ))}
                     </select>
                     {errors.idBranch && <div className="invalid-feedback d-block">{errors.idBranch}</div>}
+                </div>
+
+                {/* CAMPO FECHA */}
+                <div className="mb-2">
+                    <label className="form-label">Fecha de la cita</label>
+                    <input
+                        type="date"
+                        className={`form-control ${errors.scheduledDate ? "is-invalid" : ""}`}
+                        name="scheduledDate"
+                        value={form.scheduledDate || ""}
+                        onChange={handleChange}
+                        min={fechaMinima}
+                        max={fechaMaxima}
+                        disabled={!isClientVerified} // Desactivado hasta verificar
+                    />
+                    {errors.scheduledDate && <div className="invalid-feedback d-block">{errors.scheduledDate}</div>}
+                </div>
+
+                <div className="mb-2">
+                    <label className="form-label">Hora de Inicio</label>
+                    <select
+                        className={`form-select ${errors.initiationTime ? "is-invalid" : ""}`}
+                        name="initiationTime"
+                        value={form.initiationTime || ""}
+                        onChange={handleChange}
+                        disabled={!isClientVerified || !form.scheduledDate || !form.idBranch} // Desactivado hasta verificar e ingresar fecha
+                    >
+                        <option value="">
+                            {form.scheduledDate && form.idBranch ? "Seleccione una hora" : "Primero seleccione una fecha y una sucursal"}
+                        </option>
+                        {RANGO_HORAS
+                            .filter(hora => {
+                                if (occupiedHours.includes(hora)) return false;
+                                if (form.scheduledDate === fechaMinima) {
+                                    return hora > horaActual;
+                                }
+                                return true;
+                            })
+                            .map((hora) => (
+                                <option key={hora} value={hora}>
+                                    {hora}
+                                </option>
+                            ))
+                        }
+                    </select>
+                    {errors.initiationTime && <div className="invalid-feedback d-block">{errors.initiationTime}</div>}
+                </div>
+
+                {/* CAMPO HORA FINALIZACIÓN */}
+                <div className="mb-2">
+                    <FormField
+                        label="Hora de Finalización (1 hora de duración)"
+                        name="finalizationTime"
+                        value={form.finalizationTime || ""}
+                        onChange={() => { }}
+                        type="time"
+                        disabled={true}
+                    />
                 </div>
 
                 {/* BOTONES DE ACCIÓN */}
