@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { Branch } from "../../models/Branch";
-import { Client } from "../../models/Client";
 import { Testdrive } from "../../models/Testdrive";
 import { Unit } from "../../models/Unit";
-import { create, getOccupiedHoursByDate } from "../../services/TestdriveService";
+import { create, getClientById, getOccupiedHoursByDate } from "../../services/TestdriveService";
 import { getAll as getAllUnits } from "../../services/UnitService";
 import { getAll as getAllBranches } from "../../services/BranchService";
 import AlertSuccess from "../atoms/AlertSuccess";
@@ -27,7 +26,7 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveF
     const [occupiedHours, setOccupiedHours] = useState<string[]>([]);
     const [errors, setErrors] = useState<Partial<Record<keyof Testdrive, string>>>({});
 
-    const [cedulaInput, setCedulaInput] = useState("");
+    const [id, setId] = useState("");
     const [isClientVerified, setIsClientVerified] = useState(false);
     const [clientName, setClientName] = useState("");
 
@@ -65,32 +64,29 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveF
     }, [form.scheduledDate]);
 
     const handleVerifyClient = async () => {
-        if (!cedulaInput.trim()) {
-            alert("Por favor, ingrese un número de cédula.");
+        if (!id.trim()) {
+            AlertWarning("Por favor, ingrese un número de cédula.");
             return;
         }
 
         try {
-            // AQUÍ HARÁS EL FETCH A TU BACKEND, EJ:
-            // const res = await fetch(`http://localhost:8080/api/client/search?identification=${cedulaInput}`);
-            // const client: Client = await res.json();
+    // 1. Llamamos al servicio pasando el texto del input
+    const client = await getClientById(Number(id));
 
-            // Simulación de prueba para que verifiques la lógica:
-            const clientMock = { idUser: 101, name: "Ilian Ramírez", identification: "12345" };
-
-            if (cedulaInput === clientMock.identification) {
-                setIsClientVerified(true);
-                setClientName(clientMock.name);
-                setForm(f => ({ ...f, idUser: clientMock.idUser })); // Setea la llave foránea automáticamente
-
-            } else {
-                setIsClientVerified(false);
-                setClientName("");
-                AlertWarning("Cédula incorrecta o cliente no registrado.");
-            }
-        } catch (error) {
-            alert("Error al conectar con el servidor de clientes.");
-        }
+    if (client) { 
+        setIsClientVerified(true);
+        setClientName(client.name);
+        
+        // 2. Seteamos idUser que es el identificador único del usuario en el form
+        setForm(f => ({ ...f, idUser: client.idUser })); 
+    } else {
+        setIsClientVerified(false);
+        setClientName("");
+        AlertWarning("Cédula incorrecta o cliente no registrado.");
+    }
+} catch (error) {
+    alert("Error al conectar con el servidor de clientes.");
+}
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -118,7 +114,7 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveF
         const newErrors: Partial<Record<keyof Testdrive, string>> = {};
 
         if (!form.idUser) {
-            alert("Falta la validación de usuario.");
+           newErrors.idUser = "Debe registrar un usuario.";
             return false;
         }
         if (!form.scheduledDate) {
@@ -164,10 +160,8 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveF
     };
 
     return (
-        <div className="container d-flex justify-content-center">
-            <div className="card p-4 shadow-sm" style={{ maxWidth: '500px', width: '100%' }}>
-                <h3 className="mb-4">{testdriveToEdit ? "Editar Testdrive" : "Solicitar Testdrive"}</h3>
-
+        <div className="container d-flex justify-content-center p-4">
+            <div style={{ maxWidth: '500px', width: '100%' }}>
                 <div className="mb-4 p-3 border rounded bg-light">
                     <label className="form-label fw-bold">Verificación de Identidad</label>
                     <div className="input-group">
@@ -175,17 +169,17 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveF
                             type="text"
                             className="form-control"
                             placeholder="Ingrese su cédula"
-                            value={cedulaInput}
-                            onChange={(e) => setCedulaInput(e.target.value)}
-                            disabled={isClientVerified} // Si ya está verificado, se bloquea la cédula
+                            value={id}
+                            onChange={(e) => setId(e.target.value)}
+                            disabled={isClientVerified}
                         />
                         <ButtonIcon
                             label="Verificar"
                             color="#EEF1EF"
                             backgroundColor="#5E6572"
-                            hoverColor="#2C3E50" 
-                            onClick={handleVerifyClient} 
-                            icon={<i className="bi bi-check-lg"></i>} 
+                            hoverColor="#2C3E50"
+                            onClick={handleVerifyClient}
+                            icon={<i className="bi bi-check-lg"></i>}
                             className={""}
                         />
 

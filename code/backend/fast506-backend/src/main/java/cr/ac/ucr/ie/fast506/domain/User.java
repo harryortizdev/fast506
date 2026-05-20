@@ -1,19 +1,42 @@
 package cr.ac.ucr.ie.fast506.domain;
 
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "users")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class User {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_user")
     private int idUser;
-    private String name;
-    private int id;
-    private String email;
-    private String password;
-    private String phoneNumber;
-    private LocalDate dateBirth;
-    private String profileImage;
-    private boolean isActive;
 
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "id")
+    private int id;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "password")
+    private String password;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+    @Column(name = "date_birth")
+    private LocalDate dateBirth;
+
+    @Column(name = "profile_image")
+    private String profileImage;
+
+    @Column(name = "is_active")
+    private boolean isActive;
+    
     public int getIdUser() {
         return idUser;
     }

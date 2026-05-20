@@ -9,6 +9,7 @@ interface ButtonProps {
   hoverColor?: string;
   className: string;
   style?: React.CSSProperties;
+  disabled?: boolean; // <-- 1. Agregado a la interfaz como opcional
 }
 
 const Button = ({
@@ -18,7 +19,8 @@ const Button = ({
   backgroundColor,
   hoverColor,
   className,
-  style
+  style,
+  disabled = false // <-- 2. Recibido aquí con un valor por defecto
 }: ButtonProps) => {
   return (
     <button
@@ -29,12 +31,17 @@ const Button = ({
         ...style
       }}
       onClick={onClick}
-      onMouseEnter={e =>
-        (e.currentTarget.style.backgroundColor = hoverColor ?? "#2C3E50")
-      }
-      onMouseLeave={e =>
-        (e.currentTarget.style.backgroundColor = backgroundColor ?? "#5E6572")
-      }
+      disabled={disabled} 
+      onMouseEnter={e => {
+        if (!disabled) {
+          e.currentTarget.style.backgroundColor = hoverColor ?? "#2C3E50";
+        }
+      }}
+      onMouseLeave={e => {
+        if (!disabled) {
+          e.currentTarget.style.backgroundColor = backgroundColor ?? "#5E6572";
+        }
+      }}
     >
       <div className="d-flex align-items-center justify-content-center gap-2">
         <Label label={label} color={color} />

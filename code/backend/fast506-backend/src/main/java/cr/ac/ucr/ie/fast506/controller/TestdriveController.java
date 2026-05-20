@@ -4,6 +4,7 @@
  */
 package cr.ac.ucr.ie.fast506.controller;
 
+import cr.ac.ucr.ie.fast506.domain.Client;
 import cr.ac.ucr.ie.fast506.domain.Testdrive;
 import cr.ac.ucr.ie.fast506.service.TestdriveService;
 import java.time.LocalDate;
@@ -27,16 +28,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RestController
 @RequestMapping("/api/testdrive")
 public class TestdriveController {
-    
-       
+
     @Autowired
     private TestdriveService testdriveService;
-    
+
     @GetMapping("/all")
     public List<Testdrive> getAll() {
         return testdriveService.getAll();
     }
-    
+
     @PostMapping("/create")
     public ResponseEntity<String> create(@RequestBody Testdrive testdrive) {
         try {
@@ -46,7 +46,7 @@ public class TestdriveController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Error al guardar: " + e.getMessage());
         }
     }
-    
+
     @PutMapping("/update")
     public ResponseEntity<String> update(@RequestBody Testdrive testdrive) {
         try {
@@ -56,7 +56,7 @@ public class TestdriveController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Error al actualizar: " + e.getMessage());
         }
     }
-    
+
     @DeleteMapping("/delete")
     public ResponseEntity<String> delete(@RequestParam int id) {
         try {
@@ -66,17 +66,26 @@ public class TestdriveController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Error al eliminar: " + e.getMessage());
         }
     }
-    
+
     @GetMapping("/occupied-hours")
     public ResponseEntity<List<String>> getOccupiedHours(@RequestParam("date") String dateS) {
         try {
             LocalDate date = LocalDate.parse(dateS);
-            
+
             List<String> occupiedHours = testdriveService.getOccupiedHoursByDate(date);
             return ResponseEntity.ok(occupiedHours);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-}
 
+    @GetMapping("/search")
+    public ResponseEntity<Client> searchByIdentity(@RequestParam("id") int id) {
+        Client client = testdriveService.findByIdentity(id);
+        if (client != null) {
+            return ResponseEntity.ok(client);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+}

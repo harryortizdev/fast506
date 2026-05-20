@@ -4,7 +4,9 @@
  */
 package cr.ac.ucr.ie.fast506.service;
 
+import cr.ac.ucr.ie.fast506.domain.Client;
 import cr.ac.ucr.ie.fast506.domain.Testdrive;
+import cr.ac.ucr.ie.fast506.repository.ClientRepository;
 import cr.ac.ucr.ie.fast506.repository.TestdriveRepository;
 import java.time.LocalDate;
 import java.util.List;
@@ -20,6 +22,8 @@ public class TestdriveService {
 
     @Autowired
     TestdriveRepository testdriveRepository;
+    @Autowired
+    ClientRepository clientRepository;
 
     public List<Testdrive> getAll() {
         return testdriveRepository.getAll();
@@ -58,5 +62,8 @@ public class TestdriveService {
     public List<String> getOccupiedHoursByDate(LocalDate date) {
         return testdriveRepository.findOccupiedHoursByDate(date);
     }
+
+    public Client findByIdentity(int id) {
+return clientRepository.findByIdEquals(id).orElse(null);    }
 
 }

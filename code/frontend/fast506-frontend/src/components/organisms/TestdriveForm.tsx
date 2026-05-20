@@ -3,8 +3,8 @@ import { Branch } from "../../models/Branch";
 import { Client } from "../../models/Client";
 import { Testdrive } from "../../models/Testdrive";
 import { Unit } from "../../models/Unit";
-import { create, getOccupiedHoursByDate } from "../../services/TestdriveService"; 
-import { getAll as getAllClients } from "../../services/ClientService"; 
+import { create, getOccupiedHoursByDate } from "../../services/TestdriveService";
+import { getAll as getAllClients } from "../../services/ClientService";
 import { getAll as getAllUnits } from "../../services/UnitService";
 import { getAll as getAllBranches } from "../../services/BranchService";
 import AlertSuccess from "../atoms/AlertSuccess";
@@ -70,7 +70,8 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
 
-        let updatedForm = {...form,[name]: name === "idUser" || name === "idCar" || name === "idBranch" ? Number(value) : value
+        let updatedForm = {
+            ...form, [name]: name === "idUser" || name === "idCar" || name === "idBranch" ? Number(value) : value
         };
 
         // Lógica de automatización de la hora de finalización
@@ -79,9 +80,10 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
                 const [horas, minutos] = value.split(":").map(Number);
                 const horaFinCalculada = `${String(horas + 1).padStart(2, '0')}:${String(minutos).padStart(2, '0')}`;
 
-                updatedForm = {...updatedForm, finalizationTime: horaFinCalculada};
+                updatedForm = { ...updatedForm, finalizationTime: horaFinCalculada };
             } else {
-                updatedForm = {...updatedForm, finalizationTime: ""
+                updatedForm = {
+                    ...updatedForm, finalizationTime: ""
                 };
             }
         }
@@ -117,14 +119,19 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
 
         try {
             if (testdriveToEdit) {
-                await updateTestdrive({ ...form } as Testdrive);
+                const updatedTestdrive = {
+                    ...testdriveToEdit,
+                    ...form
+                } as Testdrive;
+
+                await updateTestdrive(updatedTestdrive);
                 AlertSuccess("Los cambios fueron guardados.");
             } else {
                 const newTestdrive = {
                     ...form,
                     creationDate: fechaMinima,
                     statusAppointment: "Agendada",
-                    isActive: 1 
+                    isActive: 1
                 } as Testdrive;
 
                 await create(newTestdrive);
@@ -196,7 +203,7 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
                         value={form.finalizationTime || ""}
                         onChange={() => { }}
                         type="time"
-                        disabled={true} 
+                        disabled={true}
                     />
                 </div>
 
@@ -253,6 +260,23 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
                     </select>
                     {errors.idBranch && <div className="invalid-feedback d-block">{errors.idBranch}</div>}
                 </div>
+
+                {/* ESTADO DE LA CITA - SOLO APARECE AL EDITAR */}
+                {testdriveToEdit && (
+                    <div className="mb-3">
+                        <label className="form-label">Estado de la Cita</label>
+                        <select
+                            className="form-select"
+                            name="statusAppointment"
+                            value={form.statusAppointment || "Agendada"}
+                            onChange={handleChange}
+                        >
+                            <option value="Agendada">Agendada</option>
+                            <option value="Finalizada">Finalizada</option>
+                            <option value="Cancelada">Cancelada</option>
+                        </select>
+                    </div>
+                )}
 
                 {/* ACCIONES */}
                 <div className="mt-3">

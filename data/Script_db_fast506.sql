@@ -1366,9 +1366,6 @@ INSERT INTO branch (name, ubication, direction, branch_Phone_Number, operation_S
 ('Fast506 Pérez Zeledón', 'San José, San Isidro', 'Contiguo a la gasolinera El Jorón', '+506 2771 4433', 'L-V: 8:00am-6:00pm, S: 9:00am-4:00pm', '1', '9.330757708994817, -83.669410048738', 1),
 ('Fast506 Liberia', 'Guanacaste, Liberia', 'Frente a la entrada al Aeropuerto Daniel Oduber', '+506 2665 9000', 'L-V: 8:00am-5:30pm, S: 9:00am-1:00pm', '1', '10.596253373403933, -85.52703150704106', 1);
 
-<<<<<<< HEAD
-
-
 
 
 -- ILIAN 18/5/2026
@@ -1426,7 +1423,7 @@ CREATE TABLE `db_fast506`.`testdrive` (
     ON UPDATE NO ACTION);
     
     
-    
+
     -- PA ELIMINAR
     
     USE `db_fast506`;
@@ -1439,7 +1436,7 @@ BEGIN
 UPDATE testdrive
 	SET is_Active = 0
     WHERE id_Test = id_TestT;
-=======
+    
 -- 18/05/2026 Tabla de catalogos (Harry)
 
 CREATE TABLE `db_fast506`.`catalogs` (
@@ -1473,7 +1470,7 @@ CHANGE COLUMN `engine_size` `engine_size` VARCHAR(255) NOT NULL ;
 
   -- pruebas
   
-  INSERT INTO db_fast506.catalogs (
+  INSERT INTO catalogs (
     car_name,
     brand_name,
     body_work,
@@ -1521,12 +1518,10 @@ BEGIN
         is_active
     FROM db_fast506.catalogs
     WHERE is_active = 1;
->>>>>>> moduleCatalog-harry
 END$$
 
 DELIMITER ;
 
-<<<<<<< HEAD
 -- PA GETALLTESTDRIVE
 
 USE `db_fast506`;
@@ -1596,7 +1591,7 @@ INSERT INTO units (VIN, engine_number, car_brand, car_name, legal_brand_name, ye
 
 -- datos prueba de catalogos
 
-INSERT INTO db_fast506.catalogs 
+INSERT INTO catalogs 
 (car_name, brand_name, body_work, technical_description, base_price, image, year_manufacture, transmission, fuel_type, engine_size, is_active) 
 VALUES
 -- 1. Bloqueamos el Nissan Sentra S Automático
@@ -1656,4 +1651,3 @@ BEGIN
         END;
 END$$
 DELIMITER ;
->>>>>>> moduleCatalog-harry
