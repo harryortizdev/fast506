@@ -54,3 +54,8 @@ export const getClientById = async (id: number): Promise<Client | null> => {
         return null;
     }
 };
+
+export const getAllCarAvailable = async () => { //async llamada asincronica que puede tardar tiempo (sin esto no se puede usar await)
+  const res = await fetch(`${API_URL}/allCarAvailable`); //hace una petición al http get y await pausa la función hasta que responda el servidor
+  return res.json(); //la respuesta se convierte a .json para que react lo pueda utilizar
+}

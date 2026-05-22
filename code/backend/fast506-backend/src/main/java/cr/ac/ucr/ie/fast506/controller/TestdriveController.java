@@ -6,6 +6,7 @@ package cr.ac.ucr.ie.fast506.controller;
 
 import cr.ac.ucr.ie.fast506.domain.Client;
 import cr.ac.ucr.ie.fast506.domain.Testdrive;
+import cr.ac.ucr.ie.fast506.domain.Unit;
 import cr.ac.ucr.ie.fast506.service.TestdriveService;
 import java.time.LocalDate;
 import java.util.List;
@@ -70,7 +71,7 @@ public class TestdriveController {
     @GetMapping("/occupied-hours")
 public ResponseEntity<List<String>> getOccupiedHours(
         @RequestParam("date") String dateS,
-        @RequestParam("idBranch") Integer idBranch) { // 🚀 Atrapar el ID de la sucursal enviado por el fetch
+        @RequestParam("idBranch") Integer idBranch) {
     try {
         LocalDate date = LocalDate.parse(dateS);
 
@@ -90,5 +91,10 @@ public ResponseEntity<List<String>> getOccupiedHours(
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+    
+    @GetMapping("/allCarAvailable")
+    public List<Unit> allCarAvailable() {
+        return testdriveService.allCarAvailable();
     }
 }

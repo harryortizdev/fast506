@@ -3,7 +3,7 @@ import { Branch } from "../../models/Branch";
 import { Testdrive } from "../../models/Testdrive";
 import { Unit } from "../../models/Unit";
 import { create, getClientById, getOccupiedHoursByDate } from "../../services/TestdriveService";
-import { getAll as getAllUnits } from "../../services/UnitService";
+import { getAllCarAvailable as getAllUnits } from "../../services/TestdriveService";
 import { getAll as getAllBranches } from "../../services/BranchService";
 import AlertSuccess from "../atoms/AlertSuccess";
 import Button from "../atoms/Button";
@@ -11,7 +11,6 @@ import FormField from "../molecules/FormField";
 import { updateTestdrive } from "../../services/TestdriveService";
 import AlertWarning from "../atoms/AlertWarning";
 import ButtonIcon from "../molecules/ButtonIcon";
-import { FORMERR } from "dns";
 
 interface TestdriveFormProps {
     onClose: () => void;
@@ -194,7 +193,6 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveF
                 </div>
 
 
-                {/* CAMPO VEHÍCULO */}
                 <div className="mb-2">
                     <label className="form-label">Vehículo</label>
                     <select
@@ -202,7 +200,7 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveF
                         name="idCar"
                         value={form.idCar ?? ""}
                         onChange={handleChange}
-                        disabled={!isClientVerified} // Desactivado hasta verificar
+                        disabled={!isClientVerified} 
                     >
                         <option value="">Seleccione un vehículo</option>
                         {units.map((u) => (
