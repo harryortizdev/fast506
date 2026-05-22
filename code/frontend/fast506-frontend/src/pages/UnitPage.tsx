@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import ButtonNew from "../components/ButtonNew";
 import UnitForm from "../components/organisms/UnitForm";
 import TableGeneric from "../components/organisms/TableGeneric";
 import { getAll, deleteUnit } from "../services/UnitService";
@@ -14,7 +13,7 @@ const UnitPage = () => {
   const [showForm, setShowForm] = useState(false);//controlo el formulario
   const [unitToEdit, setUnitToEdit] = useState<Unit | undefined>(undefined);//guarda la unidad que desea editar
 
-  const loadUnits = async () => {
+  const loadUnits = async () => { 
     const data = await getAll();//pide al backend la lista
     console.log(data);
     setUnits(data);//las guarda
