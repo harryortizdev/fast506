@@ -5,6 +5,7 @@
 package cr.ac.ucr.ie.fast506.service;
 
 import cr.ac.ucr.ie.fast506.domain.Catalog;
+import cr.ac.ucr.ie.fast506.domain.CategoriesCatalog;
 import cr.ac.ucr.ie.fast506.domain.UnitGroup;
 import cr.ac.ucr.ie.fast506.repository.CatalogRepository;
 import java.nio.file.Files;
@@ -57,7 +58,7 @@ public class CatalogService {
             catalog.setIsActive(active);
 
             catalog.setImage("uploads/" + fileName);
-            
+
             validateCatalog(catalog);
             catalogRepository.save(catalog);
         } catch (Exception e) {
@@ -106,44 +107,52 @@ public class CatalogService {
         }
 
     }
-    
- private void validateCatalog(Catalog catalog) {
 
-    if (catalog.getBrandName() == null || catalog.getBrandName().trim().isEmpty()) {
-        throw new RuntimeException("Marca requerida.");
+    public List<CategoriesCatalog> getCategories() {
+        return catalogRepository.getCategoriesCatalog();
     }
 
-    if (catalog.getCarName() == null || catalog.getCarName().trim().isEmpty()) {
-        throw new RuntimeException("Modelo requerido.");
+    public List<Catalog> getCatalogByBodyWork(String bodyWork) {
+        return catalogRepository.getCatalogByBodyWork(bodyWork);
     }
 
-    if (catalog.getYearManufacture() == 0) {
-        throw new RuntimeException("Año requerido.");
-    }
+    private void validateCatalog(Catalog catalog) {
 
-    if (catalog.getBodyWork() == null || catalog.getBodyWork().trim().isEmpty()) {
-        throw new RuntimeException("Carrocería requerida.");
-    }
+        if (catalog.getBrandName() == null || catalog.getBrandName().trim().isEmpty()) {
+            throw new RuntimeException("Marca requerida.");
+        }
 
-    if (catalog.getTransmission() == null || catalog.getTransmission().trim().isEmpty()) {
-        throw new RuntimeException("Transmisión requerida.");
-    }
+        if (catalog.getCarName() == null || catalog.getCarName().trim().isEmpty()) {
+            throw new RuntimeException("Modelo requerido.");
+        }
 
-    if (catalog.getFuelType() == null || catalog.getFuelType().trim().isEmpty()) {
-        throw new RuntimeException("Combustible requerido.");
-    }
+        if (catalog.getYearManufacture() == 0) {
+            throw new RuntimeException("Año requerido.");
+        }
 
-    if (catalog.getEngineSize() == null || catalog.getEngineSize().trim().isEmpty()) {
-        throw new RuntimeException("Motor requerido.");
-    }
+        if (catalog.getBodyWork() == null || catalog.getBodyWork().trim().isEmpty()) {
+            throw new RuntimeException("Carrocería requerida.");
+        }
 
-    if (catalog.getBasePrice() == 0 || catalog.getBasePrice() <= 0) {
-        throw new RuntimeException("Precio inválido.");
-    }
+        if (catalog.getTransmission() == null || catalog.getTransmission().trim().isEmpty()) {
+            throw new RuntimeException("Transmisión requerida.");
+        }
 
-    if (catalog.getTechnicalDescription() == null 
-            || catalog.getTechnicalDescription().trim().isEmpty()) {
-        throw new RuntimeException("Descripción requerida.");
+        if (catalog.getFuelType() == null || catalog.getFuelType().trim().isEmpty()) {
+            throw new RuntimeException("Combustible requerido.");
+        }
+
+        if (catalog.getEngineSize() == null || catalog.getEngineSize().trim().isEmpty()) {
+            throw new RuntimeException("Motor requerido.");
+        }
+
+        if (catalog.getBasePrice() == 0 || catalog.getBasePrice() <= 0) {
+            throw new RuntimeException("Precio inválido.");
+        }
+
+        if (catalog.getTechnicalDescription() == null
+                || catalog.getTechnicalDescription().trim().isEmpty()) {
+            throw new RuntimeException("Descripción requerida.");
+        }
     }
-}
 }

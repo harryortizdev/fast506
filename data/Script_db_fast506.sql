@@ -1598,10 +1598,10 @@ INSERT INTO catalogs
 (car_name, brand_name, body_work, technical_description, base_price, image, year_manufacture, transmission, fuel_type, engine_size, is_active) 
 VALUES
 -- 1. Bloqueamos el Nissan Sentra S Automático
-('Sentra S', 'Nissan', 'Sedán', 'Versión base con excelente consumo', 24000, 'nissan_sentra.png', 2026, 'Automático', 'Combustible', '2.0L', 1),
+('Sentra S', 'Nissan', 'Sedán', 'Versión base con excelente consumo', 24000, 'uploads/51c1e75b-916d-47f1-96d3-deb87787865e_nissan-sentra-s.png', 2026, 'Automático', 'Combustible', '2.0L', 1),
 
 -- 2. Bloqueamos la Toyota RAV4 Híbrida
-('RAV4', 'Toyota', 'SUV', 'Eficiencia híbrida para todo terreno', 42000, 'toyota_rav4_hybrid.png', 2026, 'Automático', 'Híbrido', '2.5L Híbrido', 1);
+('RAV4', 'Toyota', 'SUV', 'Eficiencia híbrida para todo terreno', 42000, 'uploads/0d941b5d-127f-4bc6-9b97-a2e9662a89a1_rav4.png', 2026, 'Automático', 'Híbrido', '2.5L Híbrido', 1);
 
 -- procedimiento para agrupar y comparar catalogos on unidades disponibles, este une las unidades por ciertos atributos y facilita para hacer un catalogo
 DELIMITER $$
@@ -1678,3 +1678,47 @@ END$$
 
 DELIMITER ;
 ;
+
+-- 22/05/2026 sp para saber las categorias del catalogo y cuantas del mismo hay
+
+DELIMITER $$
+
+CREATE PROCEDURE getBodyworksCatalog()
+BEGIN
+
+    SELECT 
+        body_work,
+        COUNT(*) AS total
+    FROM catalogs
+    GROUP BY body_work;
+
+END $$
+
+DELIMITER ;
+
+-- Seleccionar segun su bodywork
+DELIMITER $$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getCatalogsByBodyWork`(
+	IN p_body_work VARCHAR(100)
+    )
+BEGIN
+    SELECT 
+        id_catalog,
+        car_name,
+        brand_name,
+        body_work,
+        technical_description,
+        base_price,
+        image,
+        year_manufacture,
+        transmission,
+        fuel_type,
+        engine_size,
+        is_active
+    FROM db_fast506.catalogs
+    WHERE is_active = 1 AND
+    body_work = p_body_work;
+END$$
+
+DELIMITER ;

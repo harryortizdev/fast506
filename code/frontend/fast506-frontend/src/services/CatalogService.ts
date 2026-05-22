@@ -1,4 +1,5 @@
 import { Catalog } from "../models/Catalog";
+import { CategoriesCatalog } from "../models/CategoriesCatalog";
 import { UnitGroup } from "../models/UnitGroup";
 
 const API_URL = "http://localhost:8080/api/catalogs";
@@ -47,6 +48,21 @@ export const update = async (id: number, formData: FormData) => {
   const data =+ await response.text();
   if (!response.ok) {
     throw new Error("Error al actualizar");
-  }
+}
   return data;
+};
+
+
+export const getCategories = async (): Promise<CategoriesCatalog[]> => {
+  const res = await fetch(`${API_URL}/categories`);
+  const data = await res.json();
+  console.log("Data recibida: ", data);
+  return Array.isArray(data) ? data : [];
+};
+
+export const getCatalogByBodyWork = async (bodyWork: string): Promise<Catalog[]> => {
+  const res = await fetch(`${API_URL}/by-bodywork?bodywork=${bodyWork}`); 
+  const data = await res.json();
+  console.log("Data recibida: ", data);
+  return Array.isArray(data) ? data : [];
 };

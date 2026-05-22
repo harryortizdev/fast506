@@ -1,8 +1,8 @@
-interface Icon{
+interface IconProps{
   icon: React.ReactNode;
 }
 
-const Icon = ({ icon }: Icon) => {
+const Icon = ({ icon }: IconProps) => {
   return <span>{icon}</span>;
 };
 
