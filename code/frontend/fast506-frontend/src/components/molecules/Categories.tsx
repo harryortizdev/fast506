@@ -32,7 +32,7 @@ const Categories = ({
   };
 
   return (
-    <div style={{ margin: "0 40px" }}>  
+    <div style={{ margin: "0 40px" }}>
       <div
         style={{
           display: "flex",
@@ -55,7 +55,7 @@ const Categories = ({
                 cursor: "pointer",
                 color: "#2C3E50",
                 transition: "0.3s",
-                fontSize: "0.85rem", // ← más pequeño
+                fontSize: "0.85rem",
               }}
             >
               {category.bodyWork} ({category.total})
@@ -85,9 +85,13 @@ const Categories = ({
           style={{
             display: "flex",
             flexWrap: "wrap",
-            gap: "16px",           // ← gap más pequeño
+            gap: "16px",
             justifyContent: "flex-start",
             padding: "0 8px",
+            minHeight: "clamp(220px, 50vh, 420px)",
+            maxHeight: "clamp(220px, 50vh, 420px)",
+            overflowY: "auto",
+            alignContent: "flex-start",
           }}
         >
           {catalogs.map((catalog) => (
