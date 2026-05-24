@@ -5,6 +5,7 @@
 package cr.ac.ucr.ie.fast506.controller;
 
 import cr.ac.ucr.ie.fast506.domain.Quotation;
+import cr.ac.ucr.ie.fast506.domain.Unit;
 import cr.ac.ucr.ie.fast506.service.QuotationService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,15 +27,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RestController
 @RequestMapping("/api/quotation")
 public class QuotationController {
-    
+
     @Autowired
     private QuotationService quotationService;
-    
+
     @GetMapping("/all")
     public List<Quotation> getAll() {
         return quotationService.getAll();
     }
-    
+
     @PostMapping("/create")
     public ResponseEntity<String> create(@RequestBody Quotation quotation) {
         try {
@@ -44,7 +45,7 @@ public class QuotationController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Error al guardar: " + e.getMessage());
         }
     }
-    
+
     @PutMapping("/update")
     public ResponseEntity<String> update(@RequestBody Quotation quotation) {
         try {
@@ -54,7 +55,7 @@ public class QuotationController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Error al actualizar: " + e.getMessage());
         }
     }
-    
+
     @DeleteMapping("/delete")
     public ResponseEntity<String> delete(@RequestParam int id) {
         try {
@@ -63,5 +64,10 @@ public class QuotationController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Error al eliminar: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/filteredUnitsByCatalog")
+    public List<Unit> filteredUnitsByCatalog(@RequestParam int idCatalog) {
+        return quotationService.filteredUnitsByCatalog(idCatalog);
     }
 }

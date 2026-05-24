@@ -1,12 +1,12 @@
 export interface Quotation {
     idQuotation: number;
     referenceNumber: number;
-    date: Date;
+    date: string;
     initialPrice: number;
     transferCost: number;
     salesTax: number;
     totalPayment: number;
-    isActive: boolean;
+    isActive: number;
     idUser: number;
     idCatalog: number;
     idCar: number;

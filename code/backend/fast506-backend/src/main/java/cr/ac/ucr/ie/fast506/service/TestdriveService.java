@@ -48,18 +48,15 @@ public class TestdriveService {
     }
 
     public void add(Testdrive testdrive) {
-        int yearComplete = testdrive.getScheduledDate().getYear();
-        int yearShort = yearComplete % 100;
-
-        int month = testdrive.getScheduledDate().getMonthValue();
-        int day = testdrive.getScheduledDate().getDayOfMonth();
-        int hour = testdrive.getInitiationTime().getHour();
-        int idBranch = testdrive.getIdBranch();
-        int combination = (idBranch * 100000000) + (yearShort * 1000000) + (month * 10000) + (day * 100) + hour;
-
-        testdrive.setNumberReference(combination);
         testdrive.setIsActive(true);
 
+        int total = (int) testdriveRepository.count() + 1;
+        int month = testdrive.getScheduledDate().getMonthValue();
+        int day = testdrive.getScheduledDate().getDayOfMonth();
+
+        int combination = (total * 10000) + (day * 100) + month;
+
+        testdrive.setNumberReference(combination);
         testdriveRepository.save(testdrive);
     }
 

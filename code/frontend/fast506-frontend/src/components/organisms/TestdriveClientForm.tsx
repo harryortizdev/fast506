@@ -11,6 +11,7 @@ import FormField from "../molecules/FormField";
 import { updateTestdrive } from "../../services/TestdriveService";
 import AlertWarning from "../atoms/AlertWarning";
 import ButtonIcon from "../molecules/ButtonIcon";
+import Input from "../atoms/Input";
 
 interface TestdriveFormProps {
     onClose: () => void;
@@ -70,14 +71,11 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveF
         }
 
         try {
-            // 1. Llamamos al servicio pasando el texto del input
             const client = await getClientById(Number(id));
 
             if (client) {
                 setIsClientVerified(true);
                 setClientName(client.name);
-
-                // 2. Seteamos idUser que es el identificador único del usuario en el form
                 setForm(f => ({ ...f, idUser: client.idUser }));
             } else {
                 setIsClientVerified(false);
@@ -162,6 +160,7 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveF
     return (
         <div className="container d-flex justify-content-center p-4">
             <div style={{ maxWidth: '500px', width: '100%' }}>
+
                 <div className="mb-4 p-3 border rounded bg-light">
                     <label className="form-label fw-bold">Verificación de Identidad</label>
                     <div className="input-group">
@@ -186,7 +185,7 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveF
 
                     </div>
                     {isClientVerified && (
-                        <div className="text-success small mt-2 fw-bold animate__animated animate__fadeIn">
+                        <div className="text-success small mt-2 fw-bold ">
                             <i className="bi bi-check-circle-fill me-1"></i> Cliente verificado: {clientName}
                         </div>
                     )}
@@ -200,7 +199,7 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveF
                         name="idCar"
                         value={form.idCar ?? ""}
                         onChange={handleChange}
-                        disabled={!isClientVerified} 
+                        disabled={!isClientVerified}
                     >
                         <option value="">Seleccione un vehículo</option>
                         {units.map((u) => (
@@ -211,95 +210,101 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveF
                     </select>
                     {errors.idCar && <div className="invalid-feedback d-block">{errors.idCar}</div>}
                 </div>
+                <div className="row">
+                    <div className="col-6">
+                        <div className="mb-2">
+                            <label className="form-label">Sucursal</label>
+                            <select
+                                className={`form-select ${errors.idBranch ? "is-invalid" : ""}`}
+                                name="idBranch"
+                                value={form.idBranch ?? ""}
+                                onChange={handleChange}
+                                disabled={!isClientVerified} // Desactivado hasta verificar
+                            >
+                                <option value="">Seleccione una Sucursal</option>
+                                {branches.map((b) => (
+                                    <option key={b.idBranch} value={b.idBranch}>
+                                        {b.name}
+                                    </option>
+                                ))}
+                            </select>
+                            {errors.idBranch && <div className="invalid-feedback d-block">{errors.idBranch}</div>}
+                        </div>
 
-                {/* CAMPO SUCURSAL */}
-                <div className="mb-3">
-                    <label className="form-label">Sucursal</label>
-                    <select
-                        className={`form-select ${errors.idBranch ? "is-invalid" : ""}`}
-                        name="idBranch"
-                        value={form.idBranch ?? ""}
-                        onChange={handleChange}
-                        disabled={!isClientVerified} // Desactivado hasta verificar
-                    >
-                        <option value="">Seleccione una Sucursal</option>
-                        {branches.map((b) => (
-                            <option key={b.idBranch} value={b.idBranch}>
-                                {b.name}
-                            </option>
-                        ))}
-                    </select>
-                    {errors.idBranch && <div className="invalid-feedback d-block">{errors.idBranch}</div>}
-                </div>
+                        <div className="mb-2">
+                            <label className="form-label">Fecha de la cita</label>
+                            <input
+                                type="date"
+                                className={`form-control ${errors.scheduledDate ? "is-invalid" : ""}`}
+                                name="scheduledDate"
+                                value={form.scheduledDate || ""}
+                                onChange={handleChange}
+                                min={fechaMinima}
+                                max={fechaMaxima}
+                                disabled={!isClientVerified} // Desactivado hasta verificar
+                            />
+                            {errors.scheduledDate && <div className="invalid-feedback d-block">{errors.scheduledDate}</div>}
+                        </div>
+                    </div>
 
-                {/* CAMPO FECHA */}
-                <div className="mb-2">
-                    <label className="form-label">Fecha de la cita</label>
-                    <input
-                        type="date"
-                        className={`form-control ${errors.scheduledDate ? "is-invalid" : ""}`}
-                        name="scheduledDate"
-                        value={form.scheduledDate || ""}
-                        onChange={handleChange}
-                        min={fechaMinima}
-                        max={fechaMaxima}
-                        disabled={!isClientVerified} // Desactivado hasta verificar
-                    />
-                    {errors.scheduledDate && <div className="invalid-feedback d-block">{errors.scheduledDate}</div>}
-                </div>
+                    <div className="col-6">
 
-                <div className="mb-2">
-                    <label className="form-label">Hora de Inicio</label>
-                    <select
-                        className={`form-select ${errors.initiationTime ? "is-invalid" : ""}`}
-                        name="initiationTime"
-                        value={form.initiationTime || ""}
-                        onChange={handleChange}
-                        disabled={!isClientVerified || !form.scheduledDate || !form.idBranch} // Desactivado hasta verificar e ingresar fecha
-                    >
-                        <option value="">
-                            {form.scheduledDate && form.idBranch ? "Seleccione una hora" : "Primero seleccione una fecha y una sucursal"}
-                        </option>
-                        {RANGO_HORAS
-                            .filter(hora => {
-                                if (occupiedHours.includes(hora)) return false;
-                                if (form.scheduledDate === fechaMinima) {
-                                    return hora > horaActual;
-                                }
-                                return true;
-                            })
-                            .map((hora) => (
-                                <option key={hora} value={hora}>
-                                    {hora}
+                        <div className="mb-2">
+                            <label className="form-label">Hora de Inicio</label>
+                            <select
+                                className={`form-select ${errors.initiationTime ? "is-invalid" : ""}`}
+                                name="initiationTime"
+                                value={form.initiationTime || ""}
+                                onChange={handleChange}
+                                disabled={!isClientVerified || !form.scheduledDate || !form.idBranch} // Desactivado hasta verificar e ingresar fecha
+                            >
+                                <option value="">
+                                    {form.scheduledDate && form.idBranch ? "Seleccione una hora" : "Seleccione fecha y sucursal"}
                                 </option>
-                            ))
-                        }
-                    </select>
-                    {errors.initiationTime && <div className="invalid-feedback d-block">{errors.initiationTime}</div>}
+                                {RANGO_HORAS
+                                    .filter(hora => {
+                                        if (occupiedHours.includes(hora)) return false;
+                                        if (form.scheduledDate === fechaMinima) {
+                                            return hora > horaActual;
+                                        }
+                                        return true;
+                                    })
+                                    .map((hora) => (
+                                        <option key={hora} value={hora}>
+                                            {hora}
+                                        </option>
+                                    ))
+                                }
+                            </select>
+                            {errors.initiationTime && <div className="invalid-feedback d-block">{errors.initiationTime}</div>}
+                        </div>
+
+                        <div className="mb-2">
+
+                            <label className="form-label">Hora de Finalización</label>
+                            <Input
+                                name="finalizationTime"
+                                value={form.finalizationTime || ""}
+                                onChange={() => { }}
+                                type="time"
+                                disabled={true}
+                            />
+
+                        </div>
+                    </div>
                 </div>
 
-                {/* CAMPO HORA FINALIZACIÓN */}
-                <div className="mb-2">
-                    <FormField
-                        label="Hora de Finalización (1 hora de duración)"
-                        name="finalizationTime"
-                        value={form.finalizationTime || ""}
-                        onChange={() => { }}
-                        type="time"
-                        disabled={true}
-                    />
-                </div>
 
-                {/* BOTONES DE ACCIÓN */}
-                <div className="mt-3">
+
+                <div className="mt-2 d-flex justify-content-center">
                     <Button
-                        label="Guardar Cita"
+                        label="Guardar"
                         onClick={handleSubmit}
                         backgroundColor="#198754"
                         hoverColor="#145c32"
                         color="#fff"
                         className="btn btn-success me-2"
-                        disabled={!isClientVerified} // Desactivado hasta verificar
+                        disabled={!isClientVerified}
                     />
                     <Button
                         label="Cancelar"

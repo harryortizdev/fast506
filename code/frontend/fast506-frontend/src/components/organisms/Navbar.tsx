@@ -59,28 +59,22 @@ const Navbar = () => {
                 <button
                   onClick={() => setShowModels(!showModels)}
                   className="nav-link magic-link"
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "white",
-                    fontWeight: 500,
-                  }}
+
                 >
                   MODELOS
                 </button>
               </li>
 
-              <li className="nav-item dropdown">
-                <a className="nav-link dropdown-toggle magic-link" href="#" data-bs-toggle="dropdown">
-                  SERVICIOS
-                </a>
-                <ul className="dropdown-menu custom-dropdown text-center">
-                  <li>
-                    <a className="dropdown-item" href="/testdrive">
-                      TEST DRIVE
-                    </a>
-                  </li>
-                </ul>
+              <li className="nav-item">
+                <NavLink className="nav-link magic-link" to="/testdrive">
+                  TESTDRIVE
+                </NavLink>
+              </li>
+
+              <li className="nav-item">
+                <NavLink className="nav-link magic-link" to="/quotation">
+                  COTIZACIONES
+                </NavLink>
               </li>
 
               <li className="nav-item">
@@ -95,10 +89,28 @@ const Navbar = () => {
                 </NavLink>
               </li>
 
+              <li className="nav-item dropdown">
+                <a className="nav-link dropdown-toggle magic-link" href="#" role="button" data-bs-toggle="dropdown">
+                  ADMINISTRACIÓN
+                </a>
+                <ul className="dropdown-menu custom-dropdown text-center">
+                  <li><Link className="dropdown-item" to="/admin/administrators">ADMINISTRADORES</Link></li>
+                  <li><Link className="dropdown-item" to="/admin/catalogs">CATÁLOGOS</Link></li>
+                  <li><Link className="dropdown-item" to="/admin/clients">CLIENTES</Link></li>
+                  <li><Link className="dropdown-item" to="/admin/quotations">COTIZACIONES</Link></li>
+                  <li><Link className="dropdown-item" to="/admin/mechanics">MECÁNICOS</Link></li>
+                  <li><Link className="dropdown-item" to="/admin/suppliers">PROVEEDORES</Link></li>
+                  <li><Link className="dropdown-item" to="/admin/branches">SUCURSALES</Link></li>
+                  <li><Link className="dropdown-item" to="/admin/testdrive">TESTDRIVE</Link></li>
+                  <li><Link className="dropdown-item" to="/admin/units">UNIDADES</Link></li>
+
+                </ul>
+              </li>
+
             </ul>
 
 
-            <ul className="navbar-nav ms-auto text-center mt-3 mt-lg-0">
+            <ul className="navbar-nav text-center mt-3 mt-lg-0">
 
               <li className="nav-item dropdown">
 
@@ -154,7 +166,7 @@ const Navbar = () => {
 
       <div
         style={{
-          maxHeight: showModels ? "800px" : "0px", // ← más espacio para los cards
+          maxHeight: showModels ? "800px" : "0px",
           overflow: "hidden",
           transition: "all 0.5s ease",
           backgroundColor: "#fff",

@@ -31,3 +31,8 @@ export const updateQuotation = async (quotation: Quotation) => {
   });
   return res.text();
 };
+
+export const getUnitsByCatalog = async (idCatalog: number) => { //async llamada asincronica que puede tardar tiempo (sin esto no se puede usar await)
+    const res = await fetch(`${API_URL}/filteredUnitsByCatalog?idCatalog=${idCatalog}`); //hace una petición al http get y await pausa la función hasta que responda el servidor
+    return res.json(); //la respuesta se convierte a .json para que react lo pueda utilizar
+}
