@@ -1851,3 +1851,56 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+
+
+
+-- 23-05-26 CREACION TABLA AD
+
+CREATE TABLE `db_fast506`.`ad` (
+  `id_Ad` INT NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(50) NOT NULL,
+  `image` VARCHAR(500) NOT NULL,
+  `expiration_Date` DATE NULL,
+  `category` VARCHAR(50) NOT NULL,
+  `publication_Status` TINYINT NOT NULL,
+  `is_Active` TINYINT NOT NULL,
+  `id_user` INT NOT NULL,
+  PRIMARY KEY (`id_Ad`),
+  INDEX `fk_ad_id_user_idx` (`id_user` ASC) ,
+  CONSTRAINT `fk_ad_id_user`
+    FOREIGN KEY (`id_user`)
+    REFERENCES `db_fast506`.`users` (`id_user`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+    
+    -- PA GETALLAD
+    
+    USE `db_fast506`;
+DROP procedure IF EXISTS `getAllAd`;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE `getAllAd` ()
+BEGIN
+SELECT id_Ad, title, image, expiration_Date, category, publication_Status, is_Active, id_user FROM ad where is_Active=1;
+END$$
+
+DELIMITER ;
+
+-- PA DELETEAD
+
+USE `db_fast506`;
+DROP procedure IF EXISTS `deleteAd`;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE `deleteAd` (IN id_AdA INT)
+BEGIN
+UPDATE ad
+	SET is_Active = 0
+    WHERE id_Ad = id_AdA; 
+END$$
+
+DELIMITER ;
+

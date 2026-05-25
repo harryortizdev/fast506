@@ -12,6 +12,7 @@ import CatalogPage from "./pages/CatalogPage";
 import CreateTestdrive from "./pages/CreateTestdrive";
 import QuotationPage from "./pages/QuotationPage";
 import CreateQuotation from "./pages/CreateQuotation";
+import AdPage from "./pages/AdPage";
 
 
 
@@ -32,6 +33,8 @@ function App() {
         <Route path="/testdrive" element={<CreateTestdrive />} />
         <Route path="/admin/quotations" element={<QuotationPage />} />
         <Route path="/quotation" element={<CreateQuotation />} />
+        <Route path="/admin/ad" element={<AdPage />} />
+
 
 
 
