@@ -169,7 +169,7 @@ const Navbar = () => {
           maxHeight: showModels ? "800px" : "0px",
           overflow: "hidden",
           transition: "all 0.5s ease",
-          backgroundColor: "#fff",
+          backgroundColor: "#EEF1EF",
           boxShadow: showModels ? "0 6px 16px rgba(0,0,0,0.12)" : "none",
         }}
       >
