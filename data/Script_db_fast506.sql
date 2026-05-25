@@ -1722,3 +1722,132 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+
+
+
+     
+-- (22/5/2026) ILIAN PA UNIDADES QUE ESTAN EN EL CATALOGO
+
+USE `db_fast506`;
+DROP procedure IF EXISTS `getAllCarAvailable`;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE `getAllCarAvailable` ()
+BEGIN
+SELECT u.* FROM catalogs c INNER JOIN units u ON u.id_car = (
+        SELECT sub.id_car 
+        FROM units sub
+        WHERE sub.is_active = 1
+          AND sub.car_brand = c.brand_name
+          AND sub.car_name = c.car_name
+          AND sub.year_Manufacture = c.year_manufacture
+          AND (
+              (LOWER(c.transmission) = 'automático' AND LOWER(sub.transmission) IN ('automatico', 'automático', 'cvt'))
+              OR 
+              (LOWER(c.transmission) != 'automático' AND LOWER(sub.transmission) = LOWER(c.transmission))
+          )
+          AND (
+              (LOWER(c.fuel_type) = 'combustible' AND LOWER(sub.fuel_type) IN ('gasolina', 'diesel', 'diésel'))
+              OR 
+              (LOWER(c.fuel_type) != 'combustible' AND LOWER(sub.fuel_type) = LOWER(c.fuel_type))
+          )
+        LIMIT 1
+    )
+    WHERE u.is_active = 1;
+END$$
+
+DELIMITER ;
+
+-- TABLA QUOTATION
+
+CREATE TABLE `db_fast506`.`quotation` (
+  `id_Quotation` INT NOT NULL AUTO_INCREMENT,
+  `reference_Number` INT NOT NULL,
+  `date` DATE NOT NULL,
+  `initial_Price` DECIMAL(10,2) NOT NULL,
+  `transfer_Cost` DECIMAL(10,2) NOT NULL,
+  `sales_Tax` DECIMAL(10,2) NOT NULL,
+  `total_Payment` DECIMAL(10,2) NOT NULL,
+  `is_Active` TINYINT NOT NULL,
+  `id_user` INT NOT NULL,
+  `id_catalog` INT NOT NULL,
+  `id_car` INT NOT NULL,
+  PRIMARY KEY (`id_Quotation`),
+  INDEX `fk_quotation_users_id_user_idx` (`id_user` ASC) ,
+  INDEX `fk_quotation_catalogs_id_catalog_idx` (`id_catalog` ASC) ,
+  INDEX `fk_quotation_units_id_car_idx` (`id_car` ASC) ,
+  CONSTRAINT `fk_quotation_users_id_user`
+    FOREIGN KEY (`id_user`)
+    REFERENCES `db_fast506`.`users` (`id_user`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_quotation_catalogs_id_catalog`
+    FOREIGN KEY (`id_catalog`)
+    REFERENCES `db_fast506`.`catalogs` (`id_catalog`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_quotation_units_id_car`
+    FOREIGN KEY (`id_car`)
+    REFERENCES `db_fast506`.`units` (`id_car`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+    
+    -- PA GETALLQUOTATION
+    
+    USE `db_fast506`;
+DROP procedure IF EXISTS `getAllQuotation`;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE `getAllQuotation` ()
+BEGIN
+SELECT id_Quotation ,reference_Number ,date , initial_Price ,transfer_Cost , sales_Tax, total_Payment, is_Active ,id_user,id_catalog, id_car FROM quotation Where is_Active = 1;
+END$$
+
+DELIMITER ;
+
+-- PA ELIMINAR COTIZACION
+
+USE `db_fast506`;
+DROP procedure IF EXISTS `deleteQuotation`;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE `deleteQuotation` (IN id_QuotationQ int)
+BEGIN
+UPDATE quotation
+	SET is_Active = 0
+    WHERE id_Quotation = id_QuotationQ;
+END$$
+
+DELIMITER ;
+
+-- PA DEVUELVE UNA UNIDAD REPETIDA O NO PERO SIN REPETIR SU TRACCION
+USE `db_fast506`;
+DROP procedure IF EXISTS `getUnitsByCatalog`;
+
+DELIMITER $$
+
+CREATE PROCEDURE `getUnitsByCatalog` (IN idCatalogC INT)
+BEGIN
+    SELECT u.* FROM units u
+    INNER JOIN catalogs c ON 
+        u.car_brand = c.brand_name AND u.car_name = c.car_name AND u.year_Manufacture = c.year_manufacture
+        AND (
+            (LOWER(c.transmission) = 'automático' AND LOWER(u.transmission) IN ('automatico', 'automático', 'cvt'))
+            OR 
+            (LOWER(c.transmission) != 'automático' AND LOWER(u.transmission) = LOWER(c.transmission))
+        )
+        AND (
+            (LOWER(c.fuel_type) = 'combustible' AND LOWER(u.fuel_type) IN ('gasolina', 'diesel', 'diésel'))
+            OR 
+            (LOWER(c.fuel_type) != 'combustible' AND LOWER(u.fuel_type) = LOWER(c.fuel_type))
+        )
+    WHERE c.id_catalog = idCatalogC 
+	AND u.is_active = 1
+    GROUP BY u.traction;
+END$$
+
+DELIMITER ;

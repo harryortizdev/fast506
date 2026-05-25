@@ -4,9 +4,9 @@ const Footer = () => {
 
   <div className="container py-5">
 
-    <div className="row justify-content-center text-center text-md-start gy-4">
+    <div className="row justify-content-center text-center  gy-4">
 
-      <div className="col-6 col-md-4 col-lg-2">
+      <div className="col-6 col-md-4 col-lg-3 " >
         <h6 className="text-uppercase mb-3 fw-bold" style={{ color: "#A9B4C2" }}>
           Autos
         </h6>
@@ -18,7 +18,7 @@ const Footer = () => {
         </p>
       </div>
 
-      <div className="col-6 col-md-4 col-lg-2">
+      <div className="col-6 col-md-4 col-lg-3">
         <h6 className="text-uppercase mb-3 fw-bold" style={{ color: "#A9B4C2" }}>
           Servicios
         </h6>
@@ -30,7 +30,7 @@ const Footer = () => {
         </p>
       </div>
 
-      <div className="col-6 col-md-4 col-lg-2">
+      <div className="col-6 col-md-4 col-lg-3">
         <h6 className="text-uppercase mb-3 fw-bold" style={{ color: "#A9B4C2" }}>
           Citas Taller
         </h6>
@@ -42,7 +42,7 @@ const Footer = () => {
         </p>
       </div>
 
-      <div className="col-6 col-md-4 col-lg-2">
+      <div className="col-6 col-md-4 col-lg-3">
         <h6 className="text-uppercase mb-3 fw-bold" style={{ color: "#A9B4C2" }}>
           Sucursales
         </h6>
@@ -54,25 +54,6 @@ const Footer = () => {
         </p>
       </div>
 
-      <div className="col-12 col-md-8 col-lg-3">
-        <h6 className="text-uppercase mb-3 fw-bold" style={{ color: "#A9B4C2" }}>
-          Administración
-        </h6>
-
-        <div className="d-flex flex-column gap-2">
-          <a href="/admin/units" className="text-decoration-none small" style={{ color: "#EEF1EF" }}>
-            Unidades
-          </a>
-
-          <a href="/admin/branches" className="text-decoration-none small" style={{ color: "#EEF1EF" }}>
-            Sucursales
-          </a>
-
-          <a href="/admin/suppliers" className="text-decoration-none small" style={{ color: "#EEF1EF" }}>
-            Proveedores
-          </a>
-        </div>
-      </div>
 
     </div>
 

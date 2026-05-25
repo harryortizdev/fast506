@@ -10,7 +10,12 @@ import MechanicPage from "./pages/MechanicPage";
 import TestdrivePage from "./pages/TestdrivePage";
 import CatalogPage from "./pages/CatalogPage";
 import CreateTestdrive from "./pages/CreateTestdrive";
+<<<<<<< HEAD
 import CatalogDetailPage from "./pages/CatalogDetailPage";
+=======
+import QuotationPage from "./pages/QuotationPage";
+import CreateQuotation from "./pages/CreateQuotation";
+>>>>>>> dev
 
 
 
@@ -29,7 +34,15 @@ function App() {
         <Route path="/admin/mechanics" element={<MechanicPage />} />
         <Route path="/admin/catalogs" element={<CatalogPage />} />
         <Route path="/testdrive" element={<CreateTestdrive />} />
+<<<<<<< HEAD
  <Route path="/catalog/detail/:id" element={<CatalogDetailPage />} />
+=======
+        <Route path="/admin/quotations" element={<QuotationPage />} />
+        <Route path="/quotation" element={<CreateQuotation />} />
+
+
+
+>>>>>>> dev
 
       </Routes>
     </BrowserRouter>

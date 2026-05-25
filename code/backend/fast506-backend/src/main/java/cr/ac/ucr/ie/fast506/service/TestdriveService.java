@@ -6,6 +6,7 @@ package cr.ac.ucr.ie.fast506.service;
 
 import cr.ac.ucr.ie.fast506.domain.Client;
 import cr.ac.ucr.ie.fast506.domain.Testdrive;
+import cr.ac.ucr.ie.fast506.domain.Unit;
 import cr.ac.ucr.ie.fast506.repository.ClientRepository;
 import cr.ac.ucr.ie.fast506.repository.TestdriveRepository;
 import java.time.LocalDate;
@@ -47,15 +48,15 @@ public class TestdriveService {
     }
 
     public void add(Testdrive testdrive) {
-        int anio = testdrive.getScheduledDate().getYear();
-        int mes = testdrive.getScheduledDate().getMonthValue();
-        int dia = testdrive.getScheduledDate().getDayOfMonth();
-        int hora = testdrive.getInitiationTime().getHour();
-        int combination = (anio * 1000000) + (mes * 10000) + (dia * 100) + hora;
-
-        testdrive.setNumberReference(combination);
         testdrive.setIsActive(true);
 
+        int total = (int) testdriveRepository.count() + 1;
+        int month = testdrive.getScheduledDate().getMonthValue();
+        int day = testdrive.getScheduledDate().getDayOfMonth();
+
+        int combination = (total * 10000) + (day * 100) + month;
+
+        testdrive.setNumberReference(combination);
         testdriveRepository.save(testdrive);
     }
 
@@ -64,6 +65,12 @@ public class TestdriveService {
     }
 
     public Client findByIdentity(int id) {
-return clientRepository.findByIdEquals(id).orElse(null);    }
+        return clientRepository.findByIdEquals(id).orElse(null);
+    }
+
+    public List<Unit> allCarAvailable() {
+        return testdriveRepository.allCarAvailable();
+
+    }
 
 }

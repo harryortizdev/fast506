@@ -5,6 +5,7 @@
 package cr.ac.ucr.ie.fast506.repository;
 
 import cr.ac.ucr.ie.fast506.domain.Testdrive;
+import cr.ac.ucr.ie.fast506.domain.Unit;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
@@ -30,5 +31,8 @@ public interface TestdriveRepository extends JpaRepository<Testdrive, Integer> {
     void deleteTestdriveByIdPA(@Param("id_Testdrive") int id_Testdrive);
 
     @Query(value = "call db_fast506.getOccupiedHoursByDate(:scheduled_dateS, :id_branch)", nativeQuery = true)
-    List<String> findOccupiedHoursByDate(@Param("scheduled_dateS") LocalDate scheduled_dateS, @Param("id_branch") Integer idBranch );
+    List<String> findOccupiedHoursByDate(@Param("scheduled_dateS") LocalDate scheduled_dateS, @Param("id_branch") Integer idBranch);
+
+    @Query(value = "call db_fast506.getAllCarAvailable()", nativeQuery = true)
+    List<Unit> allCarAvailable();
 }
