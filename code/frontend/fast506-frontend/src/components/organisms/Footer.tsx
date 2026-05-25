@@ -1,4 +1,6 @@
 const Footer = () => {
+
+  
   return (
     <footer style={{ backgroundColor: "#1A2633" }} className="text-white pt-5 pb-3">
 
@@ -24,20 +26,34 @@ const Footer = () => {
         </h6>
 
         <p>
-          <a href="#!" className="text-decoration-none small" style={{ color: "#EEF1EF" }}>
-            Test Drive
+          <a href="/quotation" className="text-decoration-none small" style={{ color: "#EEF1EF" }}>
+            Cotizaciones
           </a>
         </p>
+
+        <p>
+          <a href="/testdrive" className="text-decoration-none small" style={{ color: "#EEF1EF" }}>
+            Cita Testdrive
+          </a>
+        </p>
+
+        <p>
+          <a href="#!" className="text-decoration-none small" style={{ color: "#EEF1EF" }}>
+            Cita Taller
+          </a>
+        </p>
+
+        
       </div>
 
       <div className="col-6 col-md-4 col-lg-3">
         <h6 className="text-uppercase mb-3 fw-bold" style={{ color: "#A9B4C2" }}>
-          Citas Taller
+          Pendiente
         </h6>
 
         <p>
           <a href="#!" className="text-decoration-none small" style={{ color: "#EEF1EF" }}>
-            Agendar cita
+            Pendiente
           </a>
         </p>
       </div>

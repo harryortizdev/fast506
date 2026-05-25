@@ -19,11 +19,23 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface AdRepository extends JpaRepository<Ad, Integer> {
+
     @Query(value = "call db_fast506.getAllAd()", nativeQuery = true)//permite ejecular un sp con jpa
     List<Ad> getAll();//mapea los objetos
-    
+
     @Transactional // Requerido para operaciones de eliminación/modificación
     @Modifying    // Requerido para consultas de tipo DELETE / UPDATE nativas
     @Query(value = "call db_fast506.deleteAd(:id_Ad)", nativeQuery = true)
     void deleteAdByIdPA(@Param("id_Ad") int id_Ad);
+
+    @Transactional
+    @Modifying
+    @Query(value = "call db_fast506.deactivateAdByExpirationDatePA()", nativeQuery = true)
+    public void deactivateAdByExpirationDatePA();
+
+    @Query(value = "call db_fast506.getAllAdBranch()", nativeQuery = true)
+    public List<Ad> getAllBranchPA();
+
+    @Query(value = "call db_fast506.getAllAdAdvertisement()", nativeQuery = true)
+    public List<Ad> getAllAdvertisementPA();
 }

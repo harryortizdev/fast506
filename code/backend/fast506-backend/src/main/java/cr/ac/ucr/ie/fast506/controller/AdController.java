@@ -29,6 +29,14 @@ public class AdController {
     public List<Ad> getAll() {
         return adService.getAll();
     }
+    @GetMapping("/allBranch")
+    public List<Ad> getAllBranch() {
+        return adService.getAllBranch();
+    }
+    @GetMapping("/allAdvertisement")
+    public List<Ad> getAllAdvertisement() {
+        return adService.getAllAdvertisement();
+    }
 
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> create(

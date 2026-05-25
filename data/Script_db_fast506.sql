@@ -1904,3 +1904,52 @@ END$$
 
 DELIMITER ;
 
+-- PA DESACTIVAR ANUNCIOS POR FECHA DE EXPIRACINO
+
+USE `db_fast506`;
+DROP procedure IF EXISTS `deactivateAdByExpirationDatePA`;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE `deactivateAdByExpirationDatePA` ()
+BEGIN
+UPDATE ad 
+    SET publication_status = false 
+    WHERE expiration_date <= CURRENT_DATE() 
+      AND publication_status = true 
+      AND is_active = 1;
+END$$
+
+DELIMITER ;
+
+-- PA ANUNCIOS POR MARCA
+
+USE `db_fast506`;
+DROP procedure IF EXISTS `getAllAdBranch`;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE `getAllAdBranch` ()
+BEGIN
+SELECT id_Ad, title, image, expiration_Date, category, publication_status, is_Active, id_user FROM ad where is_active=1 AND category = 'Marcas';
+
+END$$
+
+DELIMITER ;
+
+-- AD ANUNCIOS POR IMPUBLICITARIAS
+
+USE `db_fast506`;
+DROP procedure IF EXISTS `getAllAdAdvertisement`;
+
+DELIMITER $$
+USE `db_fast506`$$
+CREATE PROCEDURE `getAllAdAdvertisement` ()
+BEGIN
+SELECT id_Ad, title, image, expiration_Date, category, publication_status, is_Active, id_user FROM ad where is_active=1 AND category = 'Anuncios';
+
+END$$
+
+DELIMITER ;
+
+

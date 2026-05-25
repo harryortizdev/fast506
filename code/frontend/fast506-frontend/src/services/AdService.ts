@@ -1,9 +1,18 @@
-import { Ad } from "../models/Ad"
 const API_URL = "http://localhost:8080/api/ad";
 
 
 export const getAll = async () => { //async llamada asincronica que puede tardar tiempo (sin esto no se puede usar await)
   const res = await fetch(`${API_URL}/all`); //hace una petición al http get y await pausa la función hasta que responda el servidor
+  return res.json(); //la respuesta se convierte a .json para que react lo pueda utilizar
+}
+
+export const getAllBranch = async () => { //async llamada asincronica que puede tardar tiempo (sin esto no se puede usar await)
+  const res = await fetch(`${API_URL}/allBranch`); //hace una petición al http get y await pausa la función hasta que responda el servidor
+  return res.json(); //la respuesta se convierte a .json para que react lo pueda utilizar
+}
+
+export const getAllAdvertisement = async () => { //async llamada asincronica que puede tardar tiempo (sin esto no se puede usar await)
+  const res = await fetch(`${API_URL}/allAdvertisement `); //hace una petición al http get y await pausa la función hasta que responda el servidor
   return res.json(); //la respuesta se convierte a .json para que react lo pueda utilizar
 }
 

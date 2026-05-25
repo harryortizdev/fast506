@@ -2,6 +2,7 @@ package cr.ac.ucr.ie.fast506.service;
 
 import cr.ac.ucr.ie.fast506.domain.Ad;
 import cr.ac.ucr.ie.fast506.repository.AdRepository;
+import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +26,7 @@ public class AdService {
     public List<Ad> getAll() {
         return adRepository.getAll();
     }
+
 
     public void deleteById(int id) {
         adRepository.deleteAdByIdPA(id);
@@ -91,4 +94,21 @@ public class AdService {
         throw new RuntimeException("Error al actualizar el anuncio: " + e.getMessage());
     }
 }
+    
+    
+    @Scheduled(cron = "0 0 0 * * ?") // SEGUNDO 0, MINUTO 0, HORA 0 TODOS LOS DIAS * , TODOS LOS MESES * , DA IGUAL EL DIA DE LA SEMANA ?
+    @Transactional
+    public void deactivateAdByExpirationDate() {
+        System.out.println("Cron Job: Buscando y desactivando anuncios vencidos...");
+                adRepository.deactivateAdByExpirationDatePA(); 
+    }
+
+    public List<Ad> getAllBranch() {
+        return adRepository.getAllBranchPA();
+    }
+
+    public List<Ad> getAllAdvertisement() {
+        return adRepository.getAllAdvertisementPA();
+    }
 }
+

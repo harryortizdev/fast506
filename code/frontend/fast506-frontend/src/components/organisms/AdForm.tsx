@@ -163,7 +163,7 @@ const AdForm = ({ onClose, onRefresh, adToEdit }: AdFormProps) => {
                         onChange={handleChange}
                     >
                         <option value="">Seleccione la categoría</option>
-                        <option value="Carrusel-Anuncios">Carrusel Anuncios</option>
+                        <option value="Anuncios">Carrusel Anuncios</option>
                         <option value="Marcas">Carrusel Marcas</option>
                     </select>
                     {errors.category && <div className="invalid-feedback d-block">{errors.category}</div>}
