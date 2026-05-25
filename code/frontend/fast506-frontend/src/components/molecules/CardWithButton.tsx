@@ -1,4 +1,6 @@
 import Label from "../atoms/Label";
+import Image from "../atoms/Image";
+
 
 interface CardProps {
     image: string;
@@ -9,8 +11,13 @@ interface CardProps {
 
 const CardWithButton = ({ image, model, price, onCotizar }: CardProps) => {
     return (
-        <div className="card border-0" style={{ width: "11rem" }}>
-            <img src={image} className="card-img-top" alt={model} />
+        <div className="card border-0" style={{ width: "11rem", backgroundColor: "#EEF1EF"}}>
+          <img
+                src={image}
+                className="card-img-top"
+                alt={model}
+                style={{ objectFit: "contain", height: "100px" }}
+            />
             <div
                 className="card-body text-center d-flex flex-column"
                 style={{ gap: "2px", padding: "8px" }}

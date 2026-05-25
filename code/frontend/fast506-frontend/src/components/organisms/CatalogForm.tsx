@@ -6,6 +6,7 @@ import AlertSuccess from "../atoms/AlertSuccess";
 import AlertWarning from "../atoms/AlertWarning";
 import FormField from "../molecules/FormField";
 import Button from "../atoms/Button";
+import Image from "../atoms/Image";
 
 interface CatalogFormProps {
     onClose: () => void;
@@ -124,7 +125,6 @@ const CatalogForm = ({ onClose, onRefresh, catalogToEdit }: CatalogFormProps) =>
                 formData.append("image", image);
             }
 
-            // ✔️ CREATE o UPDATE
             if (catalogToEdit?.idCatalog) {
                 await update(catalogToEdit.idCatalog, formData);
                 AlertSuccess("Catálogo actualizado correctamente.");
@@ -191,7 +191,7 @@ const CatalogForm = ({ onClose, onRefresh, catalogToEdit }: CatalogFormProps) =>
                     {errors.image && <div className="text-danger">{errors.image}</div>}
 
                     {imagePreview && (
-                        <img
+                        <Image
                             src={imagePreview}
                             alt="preview"
                             className="mt-2 rounded"

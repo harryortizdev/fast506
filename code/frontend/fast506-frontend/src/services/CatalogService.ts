@@ -1,5 +1,6 @@
 import { Catalog } from "../models/Catalog";
 import { CategoriesCatalog } from "../models/CategoriesCatalog";
+import { ColorUnit } from "../models/ColorUnit";
 import { UnitGroup } from "../models/UnitGroup";
 
 const API_URL = "http://localhost:8080/api/catalogs";
@@ -62,6 +63,19 @@ export const getCategories = async (): Promise<CategoriesCatalog[]> => {
 
 export const getCatalogByBodyWork = async (bodyWork: string): Promise<Catalog[]> => {
   const res = await fetch(`${API_URL}/by-bodywork?bodywork=${bodyWork}`); 
+  const data = await res.json();
+  console.log("Data recibida: ", data);
+  return Array.isArray(data) ? data : [];
+};
+
+export const getCatalogById = async (id: number) => {
+  const response = await fetch(`${API_URL}/findById/${id}`);
+  const data = await response.json();
+  return data;
+};
+
+export const getColorByCatalog = async (id: number): Promise<ColorUnit[]> => {
+  const res = await fetch(`${API_URL}/color/${id}`); 
   const data = await res.json();
   console.log("Data recibida: ", data);
   return Array.isArray(data) ? data : [];

@@ -6,6 +6,7 @@ package cr.ac.ucr.ie.fast506.service;
 
 import cr.ac.ucr.ie.fast506.domain.Catalog;
 import cr.ac.ucr.ie.fast506.domain.CategoriesCatalog;
+import cr.ac.ucr.ie.fast506.domain.ColorUnit;
 import cr.ac.ucr.ie.fast506.domain.UnitGroup;
 import cr.ac.ucr.ie.fast506.repository.CatalogRepository;
 import java.nio.file.Files;
@@ -114,6 +115,14 @@ public class CatalogService {
 
     public List<Catalog> getCatalogByBodyWork(String bodyWork) {
         return catalogRepository.getCatalogByBodyWork(bodyWork);
+    }
+    
+    public Catalog findById(Integer id){
+       return catalogRepository.findById(id).orElse(null);
+    }
+    
+    public List<ColorUnit> getColorByCatalog(int id){
+        return catalogRepository.getColorByCatalog(id);
     }
 
     private void validateCatalog(Catalog catalog) {

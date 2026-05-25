@@ -70,7 +70,7 @@ const CatalogPage = () => {
             }}
         >
             <Navbar />
-            <main style={{ flex: 1 }}>
+            <main style={{ flex: 1, backgroundColor: "#EEF1EF" }}>
                 <div className="container-fluid container-md mt-3 mt-md-4 mb-4 px-2 px-md-4">
                     <div className="card shadow-sm border-0">
                         <div

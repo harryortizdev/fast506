@@ -1951,5 +1951,33 @@ SELECT id_Ad, title, image, expiration_Date, category, publication_status, is_Ac
 END$$
 
 DELIMITER ;
+-- 25/05/2026 harry sp para colores
+DELIMITER $$
 
+CREATE PROCEDURE `getColorsByCatalog`(
+    IN p_id_catalog INT
+)
+BEGIN
+    SELECT u.color
+    FROM units u
+    INNER JOIN catalogs c ON c.id_catalog = p_id_catalog
+    WHERE u.car_name         = c.car_name
+	AND u.car_brand        = c.brand_name
+	AND u.body_work        = c.body_work
+	AND u.year_manufacture = c.year_manufacture
+	AND (
+		(c.fuel_type = 'combustible' AND u.fuel_type IN ('gasolina', 'diesel'))
+		OR
+		(u.fuel_type = c.fuel_type)
+	)
+	AND (
+		(c.transmission = 'automatico' AND u.transmission IN ('automatico', 'cvt'))
+		OR
+		(u.transmission = c.transmission)
+	);
+END$$
 
+DELIMITER ;
+  
+  
+ 

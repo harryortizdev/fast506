@@ -10,11 +10,10 @@ import MechanicPage from "./pages/MechanicPage";
 import TestdrivePage from "./pages/TestdrivePage";
 import CatalogPage from "./pages/CatalogPage";
 import CreateTestdrive from "./pages/CreateTestdrive";
+import CatalogDetailPage from "./pages/CatalogDetailPage";
 import QuotationPage from "./pages/QuotationPage";
 import CreateQuotation from "./pages/CreateQuotation";
 import AdPage from "./pages/AdPage";
-
-
 
 function App() {
   return (
@@ -34,11 +33,7 @@ function App() {
         <Route path="/admin/quotations" element={<QuotationPage />} />
         <Route path="/quotation" element={<CreateQuotation />} />
         <Route path="/admin/ad" element={<AdPage />} />
-
-
-
-
-
+        <Route path="/catalog/detail/:id" element={<CatalogDetailPage />} />
       </Routes>
     </BrowserRouter>
   );

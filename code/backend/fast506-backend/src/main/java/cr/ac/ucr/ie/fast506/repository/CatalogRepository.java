@@ -6,6 +6,7 @@ package cr.ac.ucr.ie.fast506.repository;
 
 import cr.ac.ucr.ie.fast506.domain.Catalog;
 import cr.ac.ucr.ie.fast506.domain.CategoriesCatalog;
+import cr.ac.ucr.ie.fast506.domain.ColorUnit;
 import cr.ac.ucr.ie.fast506.domain.UnitGroup;
 import jakarta.transaction.Transactional;
 import java.util.List;
@@ -25,14 +26,17 @@ public interface CatalogRepository extends JpaRepository<Catalog, Integer> {
     @Transactional
     @Query(value = "call db_fast506.deleteCatalog(:idCatalog)", nativeQuery = true)
     void deleteCatalog(@Param("idCatalog") Integer idCatalog);
-    
+
     @Query(value = "call db_fast506.units_groud_exists()", nativeQuery = true)
     List<UnitGroup> getUnitsNotInCatalog();
-    
+
     @Query(value = "call db_fast506.getBodyworksCatalog()", nativeQuery = true)
     List<CategoriesCatalog> getCategoriesCatalog();
-    
+
     @Query(value = "call db_fast506.getCatalogsByBodyWork(:bodyWork)", nativeQuery = true)
     List<Catalog> getCatalogByBodyWork(@Param("bodyWork") String bodyWork);
+
+    @Query(value = "call db_fast506.getColorsByCatalog(:idCatalog)", nativeQuery = true)
+    List<ColorUnit> getColorByCatalog(@Param("idCatalog") int idCatalog);
 
 }
