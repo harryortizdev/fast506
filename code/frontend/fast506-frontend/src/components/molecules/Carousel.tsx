@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Catalog } from "../../models/Catalog";
 import { getAll } from "../../services/CatalogService";
 import Label from "../atoms/Label";
+import Image from "../atoms/Image";
 
 const Carousel = () => {
     const [catalogs, setCatalogs] = useState<Catalog[]>([]);
@@ -50,7 +51,7 @@ const Carousel = () => {
                 padding: "40px 0 100px 0",
                 overflow: "hidden",
                 position: "relative",
-                backgroundColor: "#fff",
+                backgroundColor: "#EEF1EF ",
             }}
         >
             <Slider {...settings}>
@@ -62,7 +63,7 @@ const Carousel = () => {
                         <div key={catalog.idCatalog}>
                             <div style={{ position: "relative", height: "520px" }}>
 
-                              
+
                                 <div
                                     style={{
                                         display: "flex",
@@ -75,9 +76,9 @@ const Carousel = () => {
                                     }}
                                     onMouseEnter={() => isActive && setHoveredId(catalog.idCatalog)}
                                     onMouseLeave={() => setHoveredId(null)}
-                                    onClick={() => isActive && navigate(`/catalogo/${catalog.idCatalog}`)}
+                                    onClick={() => isActive && navigate(`/catalog/detail/${catalog.idCatalog}`)}
                                 >
-                                    <img
+                                    <Image
                                         src={`http://localhost:8080/${catalog.image}`}
                                         alt={catalog.carName}
                                         style={{
@@ -120,7 +121,7 @@ const Carousel = () => {
                                     )}
                                 </div>
 
-                                
+
                                 {isActive && (
                                     <div
                                         style={{

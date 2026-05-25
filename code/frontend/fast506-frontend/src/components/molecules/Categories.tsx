@@ -32,7 +32,7 @@ const Categories = ({
   };
 
   return (
-    <div style={{ margin: "0 40px" }}>
+    <div style={{ padding: "0 40px", backgroundColor: "#EEF1EF" }}>
       <div
         style={{
           display: "flex",

@@ -66,3 +66,9 @@ export const getCatalogByBodyWork = async (bodyWork: string): Promise<Catalog[]>
   console.log("Data recibida: ", data);
   return Array.isArray(data) ? data : [];
 };
+
+export const getCatalogById = async (id: number) => {
+  const response = await fetch(`${API_URL}/findById/${id}`);
+  const data = await response.json();
+  return data;
+};

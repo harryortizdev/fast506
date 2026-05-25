@@ -133,4 +133,9 @@ public class CatalogController {
     public List<Catalog> getCatalogByBodyWork(@RequestParam String bodywork) {
         return catalogService.getCatalogByBodyWork(bodywork);
     }
+    
+    @GetMapping("/findById/{id}")
+    public Catalog findById(@PathVariable Integer id) {
+        return catalogService.findById(id);
+    }
 }

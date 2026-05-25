@@ -115,6 +115,10 @@ public class CatalogService {
     public List<Catalog> getCatalogByBodyWork(String bodyWork) {
         return catalogRepository.getCatalogByBodyWork(bodyWork);
     }
+    
+    public Catalog findById(Integer id){
+       return catalogRepository.findById(id).orElse(null);
+    }
 
     private void validateCatalog(Catalog catalog) {
 
