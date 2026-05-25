@@ -1,23 +1,30 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Catalog } from ".././models/Catalog";
-import { getCatalogById } from ".././services/CatalogService";
+import { getCatalogById, getColorByCatalog } from ".././services/CatalogService";
 import Image from ".././components/atoms/Image";
 import ButtonIcon from ".././components/molecules/ButtonIcon";
 import Label from ".././components/atoms/Label";
 import Icon from ".././components/atoms/Icon";
+import Footer from "../components/organisms/Footer";
+import Navbar from "../components/organisms/Navbar";
+
 
 
 const CatalogDetailPage = () => {
     const { id } = useParams<{ id: string }>();
     const [catalog, setCatalog] = useState<Catalog | null>(null);
     const [loading, setLoading] = useState(true);
+    const [colors, setColors] = useState<string[]>([]);
 
     useEffect(() => {
         if (id) {
             getCatalogById(Number(id))
                 .then(setCatalog)
                 .finally(() => setLoading(false));
+
+            getColorByCatalog(Number(id))
+                .then((data) => setColors(data.map((c) => c.color)));
         }
     }, [id]);
 
@@ -43,156 +50,202 @@ const CatalogDetailPage = () => {
         { icon: "bi bi-speedometer2", label: "Motor", value: catalog.engineSize },
     ];
 
+    const getColor = (color: string) => {
+
+        const value = color.toLowerCase();
+
+        if (value.includes("blanco")) {
+            return "white";
+        }
+
+        if (value.includes("negro")) {
+            return "black";
+        }
+
+        if (value.includes("gris")) {
+            return "gray";
+        }
+
+        if (value.includes("azul")) {
+            return "blue";
+        }
+
+        if (value.includes("rojo")) {
+            return "red";
+        }
+
+        if (value.includes("verde")) {
+            return "green";
+        }
+
+        if (value.includes("plateado")) {
+            return "silver";
+        }
+
+        if (
+            value.includes("cafe") ||
+            value.includes("marron")
+        ) {
+            return "brown";
+        }
+
+        return "lightgray";
+    };
+
     return (
-        <div style={{ minHeight: "100vh", backgroundColor: "#EEF1EF" }}>
+        <>
+            <Navbar />
+            <div style={{ minHeight: "100vh", backgroundColor: "#EEF1EF" }}>
 
-
-            <div
-                style={{
+                <div style={{
                     width: "100%",
-                    height: "clamp(280px, 60vw, 680px)",
+                    maxHeight: "500px",
                     overflow: "hidden",
                     backgroundColor: "#f5f5f5",
-                }}
-            >
-                <Image
-                    src={`http://localhost:8080/${catalog.image}`}
-                    alt={catalog.carName}
-                    style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        objectPosition: "center",
-                    }}
-                />
-            </div>
-
-            <div
-                style={{
                     display: "flex",
-                    flexWrap: "wrap",
-                    alignItems: "flex-start",
-                    justifyContent: "space-between",
-                    gap: "24px",
-                    padding: "clamp(20px, 4vw, 48px) clamp(20px, 6vw, 80px)",
-                }}
-            >
-
-                <div>
-                    <h1 style={{ fontSize: "clamp(24px, 4vw, 42px)", fontWeight: 700, color: "#1A2633", margin: 0 }}>
-                        <Label label={catalog.carName} color="#1A2633" />
-                    </h1>
-                    <p style={{ color: "#777", marginTop: "8px", fontSize: "clamp(14px, 2vw, 18px)" }}>
-                        <Label label="Desde " color="#777" />
-                        <strong>
-                            <Label label={`$${catalog.basePrice.toLocaleString()}`} color="#1A2633" />
-                        </strong>
-                    </p>
+                    justifyContent: "center",
+                }}>
+                    <Image
+                        src={`http://localhost:8080/${catalog.image}`}
+                        alt={catalog.carName}
+                        style={{
+                            width: "100%",
+                            maxWidth: "900px",
+                            height: "auto",
+                            objectFit: "contain",
+                            objectPosition: "center",
+                        }}
+                    />
                 </div>
 
-                <div
-                    style={{
-                        border: "1px solid #e0e0e0",
-                        borderRadius: "8px",
-                        padding: "24px",
-                        minWidth: "220px",
-                        maxWidth: "300px",
-                        width: "100%",
+                <div style={{
+                    maxWidth: "1200px",
+                    margin: "0 auto",
+                    padding: "clamp(16px, 4vw, 48px) clamp(16px, 6vw, 80px)",
+                }}>
+
+                    <div style={{
                         display: "flex",
-                        flexDirection: "column",
-                        gap: "12px",
-                        backgroundColor: "#A9B4C2 ",
-                    }}
-                >
-                    <p style={{ fontWeight: 600, color: "#1A2633", fontSize: "15px", margin: 0, textAlign: "center" }}>
-                        <Label label="Contáctanos" color="#1A2633" />
-                    </p>
+                        flexWrap: "wrap",
+                        alignItems: "flex-start",
+                        justifyContent: "space-between",
+                        gap: "24px",
+                        marginBottom: "32px",
+                    }}>
+                        <div>
+                            <h1 style={{ fontSize: "clamp(24px, 4vw, 42px)", fontWeight: 700, color: "#1A2633", margin: 0 }}>
+                                <Label label={catalog.carName} color="#1A2633" />
+                            </h1>
+                            <p style={{ color: "#777", marginTop: "8px", fontSize: "clamp(14px, 2vw, 18px)" }}>
+                                <Label label="Desde " color="#777" />
+                                <strong>
+                                    <Label label={`$${catalog.basePrice.toLocaleString()}`} color="#1A2633" />
+                                </strong>
+                            </p>
+                        </div>
 
-                    <ButtonIcon
-                        label="WhatsApp"
-                        color="#EEF1EF "
-                        backgroundColor="#25D366"
-                        hoverColor="#1ebe57"
-                        className="btn w-100"
-                        style={{ borderRadius: "4px", padding: "10px 0" }}
-                        icon={
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
-                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-                            </svg>
-                        }
-                        onClick={() => window.open(`https://wa.me/${whatsappNumber}?text=${whatsappMsg}`, "_blank")}
-                    />
+                        <div style={{
+                            border: "1px solid #e0e0e0",
+                            borderRadius: "8px",
+                            padding: "24px",
+                            minWidth: "220px",
+                            maxWidth: "300px",
+                            width: "100%",
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "12px",
+                            backgroundColor: "#A9B4C2",
+                        }}>
+                            <p style={{ fontWeight: 600, color: "#1A2633", fontSize: "15px", margin: 0, textAlign: "center" }}>
+                                <Label label="Contáctanos" color="#1A2633" />
+                            </p>
+                            <ButtonIcon
+                                label="WhatsApp"
+                                color="#EEF1EF"
+                                backgroundColor="#25D366"
+                                hoverColor="#1ebe57"
+                                className="btn w-100"
+                                style={{ borderRadius: "4px", padding: "10px 0" }}
+                                icon={
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+                                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                                    </svg>
+                                }
+                                onClick={() => window.open(`https://wa.me/${whatsappNumber}?text=${whatsappMsg}`, "_blank")}
+                            />
+                            <ButtonIcon
+                                label="Cotizar"
+                                color="#EEF1EF"
+                                backgroundColor="#1A2633"
+                                hoverColor="#2C3E50"
+                                className="btn w-100"
+                                style={{ borderRadius: "4px", padding: "10px 0" }}
+                                icon={<i className="bi bi-tag" />}
+                                onClick={() => console.log(`Cotizar: ${catalog.carName}`)}
+                            />
+                        </div>
+                    </div>
 
-                    <ButtonIcon
-                        label="Cotizar"
-                        color="#EEF1EF "
-                        backgroundColor="#1A2633"
-                        hoverColor="#2C3E50"
-                        className="btn w-100"
-                        style={{ borderRadius: "4px", padding: "10px 0" }}
-                        icon={<i className="bi bi-tag" />}
-                        onClick={() => console.log(`Cotizar: ${catalog.carName}`)}
-                    />
-                </div>
-            </div>
+                    <h2 style={{ color: "#1A2633", fontWeight: 700, marginBottom: "16px", fontSize: "clamp(20px, 3vw, 28px)" }}>
+                        <Label label="Colores" color="#1A2633" />
+                    </h2>
+                    <div className="colors-container" style={{ marginBottom: "32px" }}>
+                        {colors.map((color, index) => (
+                            <button
+                                key={index}
+                                className="color-button"
+                                style={{ backgroundColor: getColor(color) }}
+                                title={color}
+                            />
+                        ))}
+                    </div>
 
-            <div
-                style={{
-                    padding: "0 clamp(20px, 6vw, 80px) clamp(40px, 6vw, 80px)",
-                }}
-            >
-                <h2 style={{ color: "#1A2633", fontWeight: 700, marginBottom: "24px", fontSize: "clamp(20px, 3vw, 28px)" }}>
-                    <Label label="Especificaciones" color="#1A2633" />
-                </h2>
-
-                <div
-                    style={{
+                    <h2 style={{ color: "#1A2633", fontWeight: 700, marginBottom: "16px", fontSize: "clamp(20px, 3vw, 28px)" }}>
+                        <Label label="Especificaciones" color="#1A2633" />
+                    </h2>
+                    <div style={{
                         display: "grid",
-                        gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                        gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
                         gap: "16px",
                         marginBottom: "32px",
-                    }}
-                >
-                    {specs.map((spec, index) => (
-                        <div
-                            key={index}
-                            style={{
-                                backgroundColor: "#EEF1EF ",
+                    }}>
+                        {specs.map((spec, index) => (
+                            <div key={index} style={{
+                                backgroundColor: "#EEF1EF",
                                 borderRadius: "8px",
                                 padding: "20px",
                                 display: "flex",
                                 flexDirection: "column",
                                 gap: "8px",
                                 border: "1px solid #1A2633",
-                            }}
-                        >
-                            <Icon icon={<i className={spec.icon} style={{ fontSize: "22px", color: "#1A2633" }} />} />
-                            <Label label={spec.label} color="#5E6572 " />
-                            <strong>
-                                <Label label={String(spec.value)} color="#1A2633" />
-                            </strong>
-                        </div>
-                    ))}
-                </div>
+                            }}>
+                                <Icon icon={<i className={spec.icon} style={{ fontSize: "22px", color: "#1A2633" }} />} />
+                                <Label label={spec.label} color="#5E6572" />
+                                <strong>
+                                    <Label label={String(spec.value)} color="#1A2633" />
+                                </strong>
+                            </div>
+                        ))}
+                    </div>
 
-
-                {catalog.technicalDescription && (
-                    <div
-                        style={{
+                    {catalog.technicalDescription && (
+                        <div style={{
                             backgroundColor: "#EEF1EF",
                             borderRadius: "8px",
                             padding: "24px",
-                            border: "1px solid #1A2633 ",
-                        }}
-                    >
-                        <h3 style={{ color: "#1A2633", fontWeight: 600, marginBottom: "12px", fontSize: "18px" }}>
-                            <Label label="Descripción técnica" color="#1A2633" />
-                        </h3>
-                        <Label label={catalog.technicalDescription} color="#555" />
-                    </div>
-                )}
+                            border: "1px solid #1A2633",
+                        }}>
+                            <h3 style={{ color: "#1A2633", fontWeight: 600, marginBottom: "12px", fontSize: "18px" }}>
+                                <Label label="Descripción técnica" color="#1A2633" />
+                            </h3>
+                            <Label label={catalog.technicalDescription} color="#555" />
+                        </div>
+                    )}
+
+                </div>
             </div>
-        </div>
+            <Footer />
+        </>
     );
 };
 

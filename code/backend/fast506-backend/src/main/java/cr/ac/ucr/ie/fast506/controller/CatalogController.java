@@ -6,6 +6,7 @@ package cr.ac.ucr.ie.fast506.controller;
 
 import cr.ac.ucr.ie.fast506.domain.Catalog;
 import cr.ac.ucr.ie.fast506.domain.CategoriesCatalog;
+import cr.ac.ucr.ie.fast506.domain.ColorUnit;
 import cr.ac.ucr.ie.fast506.domain.UnitGroup;
 import cr.ac.ucr.ie.fast506.service.CatalogService;
 import java.util.List;
@@ -137,5 +138,10 @@ public class CatalogController {
     @GetMapping("/findById/{id}")
     public Catalog findById(@PathVariable Integer id) {
         return catalogService.findById(id);
+    }
+    
+    @GetMapping("/color/{id}")
+    public List<ColorUnit> getColorByCatalog(@PathVariable Integer id) {
+        return catalogService.getColorByCatalog(id);
     }
 }

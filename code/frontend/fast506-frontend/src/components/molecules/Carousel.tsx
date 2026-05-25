@@ -144,10 +144,24 @@ const Carousel = () => {
                                             <Label label={catalog.carName} color="#2C3E50" />
                                         </h2>
 
+                                         <p style={{ marginBottom: "10px" }}>
+                                            <Label
+                                                label={String(catalog.yearManufacture)}
+                                                color="#5E6572 "
+                                            />
+                                        </p>
+
+                                        <p style={{ marginBottom: "10px" }}>
+                                            <Label
+                                                label={catalog.transmission + " - " + catalog.fuelType}
+                                                color="#5E6572 "
+                                            />
+                                        </p>
+                                       
                                         <p style={{ marginBottom: "10px" }}>
                                             <Label
                                                 label="Precio desde"
-                                                color="#777"
+                                                color="#5E6572 "
                                             />
                                         </p>
 

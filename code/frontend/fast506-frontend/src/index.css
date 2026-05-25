@@ -192,3 +192,14 @@ code {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3) !important;
 }
 
+.colors-container{
+  display: flex;
+  gap: 10px;
+}
+
+.color-button{
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+}
