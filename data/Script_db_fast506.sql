@@ -1979,5 +1979,134 @@ END$$
 
 DELIMITER ;
   
+-- 25/05/2026 tabla de ventas
+
+CCREATE TABLE `db_fast506`.`sales` (
+  `id_sales` INT NOT NULL,
+  `invoice_number` INT(10) NULL,
+  `transaction_date` DATE NULL,
+  `payment_method` VARCHAR(45) NULL,
+  `base_price` DOUBLE NULL,
+  `sales_tax` DOUBLE NULL,
+  `extras` DOUBLE NULL,
+  `total_payment` DOUBLE NULL,
+  `transfer_cost` DOUBLE NULL,
+  `id_client` INT NULL,
+  `id_admin` INT NULL,
+  `id_car` INT NULL,
+  `id_catalog` INT NULL,
+  `is_active` TINYINT NULL,
+  PRIMARY KEY (`id_sales`),
+  INDEX `fk_sales_client_id_idx` (`id_client` ASC) ,
+  INDEX `fk_sales_admin_id_idx` (`id_admin` ASC) ,
+  INDEX `fk_sales_car_id_idx` (`id_car` ASC) ,
+  INDEX `fk_sales_catalog_id_idx` (`id_catalog` ASC) ,
+  CONSTRAINT `fk_sales_client_id`
+    FOREIGN KEY (`id_client`)
+    REFERENCES `db_fast506`.`client` (`id_user`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_sales_admin_id`
+    FOREIGN KEY (`id_admin`)
+    REFERENCES `db_fast506`.`administrator` (`id_user`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_sales_car_id`
+    FOREIGN KEY (`id_car`)
+    REFERENCES `db_fast506`.`units` (`id_car`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_sales_catalog_id`
+    FOREIGN KEY (`id_catalog`)
+    REFERENCES `db_fast506`.`catalogs` (`id_catalog`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+    
+    ALTER TABLE `db_fast506`.`sales` 
+DROP FOREIGN KEY `fk_sales_admin_id`,
+DROP FOREIGN KEY `fk_sales_car_id`,
+DROP FOREIGN KEY `fk_sales_catalog_id`,
+DROP FOREIGN KEY `fk_sales_client_id`;
+ALTER TABLE `db_fast506`.`sales` 
+CHANGE COLUMN `id_sales` `id_sales` INT(11) NOT NULL AUTO_INCREMENT ,
+CHANGE COLUMN `invoice_number` `invoice_number` INT(10) NOT NULL ,
+CHANGE COLUMN `transaction_date` `transaction_date` DATE NOT NULL ,
+CHANGE COLUMN `payment_method` `payment_method` VARCHAR(255) NOT NULL ,
+CHANGE COLUMN `base_price` `base_price` DOUBLE NULL ,
+CHANGE COLUMN `sales_tax` `sales_tax` DOUBLE NULL ,
+CHANGE COLUMN `extras` `extras` DOUBLE NULL ,
+CHANGE COLUMN `id_client` `id_client` INT(11) NOT NULL ,
+CHANGE COLUMN `id_admin` `id_admin` INT(11) NOT NULL ,
+CHANGE COLUMN `id_car` `id_car` INT(11) NOT NULL ,
+CHANGE COLUMN `id_catalog` `id_catalog` INT(11) NOT NULL ,
+ADD UNIQUE INDEX `id_sales_UNIQUE` (`id_sales` ASC) ;
+;
+ALTER TABLE `db_fast506`.`sales` 
+ADD CONSTRAINT `fk_sales_admin_id`
+  FOREIGN KEY (`id_admin`)
+  REFERENCES `db_fast506`.`administrator` (`id_user`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+ADD CONSTRAINT `fk_sales_car_id`
+  FOREIGN KEY (`id_car`)
+  REFERENCES `db_fast506`.`units` (`id_car`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+ADD CONSTRAINT `fk_sales_catalog_id`
+  FOREIGN KEY (`id_catalog`)
+  REFERENCES `db_fast506`.`catalogs` (`id_catalog`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+ADD CONSTRAINT `fk_sales_client_id`
+  FOREIGN KEY (`id_client`)
+  REFERENCES `db_fast506`.`client` (`id_user`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
   
+  -- 25/05/2026 sp de listar ventas (harry)
+  
+  DELIMITER $$
+
+CREATE PROCEDURE `getAllSales`()
+BEGIN
+    SELECT
+        id_sales,
+        invoice_number,
+        transaction_date,
+        payment_method,
+        base_price,
+        sales_tax,
+        extras,
+        total_payment,
+        transfer_cost,
+        id_client,
+        id_admin,
+        id_car,
+        id_catalog,
+        is_active
+    FROM
+        sales
+    WHERE
+        is_active = 1;
+END $$
+
+DELIMITER ;
  
+  -- 25/05/2026 sp de eliminar ventas (harry)
+  
+ DELIMITER $$
+
+CREATE PROCEDURE deleteSales(
+    IN p_id_sales INT
+)
+BEGIN
+    UPDATE sales
+    SET
+        is_active = 0
+    WHERE
+        id_sales = p_id_sales;
+END $$
+
+DELIMITER ; 
+

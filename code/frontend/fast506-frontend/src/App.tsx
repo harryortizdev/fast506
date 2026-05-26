@@ -14,6 +14,7 @@ import CatalogDetailPage from "./pages/CatalogDetailPage";
 import QuotationPage from "./pages/QuotationPage";
 import CreateQuotation from "./pages/CreateQuotation";
 import AdPage from "./pages/AdPage";
+import SalesPage from "./pages/SalesPage";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
         <Route path="/quotation" element={<CreateQuotation />} />
         <Route path="/admin/ad" element={<AdPage />} />
         <Route path="/catalog/detail/:id" element={<CatalogDetailPage />} />
+        <Route path="/admin/sales" element={<SalesPage />} />
       </Routes>
     </BrowserRouter>
   );
