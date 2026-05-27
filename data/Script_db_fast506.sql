@@ -746,7 +746,7 @@ END$$
 
 DELIMITER ;
 
-
+--  -----------------------------------------------------------------------------------------
 -- 02/05/2026 - Creación de la tabla supplier(proveedores) Nolan
 CREATE TABLE supplier (
 
@@ -905,6 +905,7 @@ BEGIN
     WHERE id_supplier = p_id_supplier;
 END$$
 DELIMITER ;
+
 -- -----------------------------------------------------------------------------------------
 -- 22/04/2026 - Creación de la tabla de units (Harry)
 
@@ -2210,4 +2211,349 @@ BEGIN
 
 END $$
 
+DELIMITER ;
+
+-- 27/05/2026 Creacion de la tabla de agendas del taller-Nolan
+CREATE TABLE workshop_schedule (
+
+    id_appointment INT AUTO_INCREMENT PRIMARY KEY,
+
+    number_reference INT NOT NULL,
+
+    license_plate VARCHAR(20) NOT NULL,
+
+    entry_date DATE NOT NULL,
+
+    reason_service VARCHAR(500) NOT NULL,
+
+    reception_mileage INT NOT NULL,
+
+    id_client INT NOT NULL,
+
+    id_branch INT NOT NULL,
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+
+    CONSTRAINT fk_workshop_client
+        FOREIGN KEY (id_client)
+        REFERENCES client(id_user),
+
+    CONSTRAINT fk_workshop_branch
+        FOREIGN KEY (id_branch)
+        REFERENCES branch(id_Branch)
+);
+
+-- Se crearon tambien los procedimientos necesarios (insert,delete,deactive, update, getAll, findById)
+
+DROP PROCEDURE IF EXISTS insertWorkshopSchedule;
+
+DELIMITER $$
+CREATE PROCEDURE insertWorkshopSchedule(
+    IN p_number_reference INT,
+    IN p_license_plate VARCHAR(20),
+    IN p_entry_date DATE,
+    IN p_reason_service VARCHAR(500),
+    IN p_reception_mileage INT,
+    IN p_id_client INT,
+    IN p_id_branch INT
+)
+BEGIN
+    INSERT INTO workshop_schedule (
+        number_reference,
+        license_plate,
+        entry_date,
+        reason_service,
+        reception_mileage,
+        id_client,
+        id_branch,
+        is_active
+    )
+    VALUES (
+        p_number_reference,
+        p_license_plate,
+        p_entry_date,
+        p_reason_service,
+        p_reception_mileage,
+        p_id_client,
+        p_id_branch,
+        TRUE
+    );
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS getAllWorkshopSchedules;
+
+DELIMITER $$
+CREATE PROCEDURE getAllWorkshopSchedules()
+BEGIN
+    SELECT
+        id_appointment,
+        number_reference,
+        license_plate,
+        entry_date,
+        reason_service,
+        reception_mileage,
+        id_client,
+        id_branch,
+        is_active
+    FROM workshop_schedule
+    WHERE is_active = TRUE;
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS updateWorkshopSchedule;
+
+DELIMITER $$
+CREATE PROCEDURE updateWorkshopSchedule(
+    IN p_id_appointment INT,
+    IN p_number_reference INT,
+    IN p_license_plate VARCHAR(20),
+    IN p_entry_date DATE,
+    IN p_reason_service VARCHAR(500),
+    IN p_reception_mileage INT,
+    IN p_id_client INT,
+    IN p_id_branch INT
+)
+BEGIN
+    UPDATE workshop_schedule
+    SET
+        number_reference = p_number_reference,
+        license_plate = p_license_plate,
+        entry_date = p_entry_date,
+        reason_service = p_reason_service,
+        reception_mileage = p_reception_mileage,
+        id_client = p_id_client,
+        id_branch = p_id_branch
+    WHERE id_appointment = p_id_appointment
+      AND is_active = TRUE;
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS deactivateWorkshopSchedule;
+
+DELIMITER $$
+CREATE PROCEDURE deactivateWorkshopSchedule(
+    IN p_id_appointment INT
+)
+BEGIN
+    UPDATE workshop_schedule
+    SET is_active = FALSE
+    WHERE id_appointment = p_id_appointment;
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS activateWorkshopSchedule;
+
+DELIMITER $$
+CREATE PROCEDURE activateWorkshopSchedule(
+    IN p_id_appointment INT
+)
+BEGIN
+    UPDATE workshop_schedule
+    SET is_active = TRUE
+    WHERE id_appointment = p_id_appointment;
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS findWorkshopScheduleById;
+
+DELIMITER $$
+CREATE PROCEDURE findWorkshopScheduleById(
+    IN p_id_appointment INT
+)
+BEGIN
+    SELECT
+        id_appointment,
+        number_reference,
+        license_plate,
+        entry_date,
+        reason_service,
+        reception_mileage,
+        id_client,
+        id_branch,
+        is_active
+    FROM workshop_schedule
+    WHERE id_appointment = p_id_appointment;
+END$$
+DELIMITER ;
+
+
+
+-- 27/05/2026 Creacion de la tabla de indormes de reparacion-Nolan
+
+CREATE TABLE repair_reports (
+
+    id_reparation INT AUTO_INCREMENT PRIMARY KEY,
+
+    number_reference INT NOT NULL,
+
+    technical_diagnosis VARCHAR(500),
+
+    spare_parts VARCHAR(500),
+
+    observations VARCHAR(500),
+
+    cost DOUBLE NOT NULL,
+
+    taxes DOUBLE NOT NULL,
+
+    total_payment DOUBLE NOT NULL,
+
+    completion_date DATE NOT NULL,
+
+    id_mechanic INT NOT NULL,
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+
+  CONSTRAINT fk_reparation_mechanic
+    FOREIGN KEY (id_mechanic)
+    REFERENCES mechanic(id_user)
+);
+
+-- Se crearon tambien los procedimientos necesarios (insert,delete,deactive(borrado logico), update, getAll, findById)
+
+DROP PROCEDURE IF EXISTS insertRepairReport;
+
+DELIMITER $$
+CREATE PROCEDURE insertRepairReport(
+    IN p_number_reference INT,
+    IN p_technical_diagnosis VARCHAR(500),
+    IN p_spare_parts VARCHAR(500),
+    IN p_observations VARCHAR(500),
+    IN p_cost DOUBLE,
+    IN p_taxes DOUBLE,
+    IN p_total_payment DOUBLE,
+    IN p_completion_date DATE,
+    IN p_id_mechanic INT
+)
+BEGIN
+    INSERT INTO repair_reports (
+        number_reference,
+        technical_diagnosis,
+        spare_parts,
+        observations,
+        cost,
+        taxes,
+        total_payment,
+        completion_date,
+        id_mechanic,
+        is_active
+    )
+    VALUES (
+        p_number_reference,
+        p_technical_diagnosis,
+        p_spare_parts,
+        p_observations,
+        p_cost,
+        p_taxes,
+        p_total_payment,
+        p_completion_date,
+        p_id_mechanic,
+        TRUE
+    );
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS getAllRepairReports;
+
+DELIMITER $$
+CREATE PROCEDURE getAllRepairReports()
+BEGIN
+    SELECT
+        id_reparation,
+        number_reference,
+        technical_diagnosis,
+        spare_parts,
+        observations,
+        cost,
+        taxes,
+        total_payment,
+        completion_date,
+        id_mechanic,
+        is_active
+    FROM repair_reports
+    WHERE is_active = TRUE;
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS updateRepairReport;
+
+DELIMITER $$
+CREATE PROCEDURE updateRepairReport(
+    IN p_id_reparation INT,
+    IN p_number_reference INT,
+    IN p_technical_diagnosis VARCHAR(500),
+    IN p_spare_parts VARCHAR(500),
+    IN p_observations VARCHAR(500),
+    IN p_cost DOUBLE,
+    IN p_taxes DOUBLE,
+    IN p_total_payment DOUBLE,
+    IN p_completion_date DATE,
+    IN p_id_mechanic INT
+)
+BEGIN
+    UPDATE repair_reports
+    SET
+        number_reference = p_number_reference,
+        technical_diagnosis = p_technical_diagnosis,
+        spare_parts = p_spare_parts,
+        observations = p_observations,
+        cost = p_cost,
+        taxes = p_taxes,
+        total_payment = p_total_payment,
+        completion_date = p_completion_date,
+        id_mechanic = p_id_mechanic
+    WHERE id_reparation = p_id_reparation
+      AND is_active = TRUE;
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS deactivateRepairReport;
+
+DELIMITER $$
+CREATE PROCEDURE deactivateRepairReport(
+    IN p_id_reparation INT
+)
+BEGIN
+    UPDATE repair_reports
+    SET is_active = FALSE
+    WHERE id_reparation = p_id_reparation;
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS activateRepairReport;
+
+DELIMITER $$
+CREATE PROCEDURE activateRepairReport(
+    IN p_id_reparation INT
+)
+BEGIN
+    UPDATE repair_reports
+    SET is_active = TRUE
+    WHERE id_reparation = p_id_reparation;
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS findRepairReportById;
+
+DELIMITER $$
+CREATE PROCEDURE findRepairReportById(
+    IN p_id_reparation INT
+)
+BEGIN
+    SELECT
+        id_reparation,
+        number_reference,
+        technical_diagnosis,
+        spare_parts,
+        observations,
+        cost,
+        taxes,
+        total_payment,
+        completion_date,
+        id_mechanic,
+        is_active
+    FROM repair_reports
+    WHERE id_reparation = p_id_reparation;
+END$$
 DELIMITER ;
