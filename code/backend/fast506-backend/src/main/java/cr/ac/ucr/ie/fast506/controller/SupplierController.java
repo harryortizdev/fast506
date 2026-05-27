@@ -3,6 +3,7 @@ package cr.ac.ucr.ie.fast506.controller;
 import cr.ac.ucr.ie.fast506.domain.Supplier;
 import cr.ac.ucr.ie.fast506.service.SupplierService;
 import java.util.LinkedList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class SupplierController {
     private SupplierService supplierService;
 
     @GetMapping("/all")
-    public LinkedList<Supplier> getAll() {
+    public List<Supplier> getAll() {
         return supplierService.getAll();
     }
 

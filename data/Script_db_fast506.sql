@@ -749,52 +749,35 @@ DELIMITER ;
 
 -- 02/05/2026 - Creación de la tabla supplier(proveedores) Nolan
 CREATE TABLE supplier (
-    id_supplier INT PRIMARY KEY AUTO_INCREMENT,
-    
-    name VARCHAR(50) NOT NULL,
-    company_name VARCHAR(50) NOT NULL,
-    legal_name VARCHAR(50) NOT NULL,
-    
+
+    id_supplier INT AUTO_INCREMENT PRIMARY KEY,
+
+    name VARCHAR(100) NOT NULL,
+
+    company_name VARCHAR(100) NOT NULL,
+
+    legal_name VARCHAR(100) NOT NULL,
+
     support_phone VARCHAR(15) NOT NULL,
-    
-    bussines_contact_name VARCHAR(150) NOT NULL,
-    email VARCHAR(100) NOT NULL,
-    
-    ubicacion VARCHAR(100) NOT NULL,
-    
-    is_active BOOLEAN DEFAULT TRUE,
-    
-    -- Llave foránea de Administrador
+
+    bussines_contact_name VARCHAR(100) NOT NULL,
+
+    email VARCHAR(100) NOT NULL UNIQUE,
+
+    ubicacion VARCHAR(200) NOT NULL,
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+
     admin_id INT NOT NULL,
-    
+
     CONSTRAINT fk_supplier_admin
         FOREIGN KEY (admin_id)
-        REFERENCES users(id_user) -- ver si cambiar dependiendo de como lo puso Allan
+        REFERENCES users(id_user)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
 
--- 07/05/2026 - Crear datos de prueba proveedor (Nolan)
-
-INSERT INTO `db_fast506`.`supplier` 
-(name, company_name, legal_name, support_phone, bussines_contact_name, email, ubicacion, admin_id)
-VALUES
-    ('Auto Parts S.A.', 'Auto Parts S.A.', 'Auto Parts S.A.', 
-    '800-123-4567', 'Carlos González', 'cgonzalez@autoparts.com', 'San José, Costa Rica', 1);
-  
-  
-  CALL insertAdministrator(
-    'Administrador de Prueba',
-    1983737,
-    'admin@prueba.com',
-    'password123',
-    '800-123-4567',
-    '1990-01-01',
-    'profile_picture.jpg',
-    'EMP001',
-    'admin@fast506.com'
-);
-
+Select* from supplier;
   
 -- 07/05/2026 - Crear procedimientos de la tabla proveedor (Nolan)
 -- Procedimiento para agregar un supplier (Nolan)
@@ -823,10 +806,12 @@ END$$
 DELIMITER ;
 
 -- -- Procedimiento para obtener todos los proveedores donde is_active = 1 (Nolan)
-DROP procedure IF EXISTS `getAllSupplier`;
+DROP procedure IF EXISTS `getAllSuppliers`;
+
+DROP PROCEDURE IF EXISTS getAllSuppliers;
 
 DELIMITER $$
-CREATE PROCEDURE `getAllSuppliers` ()
+CREATE PROCEDURE getAllSuppliers()
 BEGIN
     SELECT 
         id_supplier,
@@ -837,6 +822,7 @@ BEGIN
         bussines_contact_name,
         email,
         ubicacion,
+        is_active,
         admin_id
     FROM supplier
     WHERE is_active = 1;

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Supplier } from "../../models/Supplier";
 import { Administrator } from "../../models/Administrator";
-import { create, updateSupplier } from "../../services/SupplierService";
+import { create, updateSupplier, getAll } from "../../services/SupplierService";
 import { getAll as getAdmins } from "../../services/AdministratorService";
 import AlertSuccess from "../atoms/AlertSuccess";
 import AlertWarning from "../atoms/AlertWarning";
@@ -17,6 +17,7 @@ interface SupplierFormProps {
 const SupplierForm = ({ onClose, onRefresh, supplierToEdit }: SupplierFormProps) => {
   const [form, setForm] = useState<Partial<Supplier>>(supplierToEdit || { isActive: true });
   const [admins, setAdmins] = useState<Administrator[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [errors, setErrors] = useState<Partial<Record<keyof Supplier, string>>>({});
 
   useEffect(() => {
@@ -29,14 +30,31 @@ const SupplierForm = ({ onClose, onRefresh, supplierToEdit }: SupplierFormProps)
         console.error("Error al obtener administradores:", error);
       }
     };
+
+    const fetchSuppliers = async () => {
+      try {
+        const data = await getAll();
+        setSuppliers(data);
+      } catch (error) {
+        console.error("Error al obtener proveedores:", error);
+      }
+    };
+
     fetchAdmins();
+    fetchSuppliers();
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+
     setForm({
       ...form,
       [name]: name === "adminId" ? (value ? Number(value) : undefined) : value,
+    });
+
+    setErrors({
+      ...errors,
+      [name]: "",
     });
   };
 
@@ -48,24 +66,45 @@ const SupplierForm = ({ onClose, onRefresh, supplierToEdit }: SupplierFormProps)
     if (!form.name || form.name.trim().length === 0 || form.name.length > 50) {
       newErrors.name = "Nombre inválido: no puede estar vacío, máximo 50 caracteres.";
     }
+
     if (!form.companyName || form.companyName.trim().length === 0 || form.companyName.length > 50) {
       newErrors.companyName = "Compañía inválida: no puede estar vacía, máximo 50 caracteres.";
     }
+
     if (!form.legalName || form.legalName.trim().length === 0 || form.legalName.length > 50) {
       newErrors.legalName = "Nombre legal inválido: no puede estar vacío, máximo 50 caracteres.";
     }
+
     if (!form.supportPhone || !phoneRegex.test(form.supportPhone)) {
       newErrors.supportPhone = "Teléfono inválido: debe ser un número válido (7-20 caracteres).";
     }
-    if (!form.bussinesContactName || form.bussinesContactName.trim().length === 0 || form.bussinesContactName.length > 150) {
+
+    if (
+      !form.bussinesContactName ||
+      form.bussinesContactName.trim().length === 0 ||
+      form.bussinesContactName.length > 150
+    ) {
       newErrors.bussinesContactName = "Contacto inválido: no puede estar vacío, máximo 150 caracteres.";
     }
+
     if (!form.email || !emailRegex.test(form.email) || form.email.length > 100) {
       newErrors.email = "Correo inválido: debe ser un email válido, máximo 100 caracteres.";
+    } else {
+      const emailExists = suppliers.some(
+        (s) =>
+          s.email?.toLowerCase().trim() === form.email?.toLowerCase().trim() &&
+          s.idSupplier !== form.idSupplier
+      );
+
+      if (emailExists) {
+        newErrors.email = "Este correo ya está siendo usado por otro proveedor.";
+      }
     }
+
     if (!form.ubicacion || form.ubicacion.trim().length === 0 || form.ubicacion.length > 100) {
       newErrors.ubicacion = "Ubicación inválida: no puede estar vacía, máximo 100 caracteres.";
     }
+
     if (!form.adminId) {
       newErrors.adminId = "Debe seleccionar un administrador.";
     }
@@ -126,45 +165,27 @@ const SupplierForm = ({ onClose, onRefresh, supplierToEdit }: SupplierFormProps)
   return (
     <div className="container d-flex justify-content-center">
       <div className="card p-4 shadow-sm" style={{ maxWidth: "500px", width: "100%" }}>
-        <h3 className="text-center mb-4">{supplierToEdit ? "Editar Proveedor" : "Nuevo Proveedor"}</h3>
+        <h3 className="text-center mb-4">
+          {supplierToEdit ? "Editar Proveedor" : "Nuevo Proveedor"}
+        </h3>
 
         <div className="mb-3">
-          <FormField
-            label="Nombre:"
-            name="name"
-            value={form.name || ""}
-            onChange={handleChange}
-          />
+          <FormField label="Nombre:" name="name" value={form.name || ""} onChange={handleChange} />
           {errors.name && <div className="invalid-feedback d-block">{errors.name}</div>}
         </div>
 
         <div className="mb-3">
-          <FormField
-            label="Compañía:"
-            name="companyName"
-            value={form.companyName || ""}
-            onChange={handleChange}
-          />
+          <FormField label="Compañía:" name="companyName" value={form.companyName || ""} onChange={handleChange} />
           {errors.companyName && <div className="invalid-feedback d-block">{errors.companyName}</div>}
         </div>
 
         <div className="mb-3">
-          <FormField
-            label="Nombre Legal:"
-            name="legalName"
-            value={form.legalName || ""}
-            onChange={handleChange}
-          />
+          <FormField label="Nombre Legal:" name="legalName" value={form.legalName || ""} onChange={handleChange} />
           {errors.legalName && <div className="invalid-feedback d-block">{errors.legalName}</div>}
         </div>
 
         <div className="mb-3">
-          <FormField
-            label="Teléfono de Soporte:"
-            name="supportPhone"
-            value={form.supportPhone || ""}
-            onChange={handleChange}
-          />
+          <FormField label="Teléfono de Soporte:" name="supportPhone" value={form.supportPhone || ""} onChange={handleChange} />
           {errors.supportPhone && <div className="invalid-feedback d-block">{errors.supportPhone}</div>}
         </div>
 
@@ -190,12 +211,7 @@ const SupplierForm = ({ onClose, onRefresh, supplierToEdit }: SupplierFormProps)
         </div>
 
         <div className="mb-3">
-          <FormField
-            label="Ubicación:"
-            name="ubicacion"
-            value={form.ubicacion || ""}
-            onChange={handleChange}
-          />
+          <FormField label="Ubicación:" name="ubicacion" value={form.ubicacion || ""} onChange={handleChange} />
           {errors.ubicacion && <div className="invalid-feedback d-block">{errors.ubicacion}</div>}
         </div>
 
@@ -218,20 +234,20 @@ const SupplierForm = ({ onClose, onRefresh, supplierToEdit }: SupplierFormProps)
         </div>
 
         <div className="text-center mt-4">
-            <Button
+          <Button
             label="Guardar"
             onClick={handleSubmit}
-            backgroundColor="#198754"    
-            hoverColor="#145c32"         
-            color="#fff"     
-            className="btn btn-success me-2"            
+            backgroundColor="#198754"
+            hoverColor="#145c32"
+            color="#fff"
+            className="btn btn-success me-2"
           />
 
           <Button
             label="Cancelar"
             onClick={onClose}
-            backgroundColor="#6c757d"    
-            hoverColor="#495057"         
+            backgroundColor="#6c757d"
+            hoverColor="#495057"
             color="#fff"
             className="btn btn-secondary"
           />
