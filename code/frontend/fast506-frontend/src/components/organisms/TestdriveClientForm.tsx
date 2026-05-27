@@ -7,7 +7,6 @@ import { getAllCarAvailable as getAllUnits } from "../../services/TestdriveServi
 import { getAll as getAllBranches } from "../../services/BranchService";
 import AlertSuccess from "../atoms/AlertSuccess";
 import Button from "../atoms/Button";
-import FormField from "../molecules/FormField";
 import { updateTestdrive } from "../../services/TestdriveService";
 import AlertWarning from "../atoms/AlertWarning";
 import ButtonIcon from "../molecules/ButtonIcon";
@@ -17,9 +16,11 @@ interface TestdriveFormProps {
     onClose: () => void;
     onRefresh: () => void;
     testdriveToEdit?: Testdrive;
+    carName?: string;
+
 }
 
-const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormProps) => {
+const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit, carName }: TestdriveFormProps) => {
 
     const [form, setForm] = useState<Partial<Testdrive>>(testdriveToEdit || {});
     const [units, setUnits] = useState<Unit[]>([]);
@@ -51,6 +52,18 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveF
         getAllUnits().then(setUnits).catch(() => console.error("Error cargando vehículos"));
         getAllBranches().then(setBranch).catch(() => console.error("Error cargando sucursales"));
     }, []);
+
+    useEffect(() => {
+        if (carName && units.length > 0) {
+            const matchedVehicle = units.find(
+                (u) => u.carName.trim().toLowerCase() === carName.trim().toLowerCase()
+            );
+
+            if (matchedVehicle) {
+                setForm((f) => ({ ...f, idCar: matchedVehicle.idCar }));
+            }
+        }
+    }, [carName, units]); 
 
     useEffect(() => {
         if (form.scheduledDate && form.idBranch) {

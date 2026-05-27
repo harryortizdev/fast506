@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Catalog } from ".././models/Catalog";
 import { getCatalogById, getColorByCatalog } from ".././services/CatalogService";
 import Image from ".././components/atoms/Image";
@@ -16,6 +16,8 @@ const CatalogDetailPage = () => {
     const [catalog, setCatalog] = useState<Catalog | null>(null);
     const [loading, setLoading] = useState(true);
     const [colors, setColors] = useState<string[]>([]);
+    const navigate = useNavigate();
+
 
     useEffect(() => {
         if (id) {
@@ -38,7 +40,7 @@ const CatalogDetailPage = () => {
 
     if (!catalog) return null;
 
-    const whatsappNumber = "50600000000";
+    const whatsappNumber = "50661186130";
     const whatsappMsg = encodeURIComponent(`Hola, me interesa el ${catalog.carName}`);
 
     const specs = [
@@ -180,8 +182,26 @@ const CatalogDetailPage = () => {
                                 hoverColor="#2C3E50"
                                 className="btn w-100"
                                 style={{ borderRadius: "4px", padding: "10px 0" }}
-                                icon={<i className="bi bi-tag" />}
-                                onClick={() => console.log(`Cotizar: ${catalog.carName}`)}
+                                icon={<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" className="bi bi-tag" viewBox="0 0 16 16">
+                                    <path d="M6 4.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m-1 0a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0" />
+                                    <path d="M2 1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 1 6.586V2a1 1 0 0 1 1-1m0 5.586 7 7L13.586 9l-7-7H2z" />
+                                </svg>}
+                                onClick={() => navigate("/quotation", { state: { idCatalog: Number(id) } })}
+
+                            />
+
+                            <ButtonIcon
+                                label="Testdrive"
+
+                                color="#1A2633"
+                                backgroundColor="#EEF1EF"
+                                hoverColor="A9B4C2 "
+
+                                className="btn w-100"
+                                style={{ borderRadius: "4px", padding: "10px 0" }}
+                                icon={ <i  className="bi bi-cone-striped"/>}
+                                onClick={() => navigate("/testdrive", { state: { carName: catalog.carName } })}
+
                             />
                         </div>
                     </div>

@@ -16,9 +16,10 @@ interface QuotationFormProp {
     onClose: () => void;
     onRefresh: () => void;
     quotationToEdit?: Quotation;
+    idCatalog?: number;
 }
 
-const QuotationForm = ({ onClose, onRefresh, quotationToEdit }: QuotationFormProp) => {
+const QuotationForm = ({ onClose, onRefresh, quotationToEdit, idCatalog }: QuotationFormProp) => {
 
     const [form, setForm] = useState<Partial<Quotation>>(quotationToEdit || {});
     const [errors, setErrors] = useState<Partial<Record<keyof Quotation, string>>>({});
@@ -41,6 +42,21 @@ const QuotationForm = ({ onClose, onRefresh, quotationToEdit }: QuotationFormPro
     useEffect(() => {
         getAllCatalog().then(setCatalog);
     }, []);
+
+    useEffect(() => {
+        if (idCatalog) {
+            setForm(f => ({ ...f, idCatalog: idCatalog }));
+
+            getUnitsByCatalog(Number(idCatalog)).then((units) => {
+                setUnit(units);
+            })
+
+                .catch((err) => {
+                    console.error("Error al cargar tracciones automáticas:", err);
+                    setUnit([]);
+                });
+        }
+    }, [idCatalog]);
 
     useEffect(() => {
         if (quotationToEdit?.idCatalog) {

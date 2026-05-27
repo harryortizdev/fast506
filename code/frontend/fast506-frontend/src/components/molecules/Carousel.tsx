@@ -179,6 +179,7 @@ const Carousel = () => {
                                         </h3>
 
                                         <button
+                                        onClick={() => navigate("/quotation", { state: { idCatalog: catalog.idCatalog } })}
                                             style={{
                                                 backgroundColor: "#5E6572",
                                                 color: "#fff",

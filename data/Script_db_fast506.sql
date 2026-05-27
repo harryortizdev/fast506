@@ -1981,7 +1981,7 @@ DELIMITER ;
   
 -- 25/05/2026 tabla de ventas
 
-CCREATE TABLE `db_fast506`.`sales` (
+CREATE TABLE `db_fast506`.`sales` (
   `id_sales` INT NOT NULL,
   `invoice_number` INT(10) NULL,
   `transaction_date` DATE NULL,
