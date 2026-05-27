@@ -27,16 +27,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RestController
 @RequestMapping("/api/sales")
 public class SalesController {
-    
+
     @Autowired
     private SalesService salesService;
-    
+
     @GetMapping("/all")
     public List<Sales> getAll() {
         return salesService.getAll();
     }
-    
-     @PostMapping("/create")
+
+    @PostMapping("/create")
     public ResponseEntity<String> create(@RequestBody Sales sales) {
         try {
             salesService.add(sales);
@@ -45,8 +45,8 @@ public class SalesController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Error al guardar: " + e.getMessage());
         }
     }
-    
-     @PutMapping("/update")
+
+    @PutMapping("/update")
     public ResponseEntity<String> update(@RequestBody Sales sales) {
         try {
             salesService.update(sales);
@@ -55,8 +55,8 @@ public class SalesController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Error al actualizar: " + e.getMessage());
         }
     }
-    
-     @DeleteMapping("/delete")
+
+    @DeleteMapping("/delete")
     public ResponseEntity<String> delete(@RequestParam int id) {
         try {
             salesService.deleteById(id);
@@ -65,9 +65,15 @@ public class SalesController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Error al eliminar: " + e.getMessage());
         }
     }
-    
+
     @GetMapping("/filteredUnitsByCatalog")
     public List<Unit> filteredUnitsByCatalog(@RequestParam int idCatalog) {
         return salesService.filteredUnitsByCatalog(idCatalog);
     }
+
+     @GetMapping("/filteredUnitsByColor")
+    public List<Unit> filteredUnitsByCatalog(@RequestParam int idCatalog, @RequestParam String traction) {
+        return salesService.filteredUnitsByColor(idCatalog,traction);
+    }
+  
 }

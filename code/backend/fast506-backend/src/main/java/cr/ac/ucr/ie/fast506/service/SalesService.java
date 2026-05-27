@@ -4,8 +4,10 @@
  */
 package cr.ac.ucr.ie.fast506.service;
 
+import cr.ac.ucr.ie.fast506.domain.Administrator;
 import cr.ac.ucr.ie.fast506.domain.Sales;
 import cr.ac.ucr.ie.fast506.domain.Unit;
+import cr.ac.ucr.ie.fast506.repository.AdministratorRespository;
 import cr.ac.ucr.ie.fast506.repository.SalesRepository;
 import cr.ac.ucr.ie.fast506.repository.UnitRepository;
 import java.util.List;
@@ -25,12 +27,19 @@ public class SalesService {
     @Autowired
     private UnitRepository unitRepository;
 
+    @Autowired
+    private AdministratorRespository adminRepository;
+
     public List<Sales> getAll() {
         return salesRepository.getAll();
     }
 
     public void add(Sales sales) {
         sales.setIsActive(true);
+
+        if (sales.getIdAdmin() > 0) {
+            sales.setSalesStatus("Completada");
+        }
 
         int total = (int) salesRepository.count() + 1;
         int month = sales.getTransactionDate().getMonthValue();
@@ -40,14 +49,17 @@ public class SalesService {
 
         sales.setInvoiceNumber(combination);
         salesRepository.save(sales);
-        
-        if(sales.getIdCar() != 0){
+
+        if (sales.getIdCar() != 0 && "Completada".equals(sales.getSalesStatus())) {
             unitRepository.deleteUnit(sales.getIdCar());
         }
     }
 
     public void update(Sales sales) {
         salesRepository.save(sales);
+        if (sales.getIdCar() != 0 && "Completada".equals(sales.getSalesStatus())) {
+            unitRepository.deleteUnit(sales.getIdCar());
+        }
     }
 
     public void deleteById(int id) {
@@ -56,6 +68,10 @@ public class SalesService {
 
     public List<Unit> filteredUnitsByCatalog(int idCatalog) {
         return salesRepository.filteredUnitsByCatalog(idCatalog);
+    }
+
+    public List<Unit> filteredUnitsByColor(int idCatalog, String traction) {
+        return salesRepository.filteredUnitsByColor(idCatalog,traction);
     }
 
 }

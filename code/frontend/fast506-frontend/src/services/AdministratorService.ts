@@ -64,3 +64,17 @@ export const updateAdministrator = async (administrator: Administrator) => {
     return res.text();
 
 };
+
+//login Sales
+ 
+export const login = async (email: string, password: string): Promise<Administrator> => {
+  const res = await fetch(`${API_URL}/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (!res.ok) throw new Error("Credenciales inválidas");
+
+  return res.json();
+};

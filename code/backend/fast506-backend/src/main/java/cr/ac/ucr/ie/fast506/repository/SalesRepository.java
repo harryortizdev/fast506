@@ -19,17 +19,20 @@ import org.springframework.stereotype.Repository;
  * @author Harry Ortiz
  */
 @Repository
-public interface SalesRepository extends JpaRepository<Sales, Integer>{
-    
-    
+public interface SalesRepository extends JpaRepository<Sales, Integer> {
+
     @Query(value = "call db_fast506.getAllSales()", nativeQuery = true)
     List<Sales> getAll();
-    
+
     @Modifying
     @Transactional
     @Query(value = "call db_fast506.deleteSales(:idSales)", nativeQuery = true)
     void deleteSales(@Param("id_Sales") Integer idSales);
-    
+
     @Query(value = "call db_fast506.getUnitsByCatalog(:id_Catalog)", nativeQuery = true)
     List<Unit> filteredUnitsByCatalog(@Param("id_Catalog") int id_Catalog);
+    
+    @Query(value = "call db_fast506.getColorsByCatalogAndTraction(:id_Catalog, :traction)", nativeQuery = true)
+    List<Unit> filteredUnitsByColor(@Param("id_Catalog") int id_Catalog, @Param("traction") String traction);
+  
 }

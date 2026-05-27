@@ -1,8 +1,17 @@
 package cr.ac.ucr.ie.fast506.domain;
 
-public class Administrator extends User {
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
+@Entity
+@Table(name = "administrator")
+public class Administrator extends User {
+    
+    @Column(name = "employee_id")
     private String employeeId;
+    
+    @Column(name = "corporate_email")
     private String corporateEmail;
 
     public String getEmployeeId() {

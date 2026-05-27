@@ -48,12 +48,15 @@ public class Sales {
     
     @Column(name = "transfer_cost")
     private double transferCost;
+    
+    @Column(name = "sales_status")
+    private String salesStatus;
 
     @Column(name = "id_client")
     private int idClient;
 
     @Column(name = "id_admin")
-    private int idAdmin;
+    private Integer idAdmin;
 
     @Column(name = "id_Car")
     private int idCar;
@@ -136,11 +139,11 @@ public class Sales {
         this.idClient = idClient;
     }
 
-    public int getIdAdmin() {
+    public Integer getIdAdmin() {
         return idAdmin;
     }
 
-    public void setIdAdmin(int idAdmin) {
+    public void setIdAdmin(Integer idAdmin) {
         this.idAdmin = idAdmin;
     }
 
@@ -176,5 +179,11 @@ public class Sales {
         this.idCatalog = idCatalog;
     }
 
-    
+    public String getSalesStatus() {
+        return salesStatus;
+    }
+
+    public void setSalesStatus(String salesStatus) {
+        this.salesStatus = salesStatus;
+    }
 }

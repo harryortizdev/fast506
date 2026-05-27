@@ -2063,7 +2063,21 @@ ADD CONSTRAINT `fk_sales_client_id`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
-  
+  ALTER TABLE `db_fast506`.`sales` 
+ADD COLUMN `state_sales` VARCHAR(45) NOT NULL AFTER `is_active`;
+
+ALTER TABLE `db_fast506`.`sales` 
+DROP FOREIGN KEY `fk_sales_admin_id`;
+ALTER TABLE `db_fast506`.`sales` 
+CHANGE COLUMN `id_admin` `id_admin` INT(11) NULL DEFAULT NULL ,
+CHANGE COLUMN `state_sales` `sales_status` VARCHAR(20) NOT NULL DEFAULT 'Pendiente' ;
+ALTER TABLE `db_fast506`.`sales` 
+ADD CONSTRAINT `fk_sales_admin_id`
+  FOREIGN KEY (`id_admin`)
+  REFERENCES `db_fast506`.`administrator` (`id_user`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
   -- 25/05/2026 sp de listar ventas (harry)
   
   DELIMITER $$
@@ -2080,6 +2094,7 @@ BEGIN
         extras,
         total_payment,
         transfer_cost,
+        sales_status,
         id_client,
         id_admin,
         id_car,
@@ -2110,3 +2125,103 @@ END $$
 
 DELIMITER ; 
 
+-- 26/05/2026 sp para verificar si es admin
+
+DELIMITER $$
+
+CREATE PROCEDURE getAdminByCredentials(IN p_email VARCHAR(255), IN p_password VARCHAR(255))
+BEGIN
+    SELECT 
+        u.id_user,
+        u.name,
+        u.id,
+        u.email,
+        u.password,
+        u.phone_number,
+        u.date_birth,
+        u.profile_image,
+        u.is_active,
+        a.employee_id,
+        a.corporate_email
+    FROM users u 
+    INNER JOIN administrator a ON u.id_user = a.id_user 
+    WHERE u.email = p_email 
+    AND u.password = p_password;
+END$$
+
+DELIMITER ;
+
+-- 26/05/2026 sp para agrupar por colores
+
+DELIMITER $$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getColorsByCatalogAndTraction`(
+    IN idCatalogC INT,
+    IN tractionC VARCHAR(50)
+)
+BEGIN
+
+    SELECT DISTINCT
+        u.id_car,
+        u.VIN,
+        u.engine_number,
+        u.car_brand,
+        u.car_name,
+        u.legal_brand_name,
+        u.year_manufacture,
+        u.color,
+        u.transmission,
+        u.traction,
+        u.body_work,
+        u.engine_size,
+        u.fuel_type,
+        u.stock_status,
+        u.id_supplier,
+        u.is_active
+
+    FROM units u
+
+    INNER JOIN catalogs c
+        ON u.car_brand = c.brand_name
+        AND u.car_name = c.car_name
+        AND u.year_manufacture = c.year_manufacture
+
+        AND (
+            (
+                LOWER(c.transmission) = 'automático'
+                AND LOWER(u.transmission)
+                    IN ('automatico', 'automático', 'cvt')
+            )
+
+            OR
+
+            (
+                LOWER(c.transmission) != 'automático'
+                AND LOWER(u.transmission)
+                    = LOWER(c.transmission)
+            )
+        )
+
+        AND (
+            (
+                LOWER(c.fuel_type) = 'combustible'
+                AND LOWER(u.fuel_type)
+                    IN ('gasolina', 'diesel', 'diésel')
+            )
+
+            OR
+
+            (
+                LOWER(c.fuel_type) != 'combustible'
+                AND LOWER(u.fuel_type)
+                    = LOWER(c.fuel_type)
+            )
+        )
+
+    WHERE c.id_catalog = idCatalogC
+      AND u.is_active = 1
+      AND LOWER(u.traction) = LOWER(tractionC);
+
+END $$
+
+DELIMITER ;

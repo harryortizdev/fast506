@@ -7,9 +7,10 @@ export interface Sales {
     salesTax: number,
     extras: number,
     totalPayment: number,
-    transferCost: number,       
+    transferCost: number, 
+    salesStatus: string,      
     idClient: number,
-    idAdmin: number,
+    idAdmin: number | null,
     idCar: number,
     idCatalog: number,
     isActive: boolean | null

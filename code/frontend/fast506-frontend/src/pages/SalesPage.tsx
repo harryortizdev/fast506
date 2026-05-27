@@ -56,6 +56,7 @@ const SalesPage = () => {
         { key: "salesTax", label: "IVA ($)" },
         { key: "totalPayment", label: "Total ($)" },
         { key: "transferCost", label: "Traspaso ($)" },
+        { key: "salesStatus", label: "Estado" },
         { key: "idClient", label: "Cliente" },
         { key: "idAdmin", label: "Administrador" },
         { key: "idCar", label: "Unidad" },
@@ -81,7 +82,7 @@ const SalesPage = () => {
                             <h5
                                 className="mb-0 text-center text-md-start"
                                 style={{ color: "#EEF1EF" }}>
-                                Catálogo de Vehículos
+                                Venta de Vehículo
                             </h5>
                             {!showForm && (
                                 <div className="d-flex justify-content-center justify-content-md-end">
