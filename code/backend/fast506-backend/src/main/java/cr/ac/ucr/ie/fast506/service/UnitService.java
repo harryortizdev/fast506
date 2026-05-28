@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import cr.ac.ucr.ie.fast506.repository.UnitRepository;
+import java.util.Optional;
 
 @Service
 public class UnitService {
@@ -95,6 +96,10 @@ public class UnitService {
         if (unit.getIdSupplier() <= 0) {
             throw new IllegalArgumentException("Debe seleccionar un proveedor.");
         }
+    }
+
+    Optional<Unit> findById(int idCar) {
+        return unitRepository.findById(idCar);
     }
 
 }

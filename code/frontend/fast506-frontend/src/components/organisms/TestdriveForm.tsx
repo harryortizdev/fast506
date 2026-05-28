@@ -3,7 +3,7 @@ import { Branch } from "../../models/Branch";
 import { Client } from "../../models/Client";
 import { Testdrive } from "../../models/Testdrive";
 import { Unit } from "../../models/Unit";
-import { create, getOccupiedHoursByDate } from "../../services/TestdriveService";
+import { create, getOccupiedHoursByDate, sendEmailCreate, sendEmailUpdate } from "../../services/TestdriveService";
 import { getAll as getAllClients } from "../../services/ClientService";
 import { getAllCarAvailable as getAllUnits } from "../../services/TestdriveService";
 import { getAll as getAllBranches } from "../../services/BranchService";
@@ -124,6 +124,7 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
                 } as Testdrive;
 
                 await updateTestdrive(updatedTestdrive);
+                sendEmailUpdate(updatedTestdrive);
                 AlertSuccess("Los cambios fueron guardados.");
             } else {
                 const newTestdrive = {
@@ -134,6 +135,7 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
                 } as Testdrive;
 
                 await create(newTestdrive);
+                sendEmailCreate(newTestdrive);
                 AlertSuccess("Testdrive creada correctamente.");
             }
             onRefresh();

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Nueva Cotización de Vehículo</title>
+    </head>
+    <body style="margin:0; padding:0; background-color:#f4f4f4; font-family: Arial, sans-serif;">
+
+        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+                <td align="center" style="padding: 20px 0;">
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+
+                        <tr>
+                            <td align="center" bgcolor="#2C3E50" style="padding: 25px; color: #ffffff; font-size: 22px; font-weight: bold; letter-spacing: 1px;">
+                                Fast506 - Detalles de tu Cotización
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 20px; color: #333333; font-size: 16px; line-height: 1.5;">
+                                <p>Hola <strong th:text="${user.name}">Cliente</strong></p>
+                                <p th:if="${quotation.idQuotation != null && quotation.idQuotation > 0}">
+                                    Hemos detectado cambios en tus preferencias. Tu cotización ha sido <strong>actualizada</strong> con éxito. A continuación podés revisar el nuevo desglose de la información:
+                                </p>
+
+                                <p th:unless="${quotation.idQuotation != null && quotation.idQuotation > 0}">
+                                    Hemos procesado la cotización para el vehículo de tus sueños. A continuación podés revisar el desglose de la información:
+                                </p>
+                                <table cellpadding="8" cellspacing="0" width="100%" style="border-collapse: collapse; margin-top: 15px;">
+
+                                    <tr>
+                                        <td style="border-bottom: 1px solid #ddd;"><strong>N° de Cotización:</strong></td>
+                                        <td style="border-bottom: 1px solid #ddd;" th:text="${#strings.toString(quotation.referenceNumber)}">1001</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td style="border-bottom: 1px solid #ddd;"><strong>Fecha de creación:</strong></td>
+                                        <td style="border-bottom: 1px solid #ddd;" th:text="${quotation.date}">2026-05-21</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td style="border-bottom: 1px solid #ddd; width: 35%;"><strong>Modelo:</strong></td>
+                                        <td style="border-bottom: 1px solid #ddd;" th:text="|${unit.carBrand} ${unit.carName} ${unit.yearManufacture}|">Toyota RAV4</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td style="border-bottom: 1px solid #ddd; width: 35%;"><strong>Especificaciones:</strong></td>
+                                        <td style="border-bottom: 1px solid #ddd;" th:text="|${unit.transmission} ${unit.traction} ${unit.fuelType}|">Detalles</td>
+
+                                    </tr>
+                                    <tr>
+                                        <td style="border-bottom: 1px solid #ddd;"><strong>Precio Base:</strong></td>
+                                        <td style="border-bottom: 1px solid #ddd; color: #28a745; font-weight: bold;">
+                                            $<span th:text="${#numbers.formatDecimal(quotation.initialPrice, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td style="border-bottom: 1px solid #ddd;"><strong>I.V.A (Incluido):</strong></td>
+                                        <td style="border-bottom: 1px solid #ddd; color: #28a745; font-weight: bold;">
+                                            $<span th:text="${#numbers.formatDecimal(quotation.salesTax, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td style="border-bottom: 1px solid #ddd;"><strong>Costo de transferecia:</strong></td>
+                                        <td style="border-bottom: 1px solid #ddd; color: #28a745; font-weight: bold;">
+                                            $<span th:text="${#numbers.formatDecimal(quotation.transferCost, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td style="border-bottom: 1px solid #ddd;"><strong>Total:</strong></td>
+                                        <td style="border-bottom: 1px solid #ddd; color: #28a745; font-weight: bold;">
+                                            $<span th:text="${#numbers.formatDecimal(quotation.totalPayment, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                                        </td>
+                                    </tr>
+
+                                </table>
+
+                                <p style="margin-top: 25px; text-align: center;">Si tenés alguna duda inmediata, podés responder directamente a este correo electrónico agenciafast506@gmail.com o al WhatsApp +506 6118 6130.</p>
+
+
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td bgcolor="#f8f9fa" style="padding: 20px; font-size: 12px; color: #777777; text-align: center; border-top: 1px solid #eeeeee;">
+                                Fast506. Todos los derechos reservados.<br>
+                                <span style="color: #999999;">Este es un correo automático generado por el sistema de gestión del concesionario.</span>
+                            </td>
+                        </tr>
+
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+    </body>
+</html>

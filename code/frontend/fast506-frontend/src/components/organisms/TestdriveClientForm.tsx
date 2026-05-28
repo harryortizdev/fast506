@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Branch } from "../../models/Branch";
 import { Testdrive } from "../../models/Testdrive";
 import { Unit } from "../../models/Unit";
-import { create, getClientById, getOccupiedHoursByDate } from "../../services/TestdriveService";
+import { create, getClientById, getOccupiedHoursByDate, sendEmailCreate, sendEmailUpdate } from "../../services/TestdriveService";
 import { getAllCarAvailable as getAllUnits } from "../../services/TestdriveService";
 import { getAll as getAllBranches } from "../../services/BranchService";
 import AlertSuccess from "../atoms/AlertSuccess";
@@ -151,6 +151,7 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit, carName }: T
         try {
             if (testdriveToEdit) {
                 await updateTestdrive({ ...form } as Testdrive);
+                sendEmailUpdate({ ...form } as Testdrive);
                 AlertSuccess("Los cambios fueron guardados.");
             } else {
                 const newTestdrive = {
@@ -161,6 +162,7 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit, carName }: T
                 } as Testdrive;
 
                 await create(newTestdrive);
+                sendEmailCreate(newTestdrive);
                 AlertSuccess("Testdrive creada correctamente.");
             }
             onRefresh();

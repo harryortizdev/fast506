@@ -7,6 +7,7 @@ package cr.ac.ucr.ie.fast506.service;
 import cr.ac.ucr.ie.fast506.domain.Branch;
 import cr.ac.ucr.ie.fast506.repository.BranchRepository;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +36,10 @@ public class BranchService {
     
     public void deleteById(int id) {
         branchRepository.deleteBranchByIdPA(id);
+    }
+
+    Optional<Branch> findById(int idBranch) {
+        return branchRepository.findById(idBranch);
     }
     
 }

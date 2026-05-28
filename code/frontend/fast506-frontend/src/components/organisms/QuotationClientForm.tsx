@@ -4,7 +4,7 @@ import { getAll as getAllCatalog } from "../../services/CatalogService";
 import { Catalog } from "../../models/Catalog";
 import { Unit } from "../../models/Unit";
 import AlertSuccess from "../atoms/AlertSuccess";
-import { create, getUnitsByCatalog, updateQuotation } from "../../services/QuotationService";
+import { create, getUnitsByCatalog, sendEmailCreate, sendEmailUpdate, updateQuotation } from "../../services/QuotationService";
 import { getClientById } from "../../services/TestdriveService";
 
 import Button from "../atoms/Button";
@@ -183,10 +183,12 @@ const QuotationForm = ({ onClose, onRefresh, quotationToEdit, idCatalog }: Quota
             if (quotationToEdit) {
                 const updatedQuotation = { ...quotationToEdit, ...form } as Quotation;
                 await updateQuotation(updatedQuotation);
+                 sendEmailUpdate(updatedQuotation);
                 AlertSuccess("Los cambios fueron guardados.");
             } else {
                 const newQuotation = { ...form, date: dateToday, isActive: 1 } as Quotation;
                 await create(newQuotation);
+                 sendEmailCreate(newQuotation);
                 AlertSuccess("Cotización creada correctamente.");
             }
             onRefresh();

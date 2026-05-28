@@ -1,6 +1,8 @@
 import { Testdrive } from "../models/Testdrive";
 import { Client } from "../models/Client";
 const API_URL = "http://localhost:8080/api/testdrive";
+const API_URL_EMAIL= "http://localhost:8080/api/email";
+
 
 
 export const getAll = async () => { //async llamada asincronica que puede tardar tiempo (sin esto no se puede usar await)
@@ -59,3 +61,22 @@ export const getAllCarAvailable = async () => {
   const res = await fetch(`${API_URL}/allCarAvailable`);
   return res.json(); 
 }
+
+
+export const sendEmailUpdate = async (Testdrive: Testdrive) => {
+  const res = await fetch(`${API_URL_EMAIL}/testdrive`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(Testdrive),
+  });
+  return res.text();
+};
+
+export const sendEmailCreate = async (Testdrive: Partial<Testdrive>) => { //llamada asincronica
+  const res = await fetch(`${API_URL_EMAIL}/testdrive`, { //hace la comunicación al http create 
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(Testdrive),
+  });
+  return res.text();
+};

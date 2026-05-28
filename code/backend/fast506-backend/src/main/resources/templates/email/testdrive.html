@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Confirmación de Prueba de Manejo</title>
+    </head>
+    <body style="margin:0; padding:0; background-color:#f4f4f4; font-family: Arial, sans-serif;">
+
+        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+                <td align="center" style="padding: 20px 0;">
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+
+                        <tr>
+                            <td align="center" bgcolor="#2C3E50" style="padding: 25px; color: #ffffff; font-size: 22px; font-weight: bold; letter-spacing: 1px;">
+                                Fast506 - Tu Prueba de Manejo
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 20px; color: #333333; font-size: 16px; line-height: 1.5;">
+                                <p>Hola <strong th:text="${user.name}">Cliente</strong>,</p>
+
+                                <p th:if="${testdrive.idTest != null && testdrive.idTest > 0}">
+                                    Te informamos que los cambios en tu testdrive han sido procesados. Tu cita para el Test Drive ha sido <strong>actualizada</strong> con éxito. A continuación podés revisar los nuevos detalles de tu cita:
+                                </p>
+
+                                <p th:unless="${testdrive.idTest != null && testdrive.idTest > 0}">
+                                    ¡Todo listo! Tu cita para realizar la prueba de manejo ha sido programada correctamente. A continuación podés revisar los detalles de tu reservación:
+                                </p>
+
+                                <table cellpadding="8" cellspacing="0" width="100%" style="border-collapse: collapse; margin-top: 15px;">
+
+                                    <tr>
+                                        <td style="border-bottom: 1px solid #ddd; width: 35%;"><strong>N° de Cita:</strong></td>
+                                        <td style="border-bottom: 1px solid #ddd;" th:text="|#${testdrive.numberReference}|">#1001</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td style="border-bottom: 1px solid #ddd;"><strong>Fecha de la Cita:</strong></td>
+                                        <td style="border-bottom: 1px solid #ddd;" th:text="${testdrive.scheduledDate}">2026-05-28</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td style="border-bottom: 1px solid #ddd;"><strong>Hora de la Cita:</strong></td>
+                                        <td style="border-bottom: 1px solid #ddd;" th:text="${testdrive.initiationTime}">10:00 AM</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td style="border-bottom: 1px solid #ddd;"><strong>Vehículo a probar:</strong></td>
+                                        <td style="border-bottom: 1px solid #ddd;" th:text="|${unit.carBrand} ${unit.carName} (${unit.yearManufacture})|">Toyota RAV4</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td style="border-bottom: 1px solid #ddd;"><strong>Sucursal:</strong></td>
+                                        <td style="border-bottom: 1px solid #ddd;" th:text="${branch.name}">Sucursal Central</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border-bottom: 1px solid #ddd;"><strong>Contacto de la sucursal:</strong></td>
+                                        <td style="border-bottom: 1px solid #ddd;" th:text="${branch.branchPhoneNumber}">555555555</td>
+                                    </tr>
+
+
+
+                                </table>
+
+                                <div style="text-align: center; margin: 20px 0; font-family: Arial, sans-serif;">
+
+                                    <a th:href="|https://waze.com/ul?ll=${branch.coordinates}&navigate=yes|" 
+                                       target="_blank" 
+                                       style="background-color: #5E6572; color: #EEF1EF; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px; margin-right: 15px; display: inline-block;">
+                                        Waze
+                                    </a>
+
+                                    <a th:href="|https://www.google.com/maps/search/?api=1&query=${branch.coordinates}|" 
+                                       target="_blank" 
+                                       style="background-color: #5E6572; color: #EEF1EF; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px; display: inline-block;">
+                                        Google Maps
+                                    </a>
+
+                                </div>
+
+                                <p style="margin-top: 25px; padding: 10px; background-color: #fff3cd; border-left: 4px solid #ffc107; color: #856404; font-size: 14px; border-radius: 4px;">
+                                    <strong>Recordatorio importante:</strong> Por favor, recordá presentarte 10 minutos antes de la hora acordada en la sucursal seleccionada y traer tu <strong>licencia de conducir vigente</strong>. Sin la licencia física no se podrá realizar la prueba en carretera.
+                                </p>
+
+                                <p style="margin-top: 20px; text-align: center;">Si ocupás reprogramar o cancelar esta cita, podés responder directamente a este correo electrónico o escribirnos al WhatsApp +506 6118 6130.</p>
+
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td bgcolor="#f8f9fa" style="padding: 20px; font-size: 12px; color: #777777; text-align: center; border-top: 1px solid #eeeeee;">
+                                Fast506. Todos los derechos reservados.<br>
+                                <span style="color: #999999;">Este es un correo automático generado por el sistema de gestión del concesionario.</span>
+                            </td>
+                        </tr>
+
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+    </body>
+</html>

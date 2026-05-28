@@ -6,7 +6,7 @@ import { Client } from "../../models/Client";
 import { Catalog } from "../../models/Catalog";
 import { Unit } from "../../models/Unit";
 import AlertSuccess from "../atoms/AlertSuccess";
-import { create, getUnitsByCatalog, updateQuotation } from "../../services/QuotationService";
+import { create, getUnitsByCatalog, sendEmailCreate, sendEmailUpdate, updateQuotation } from "../../services/QuotationService";
 import Button from "../atoms/Button";
 import FormField from "../molecules/FormField";
 
@@ -136,10 +136,14 @@ const QuotationForm = ({ onClose, onRefresh, quotationToEdit }: QuotationFormPro
             if (quotationToEdit) {
                 const updatedQuotation = { ...quotationToEdit, ...form } as Quotation;
                 await updateQuotation(updatedQuotation);
+                 sendEmailUpdate(updatedQuotation);
+
                 AlertSuccess("Los cambios fueron guardados.");
             } else {
                 const newQuotation = { ...form, date: dateToday, isActive: 1 } as Quotation;
                 await create(newQuotation);
+                 sendEmailCreate(newQuotation);
+
                 AlertSuccess("Cotización creada correctamente.");
             }
             onRefresh();
