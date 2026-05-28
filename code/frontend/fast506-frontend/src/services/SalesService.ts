@@ -36,33 +36,18 @@ export const getUnitsByCatalog = async (idCatalog: number) => { //async llamada 
   return res.json(); //la respuesta se convierte a .json para que react lo pueda utilizar
 }
 
-export const getUnitsByColor = async (
-  idCatalog: number,
-  traction: string
-) => {
-
-  const res = await fetch(
-    `${API_URL}/filteredUnitsByColor?idCatalog=${idCatalog}&traction=${traction}`
-  );
-
+export const getUnitsByColor = async (idCatalog: number, traction: string) => {
+  const res = await fetch(`${API_URL}/filteredUnitsByColor?idCatalog=${idCatalog}&traction=${traction}`);
   const data = await res.json();
-
   console.log("API COLORS:", data);
-
-  // Si el backend devuelve directamente []
   if (Array.isArray(data)) {
     return data;
   }
-
-  // Si devuelve { data: [] }
   if (Array.isArray(data.data)) {
     return data.data;
   }
-
-  // Si devuelve { units: [] }
   if (Array.isArray(data.units)) {
     return data.units;
   }
-
   return [];
 };

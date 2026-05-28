@@ -8,6 +8,7 @@ import cr.ac.ucr.ie.fast506.domain.Administrator;
 import cr.ac.ucr.ie.fast506.domain.Sales;
 import cr.ac.ucr.ie.fast506.domain.Unit;
 import cr.ac.ucr.ie.fast506.repository.AdministratorRespository;
+import cr.ac.ucr.ie.fast506.repository.CatalogRepository;
 import cr.ac.ucr.ie.fast506.repository.SalesRepository;
 import cr.ac.ucr.ie.fast506.repository.UnitRepository;
 import java.util.List;
@@ -30,28 +31,20 @@ public class SalesService {
     @Autowired
     private AdministratorRespository adminRepository;
 
+    @Autowired
+    private CatalogRepository catalogRepository;
+
     public List<Sales> getAll() {
         return salesRepository.getAll();
     }
 
     public void add(Sales sales) {
         sales.setIsActive(true);
-
-        if (sales.getIdAdmin() > 0) {
-            sales.setSalesStatus("Completada");
-        }
-
-        int total = (int) salesRepository.count() + 1;
-        int month = sales.getTransactionDate().getMonthValue();
-        int day = sales.getTransactionDate().getDayOfMonth();
-
-        int combination = (total * 10000) + (day * 100) + month;
-
-        sales.setInvoiceNumber(combination);
+        setSalesStatus(sales);
+        sales.setInvoiceNumber(generateInvoiceNumber(sales));
         salesRepository.save(sales);
-
         if (sales.getIdCar() != 0 && "Completada".equals(sales.getSalesStatus())) {
-            unitRepository.deleteUnit(sales.getIdCar());
+            processCompletedSale(sales);
         }
     }
 
@@ -71,7 +64,45 @@ public class SalesService {
     }
 
     public List<Unit> filteredUnitsByColor(int idCatalog, String traction) {
-        return salesRepository.filteredUnitsByColor(idCatalog,traction);
+        return salesRepository.filteredUnitsByColor(idCatalog, traction);
+    }
+
+    private void setSalesStatus(Sales sales) {
+        if (sales.getIdAdmin() != null && sales.getIdAdmin() > 0) {
+            sales.setSalesStatus("Completada");
+        } else {
+            sales.setSalesStatus("Pendiente");
+        }
+    }
+
+    private int generateInvoiceNumber(Sales sales) {
+        int year = sales.getTransactionDate().getYear();
+        int month = sales.getTransactionDate().getMonthValue();
+        int day = sales.getTransactionDate().getDayOfMonth();
+        int unique = (int) (System.currentTimeMillis() % 10000);
+        return (year % 100) * 1000000 + month * 10000 + day * 100 + unique;
+    }
+
+    private void processCompletedSale(Sales sales) {
+
+        unitRepository.deleteUnit(sales.getIdCar());
+
+        unitRepository.flush();
+
+        int total = catalogRepository.countUnitsByCatalog(
+                sales.getIdCatalog()
+        );
+
+        System.out.println("TOTAL: " + total);
+
+        if (total == 0) {
+
+            catalogRepository.deleteCatalog(
+                    sales.getIdCatalog()
+            );
+
+            System.out.println("CATALOGO ELIMINADO");
+        }
     }
 
 }

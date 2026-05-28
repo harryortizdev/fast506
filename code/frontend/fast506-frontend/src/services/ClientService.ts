@@ -1,4 +1,4 @@
-import { Client } from "../models/Client";
+import { Client } from '../models/Client';
 const API_URL = "http://localhost:8080/api/clients";
 
 // Fetch getAll
@@ -56,4 +56,16 @@ export const updateClient = async (client: Client) => {
 
     return res.text();
 
+};
+
+export const login = async (email: string, password: string): Promise<Client> => {
+  const res = await fetch(`${API_URL}/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (!res.ok) throw new Error("Credenciales inválidas");
+
+  return res.json();
 };

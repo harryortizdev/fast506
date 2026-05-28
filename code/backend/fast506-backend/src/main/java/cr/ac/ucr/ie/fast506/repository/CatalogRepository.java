@@ -13,6 +13,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -39,4 +40,6 @@ public interface CatalogRepository extends JpaRepository<Catalog, Integer> {
     @Query(value = "call db_fast506.getColorsByCatalog(:idCatalog)", nativeQuery = true)
     List<ColorUnit> getColorByCatalog(@Param("idCatalog") int idCatalog);
 
+    @Procedure(procedureName = "countUnitsByCatalog")//para los que traen out
+    int countUnitsByCatalog(@Param("p_idCatalog") int idCatalog);
 }

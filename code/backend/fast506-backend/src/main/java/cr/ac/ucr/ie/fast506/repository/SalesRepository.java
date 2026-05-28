@@ -26,13 +26,15 @@ public interface SalesRepository extends JpaRepository<Sales, Integer> {
 
     @Modifying
     @Transactional
-    @Query(value = "call db_fast506.deleteSales(:idSales)", nativeQuery = true)
-    void deleteSales(@Param("id_Sales") Integer idSales);
+    @Query(value = "call db_fast506.deleteSales(:id_Sales)", nativeQuery = true)
+    void deleteSales(@Param("id_Sales") Integer id_Sales);
 
     @Query(value = "call db_fast506.getUnitsByCatalog(:id_Catalog)", nativeQuery = true)
     List<Unit> filteredUnitsByCatalog(@Param("id_Catalog") int id_Catalog);
     
     @Query(value = "call db_fast506.getColorsByCatalogAndTraction(:id_Catalog, :traction)", nativeQuery = true)
     List<Unit> filteredUnitsByColor(@Param("id_Catalog") int id_Catalog, @Param("traction") String traction);
+    
   
 }
+    
