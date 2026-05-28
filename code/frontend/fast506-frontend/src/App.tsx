@@ -15,6 +15,10 @@ import QuotationPage from "./pages/QuotationPage";
 import CreateQuotation from "./pages/CreateQuotation";
 import AdPage from "./pages/AdPage";
 import SalesPage from "./pages/SalesPage";
+import WorkshopSchedulePage from "./pages/WorkshopSchedulePage";
+import CreateWorkshopSchedule from "./pages/CreateWorkshopSchedule";
+import RepairReportPage from "./pages/RepairReportPage";
+
 
 function App() {
   return (
@@ -36,6 +40,10 @@ function App() {
         <Route path="/admin/ad" element={<AdPage />} />
         <Route path="/catalog/detail/:id" element={<CatalogDetailPage />} />
         <Route path="/admin/sales" element={<SalesPage />} />
+        <Route path="/admin/repair-reports" element={<RepairReportPage />} />
+        <Route path="/workshop-schedules/create" element={<CreateWorkshopSchedule />} />
+        <Route path="/admin/workshop-schedules" element={<WorkshopSchedulePage />} />
+        
       </Routes>
     </BrowserRouter>
   );

@@ -2379,6 +2379,9 @@ DELIMITER ;
 
 
 
+SELECT * FROM client;
+SELECT * FROM branch;
+
 -- 27/05/2026 Creacion de la tabla de indormes de reparacion-Nolan
 
 CREATE TABLE repair_reports (

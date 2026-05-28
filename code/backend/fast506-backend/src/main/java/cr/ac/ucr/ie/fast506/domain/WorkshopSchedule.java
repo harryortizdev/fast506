@@ -41,10 +41,6 @@ public class WorkshopSchedule {
     @Column(name = "is_active")
     private boolean isActive;
 
-    public WorkshopSchedule() {
-    }
-
-
     public int getIdAppointment() {
         return idAppointment;
     }

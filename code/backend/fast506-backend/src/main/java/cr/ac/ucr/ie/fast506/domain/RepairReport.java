@@ -47,27 +47,6 @@ public class RepairReport {
     @Column(name = "is_active")
     private boolean isActive;
 
-    public RepairReport() {
-    }
-
-    public RepairReport(int idReparation, int numberReference,
-            String technicalDiagnosis, String spareParts,
-            String observations, double cost, double taxes,
-            double totalPayment, Date completionDate,
-            int idMechanic, boolean isActive) {
-
-        this.idReparation = idReparation;
-        this.numberReference = numberReference;
-        this.technicalDiagnosis = technicalDiagnosis;
-        this.spareParts = spareParts;
-        this.observations = observations;
-        this.cost = cost;
-        this.taxes = taxes;
-        this.totalPayment = totalPayment;
-        this.completionDate = completionDate;
-        this.idMechanic = idMechanic;
-        this.isActive = isActive;
-    }
 
     public int getIdReparation() {
         return idReparation;
