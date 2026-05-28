@@ -2,13 +2,16 @@ import React from "react";
 import Navbar from "../components/organisms/Navbar";
 import Footer from "../components/organisms/Footer";
 import ClientQuotationForm from "../components/organisms/QuotationClientForm";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const CreateQuotation = () => {
   const navigate = useNavigate();
+  const location = useLocation(); 
+  const idCatalog = location.state?.idCatalog;
 
   const handleAction = () => {
     navigate("/"); 
+    
   };
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", backgroundColor: "#EEF1EF" }}>
@@ -24,6 +27,7 @@ const CreateQuotation = () => {
             <ClientQuotationForm 
               onClose={handleAction} 
               onRefresh={handleAction} 
+              idCatalog={idCatalog}
             />
 
           </div>

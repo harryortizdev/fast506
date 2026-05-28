@@ -16,11 +16,17 @@ const SupplierPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [supplierToEdit, setSupplierToEdit] = useState<Supplier | undefined>(undefined);
 
-  const loadSuppliers = async () => {
+const loadSuppliers = async () => {
+  try {
     const data = await getAll();
-    const mapped = data.map((s: any) => ({ ...s, isActive: s.active }));
-    setSuppliers(mapped);
-  };
+    console.log("SupplierPage data:", data);
+
+    setSuppliers(Array.isArray(data) ? data : []);
+  } catch (error) {
+    console.error("Error cargando suppliers:", error);
+    setSuppliers([]);
+  }
+};
 
   useEffect(() => {
     loadSuppliers();

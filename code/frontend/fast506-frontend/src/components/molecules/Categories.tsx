@@ -3,6 +3,8 @@ import { CategoriesCatalog } from "../../models/CategoriesCatalog";
 import { Catalog } from "../../models/Catalog";
 import { getCatalogByBodyWork } from "../../services/CatalogService";
 import CardWithButton from "./CardWithButton";
+import { useNavigate } from "react-router-dom";
+
 
 interface CategoriesProps {
   categories: CategoriesCatalog[];
@@ -17,6 +19,8 @@ const Categories = ({
 }: CategoriesProps) => {
   const [catalogs, setCatalogs] = useState<Catalog[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     if (selectedCategory) {
@@ -100,8 +104,7 @@ const Categories = ({
               image={`http://localhost:8080/${catalog.image}`}
               model={catalog.carName}
               price={catalog.basePrice}
-              onCotizar={() => console.log(`Cotizar: ${catalog.carName}`)}
-            />
+              onCotizar={() => navigate("/quotation", { state: { idCatalog: catalog.idCatalog } })} />
           ))}
         </div>
       )}

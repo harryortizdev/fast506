@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+
 import { Catalog } from "../models/Catalog";
 import { getCatalogById, getColorByCatalog } from "../services/CatalogService";
+
 import Footer from "../components/organisms/Footer";
 import Navbar from "../components/organisms/Navbar";
+
 import ButtonIcon from "../components/molecules/ButtonIcon";
+
 import Image from "../components/atoms/Image";
 import Label from "../components/atoms/Label";
 import Icon from "../components/atoms/Icon";
@@ -37,7 +41,7 @@ const CatalogDetailPage = () => {
 
     if (!catalog) return null;
 
-    const whatsappNumber = "50600000000";
+    const whatsappNumber = "50661186130";
     const whatsappMsg = encodeURIComponent(`Hola, me interesa el ${catalog.carName}`);
 
     const specs = [
@@ -68,7 +72,6 @@ const CatalogDetailPage = () => {
 
             <div style={{ minHeight: "100vh", backgroundColor: "#EEF1EF" }}>
 
-                {/* Imagen principal */}
                 <div style={{
                     width: "100%",
                     maxHeight: "500px",
@@ -96,7 +99,6 @@ const CatalogDetailPage = () => {
                     padding: "clamp(16px, 4vw, 48px) clamp(16px, 6vw, 80px)",
                 }}>
 
-                    {/* Encabezado + panel de contacto */}
                     <div style={{
                         display: "flex",
                         flexWrap: "wrap",
@@ -117,7 +119,6 @@ const CatalogDetailPage = () => {
                             </p>
                         </div>
 
-                        {/* Panel de contacto */}
                         <div style={{
                             border: "1px solid #e0e0e0",
                             borderRadius: "8px",
@@ -156,8 +157,26 @@ const CatalogDetailPage = () => {
                                 hoverColor="#2C3E50"
                                 className="btn w-100"
                                 style={{ borderRadius: "4px", padding: "10px 0" }}
-                                icon={<i className="bi bi-tag" />}
-                                onClick={() => console.log(`Cotizar: ${catalog.carName}`)}
+                                icon={<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" className="bi bi-tag" viewBox="0 0 16 16">
+                                    <path d="M6 4.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m-1 0a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0" />
+                                    <path d="M2 1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 1 6.586V2a1 1 0 0 1 1-1m0 5.586 7 7L13.586 9l-7-7H2z" />
+                                </svg>}
+                                onClick={() => navigate("/quotation", { state: { idCatalog: Number(id) } })}
+
+                            />
+
+                            <ButtonIcon
+                                label="Testdrive"
+
+                                color="#1A2633"
+                                backgroundColor="#EEF1EF"
+                                hoverColor="#A9B4C2 "
+
+                                className="btn w-100"
+                                style={{ borderRadius: "4px", padding: "10px 0" }}
+                                icon={ <i  className="bi bi-cone-striped"/>}
+                                onClick={() => navigate("/testdrive", { state: { carName: catalog.carName } })}
+
                             />
 
                             <ButtonIcon
@@ -167,13 +186,12 @@ const CatalogDetailPage = () => {
                                 hoverColor="#2C3E50"
                                 className="btn w-100"
                                 style={{ borderRadius: "4px", padding: "10px 0" }}
-                                icon={<i className="bi bi-cart" />}
+                                icon={<i className="bi bi-cart2 text-white" />}
                                 onClick={() => navigate("/catalog/client/sales", { state: { idCatalog: catalog.idCatalog } })}
                             />
                         </div>
                     </div>
 
-                    {/* Colores */}
                     <h2 style={{ color: "#1A2633", fontWeight: 700, marginBottom: "16px", fontSize: "clamp(20px, 3vw, 28px)" }}>
                         <Label label="Colores" color="#1A2633" />
                     </h2>
@@ -188,7 +206,6 @@ const CatalogDetailPage = () => {
                         ))}
                     </div>
 
-                    {/* Especificaciones */}
                     <h2 style={{ color: "#1A2633", fontWeight: 700, marginBottom: "16px", fontSize: "clamp(20px, 3vw, 28px)" }}>
                         <Label label="Especificaciones" color="#1A2633" />
                     </h2>
@@ -217,7 +234,6 @@ const CatalogDetailPage = () => {
                         ))}
                     </div>
 
-                    {/* Descripción técnica */}
                     {catalog.technicalDescription && (
                         <div style={{
                             backgroundColor: "#EEF1EF",

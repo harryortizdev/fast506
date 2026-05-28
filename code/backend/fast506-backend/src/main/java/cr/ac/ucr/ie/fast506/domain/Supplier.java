@@ -1,23 +1,46 @@
 package cr.ac.ucr.ie.fast506.domain;
 
+import jakarta.persistence.*;
+import java.io.Serializable;
 
-public class Supplier {
+@Entity
+@Table(name = "supplier")
+public class Supplier implements Serializable {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_supplier")
     private int idSupplier;
+
+    @Column(name = "name")
     private String name;
+
+    @Column(name = "company_name")
     private String companyName;
+
+    @Column(name = "legal_name")
     private String legalName;
+
+    @Column(name = "support_phone")
     private String supportPhone;
+
+    @Column(name = "bussines_contact_name")
     private String bussinesContactName;
+
+    @Column(name = "email")
     private String email;
+
+    @Column(name = "ubicacion")
     private String ubicacion;
+
+    @Column(name = "is_active")
     private boolean isActive;
+
+    @Column(name = "admin_id")
     private int adminId;
 
-   
-
-     public Supplier(){}
-
+    
+    
     public int getIdSupplier() {
         return idSupplier;
     }
@@ -73,7 +96,7 @@ public class Supplier {
     public void setEmail(String email) {
         this.email = email;
     }
-
+    
     public String getUbicacion() {
         return ubicacion;
     }
@@ -97,6 +120,4 @@ public class Supplier {
     public void setAdminId(int adminId) {
         this.adminId = adminId;
     }
-
-
 }

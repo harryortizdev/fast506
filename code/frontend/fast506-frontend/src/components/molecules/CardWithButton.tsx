@@ -1,5 +1,7 @@
 import Label from "../atoms/Label";
 import Image from "../atoms/Image";
+import { useNavigate } from "react-router-dom";
+import { key } from "ionicons/icons";
 
 
 interface CardProps {
@@ -9,10 +11,13 @@ interface CardProps {
     onCotizar?: () => void;
 }
 
+
 const CardWithButton = ({ image, model, price, onCotizar }: CardProps) => {
+    const navigate = useNavigate();
+
     return (
-        <div className="card border-0" style={{ width: "11rem", backgroundColor: "#EEF1EF"}}>
-          <img
+        <div className="card border-0" style={{ width: "11rem", backgroundColor: "#EEF1EF" }}>
+            <img
                 src={image}
                 className="card-img-top"
                 alt={model}
@@ -34,11 +39,8 @@ const CardWithButton = ({ image, model, price, onCotizar }: CardProps) => {
                     <Label label={`$${price.toLocaleString()}`} color="#6c757d" />
                 </p>
                 <a
-                    href="#"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        onCotizar?.();
-                    }}
+                    onClick={onCotizar}
+
                     style={{
                         color: "#2C3E50",
                         textDecoration: "none",
