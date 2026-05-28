@@ -78,9 +78,9 @@ const Navbar = () => {
               </li>
 
               <li className="nav-item">
-                <a className="nav-link magic-link" href="#">
+                <NavLink className="nav-link magic-link" to="/workshop-schedules/create">
                   CITAS TALLER
-                </a>
+                </NavLink>
               </li>
 
               <li className="nav-item">
@@ -100,11 +100,13 @@ const Navbar = () => {
                   <li><Link className="dropdown-item" to="/admin/clients">CLIENTES</Link></li>
                   <li><Link className="dropdown-item" to="/admin/quotations">COTIZACIONES</Link></li>
                   <li><Link className="dropdown-item" to="/admin/mechanics">MECÁNICOS</Link></li>
+                  <li><Link className="dropdown-item" to="/admin/repair-reports">REPORTES DE REPARACIÓN</Link></li>
                   <li><Link className="dropdown-item" to="/admin/suppliers">PROVEEDORES</Link></li>
                   <li><Link className="dropdown-item" to="/admin/branches">SUCURSALES</Link></li>
                   <li><Link className="dropdown-item" to="/admin/testdrive">TESTDRIVE</Link></li>
                   <li><Link className="dropdown-item" to="/admin/units">UNIDADES</Link></li>
                   <li><Link className="dropdown-item" to="/admin/sales">VENTAS</Link></li>
+                  <li><Link className="dropdown-item" to="/admin/workshop-schedules">CITAS TALLER</Link></li>
 
                 </ul>
               </li>

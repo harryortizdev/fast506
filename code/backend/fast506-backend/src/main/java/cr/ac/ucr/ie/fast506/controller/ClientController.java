@@ -3,6 +3,7 @@ package cr.ac.ucr.ie.fast506.controller;
 import cr.ac.ucr.ie.fast506.domain.Client;
 import cr.ac.ucr.ie.fast506.service.ClientService;
 import java.util.LinkedList;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -81,6 +82,19 @@ public class ClientController {
 
         }
 
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
+        String email = credentials.get("email");
+        String password = credentials.get("password");
+
+        Client admin = clientService.findByEmailAndPassword(email, password);
+
+        if (admin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
+        }
+        return ResponseEntity.ok(admin);
     }
 
 }

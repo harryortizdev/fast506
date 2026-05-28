@@ -2225,3 +2225,73 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+-- sp de login client
+
+DELIMITER $$
+
+CREATE PROCEDURE getClientByCredentials(IN p_email VARCHAR(255), IN p_password VARCHAR(255))
+BEGIN
+    SELECT 
+        u.id_user,
+        u.name,
+        u.id,
+        u.email,
+        u.password,
+        u.phone_number,
+        u.date_birth,
+        u.profile_image,
+        u.is_active,
+        comm_interest,
+        physical_address,
+        occupation
+    FROM users u 
+    INNER JOIN db_fast506.client c  ON u.id_user = c.id_user 
+    WHERE u.email = p_email 
+    AND u.password = p_password;
+END$$
+
+DELIMITER ;
+
+-- sp para contar unidades por catalogo
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS countUnitsByCatalog$$
+
+CREATE PROCEDURE countUnitsByCatalog(
+    IN p_idCatalog INT,
+    OUT p_total INT
+)
+BEGIN
+
+    SELECT COUNT(*) INTO p_total
+    FROM units u
+    INNER JOIN catalogs c ON 
+        u.car_brand = c.brand_name 
+        AND u.car_name = c.car_name 
+        AND u.year_Manufacture = c.year_manufacture
+        AND u.body_work = c.body_work
+        AND (
+            CASE 
+                WHEN u.transmission IN ('Automático', 'CVT')
+                THEN 'Automático'
+                ELSE u.transmission
+            END
+        ) = c.transmission
+        AND (
+            CASE 
+                WHEN u.fuel_type IN ('Gasolina', 'Diesel')
+                THEN 'Combustible'
+                ELSE u.fuel_type
+            END
+        ) = c.fuel_type
+
+    WHERE c.id_catalog = p_idCatalog
+    AND u.is_active = 1;
+
+END$$
+
+DELIMITER ;
+
+

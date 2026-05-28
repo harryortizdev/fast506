@@ -1,0 +1,266 @@
+import { useState, useEffect } from "react";
+import { WorkshopSchedule } from "../../models/WorkshopSchedule";
+import { create, updateWorkshopSchedule } from "../../services/WorkshopScheduleService";
+import { getAll as getAllClients } from "../../services/ClientService";
+import { getAll as getAllBranches } from "../../services/BranchService";
+import { Client } from "../../models/Client";
+import { Branch } from "../../models/Branch";
+import AlertSuccess from "../atoms/AlertSuccess";
+import AlertWarning from "../atoms/AlertWarning";
+import FormField from "../molecules/FormField";
+import Button from "../atoms/Button";
+
+interface WorkshopScheduleFormProps {
+  onClose: () => void;
+  onRefresh: () => void;
+  workshopScheduleToEdit?: WorkshopSchedule;
+}
+
+const WorkshopScheduleForm = ({
+  onClose,
+  onRefresh,
+  workshopScheduleToEdit,
+}: WorkshopScheduleFormProps) => {
+  const [form, setForm] = useState<Partial<WorkshopSchedule>>(
+    workshopScheduleToEdit || { isActive: true }
+  );
+
+  const [errors, setErrors] = useState<Partial<Record<keyof WorkshopSchedule, string>>>({});
+  const [clients, setClients] = useState<Client[]>([]);
+  const [branches, setBranches] = useState<Branch[]>([]);
+  const [loadingClients, setLoadingClients] = useState(true);
+  const [loadingBranches, setLoadingBranches] = useState(true);
+
+  useEffect(() => {
+    const loadClients = async () => {
+      try {
+        const data = await getAllClients();
+        setClients(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Error cargando clientes:", error);
+        setClients([]);
+      } finally {
+        setLoadingClients(false);
+      }
+    };
+
+    const loadBranches = async () => {
+      try {
+        const data = await getAllBranches();
+        setBranches(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Error cargando sucursales:", error);
+        setBranches([]);
+      } finally {
+        setLoadingBranches(false);
+      }
+    };
+
+    loadClients();
+    loadBranches();
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+
+    setForm({
+      ...form,
+      [name]:
+        name === "numberReference" ||
+        name === "receptionMileage" ||
+        name === "idClient" ||
+        name === "idBranch"
+          ? Number(value)
+          : value,
+    });
+
+    setErrors({
+      ...errors,
+      [name]: "",
+    });
+  };
+
+  const validate = (): boolean => {
+    const newErrors: Partial<Record<keyof WorkshopSchedule, string>> = {};
+
+    if (!form.numberReference || form.numberReference <= 0) {
+      newErrors.numberReference = "El número de referencia es requerido.";
+    }
+
+    if (!form.licensePlate || form.licensePlate.trim() === "" || form.licensePlate.length > 20) {
+      newErrors.licensePlate = "Placa inválida: no puede estar vacía, máximo 20 caracteres.";
+    }
+
+    if (!form.entryDate) {
+      newErrors.entryDate = "La fecha de ingreso es requerida.";
+    }
+
+    if (!form.reasonService || form.reasonService.trim() === "" || form.reasonService.length > 500) {
+      newErrors.reasonService = "Motivo inválido: no puede estar vacío, máximo 500 caracteres.";
+    }
+
+    if (form.receptionMileage === undefined || form.receptionMileage < 0) {
+      newErrors.receptionMileage = "El kilometraje no puede ser negativo.";
+    }
+
+    if (!form.idClient || form.idClient <= 0) {
+      newErrors.idClient = "Debe ingresar un cliente válido.";
+    }
+
+    if (!form.idBranch || form.idBranch <= 0) {
+      newErrors.idBranch = "Debe ingresar una sucursal válida.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async () => {
+    if (!validate()) return;
+
+    try {
+      const dataToSend: any = {
+        idAppointment: form.idAppointment,
+        numberReference: Number(form.numberReference),
+        licensePlate: form.licensePlate,
+        entryDate: form.entryDate,
+        reasonService: form.reasonService,
+        receptionMileage: Number(form.receptionMileage),
+        idClient: Number(form.idClient),
+        idBranch: Number(form.idBranch),
+        active: form.isActive,
+      };
+
+      if (workshopScheduleToEdit) {
+        await updateWorkshopSchedule(dataToSend as WorkshopSchedule);
+        AlertSuccess("Cita de taller actualizada correctamente.");
+      } else {
+        await create(dataToSend as WorkshopSchedule);
+        AlertSuccess("Cita de taller creada correctamente.");
+      }
+
+      onRefresh();
+      onClose();
+    } catch (error) {
+      AlertWarning("Error al guardar la cita de taller.");
+      console.error("Error al guardar cita:", error);
+    }
+  };
+
+  return (
+    <div className="container d-flex justify-content-center">
+      <div className="card p-4 shadow-sm" style={{ maxWidth: "500px", width: "100%" }}>
+        <h3 className="text-center mb-4">
+          {workshopScheduleToEdit ? "Editar Cita de Taller" : "Nueva Cita de Taller"}
+        </h3>
+
+        <FormField
+          label="Número de Referencia:"
+          name="numberReference"
+          value={form.numberReference?.toString() || ""}
+          onChange={handleChange}
+          type="number"
+        />
+        {errors.numberReference && <div className="invalid-feedback d-block">{errors.numberReference}</div>}
+
+        <FormField
+          label="Placa:"
+          name="licensePlate"
+          value={form.licensePlate || ""}
+          onChange={handleChange}
+        />
+        {errors.licensePlate && <div className="invalid-feedback d-block">{errors.licensePlate}</div>}
+
+        <FormField
+          label="Fecha de Ingreso:"
+          name="entryDate"
+          value={form.entryDate || ""}
+          onChange={handleChange}
+          type="date"
+        />
+        {errors.entryDate && <div className="invalid-feedback d-block">{errors.entryDate}</div>}
+
+        <FormField
+          label="Motivo del Servicio:"
+          name="reasonService"
+          value={form.reasonService || ""}
+          onChange={handleChange}
+        />
+        {errors.reasonService && <div className="invalid-feedback d-block">{errors.reasonService}</div>}
+
+        <FormField
+          label="Kilometraje:"
+          name="receptionMileage"
+          value={form.receptionMileage?.toString() || ""}
+          onChange={handleChange}
+          type="number"
+        />
+        {errors.receptionMileage && <div className="invalid-feedback d-block">{errors.receptionMileage}</div>}
+
+        <div className="mb-3">
+          <label className="form-label">Cliente:</label>
+          <select
+            name="idClient"
+            value={form.idClient?.toString() || ""}
+            onChange={handleChange}
+            className={`form-control ${errors.idClient ? "is-invalid" : ""}`}
+            disabled={loadingClients}
+          >
+            <option value="">
+              {loadingClients ? "Cargando clientes..." : "Seleccionar cliente"}
+            </option>
+{clients.map((client) => (
+  <option key={client.idUser} value={client.idUser}>
+    {client.name || `Cliente #${client.idUser}`}
+  </option>
+))}
+          </select>
+          {errors.idClient && <div className="invalid-feedback d-block">{errors.idClient}</div>}
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Sucursal:</label>
+          <select
+            name="idBranch"
+            value={form.idBranch?.toString() || ""}
+            onChange={handleChange}
+            className={`form-control ${errors.idBranch ? "is-invalid" : ""}`}
+            disabled={loadingBranches}
+          >
+            <option value="">
+              {loadingBranches ? "Cargando sucursales..." : "Seleccionar sucursal"}
+            </option>
+            {branches.map((branch) => (
+              <option key={branch.idBranch} value={branch.idBranch}>
+                {branch.name || `Sucursal #${branch.idBranch}`}
+              </option>
+            ))}
+          </select>
+          {errors.idBranch && <div className="invalid-feedback d-block">{errors.idBranch}</div>}
+        </div>
+
+        <div className="text-center mt-4">
+          <Button
+            label="Guardar"
+            onClick={handleSubmit}
+            backgroundColor="#198754"
+            hoverColor="#145c32"
+            color="#fff"
+            className="btn btn-success me-2"
+          />
+
+          <Button
+            label="Cancelar"
+            onClick={onClose}
+            backgroundColor="#6c757d"
+            hoverColor="#495057"
+            color="#fff"
+            className="btn btn-secondary"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default WorkshopScheduleForm;

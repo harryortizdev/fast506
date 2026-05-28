@@ -1,23 +1,24 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Catalog } from ".././models/Catalog";
-import { getCatalogById, getColorByCatalog } from ".././services/CatalogService";
-import Image from ".././components/atoms/Image";
-import ButtonIcon from ".././components/molecules/ButtonIcon";
-import Label from ".././components/atoms/Label";
-import Icon from ".././components/atoms/Icon";
+
+import { Catalog } from "../models/Catalog";
+import { getCatalogById, getColorByCatalog } from "../services/CatalogService";
+
 import Footer from "../components/organisms/Footer";
 import Navbar from "../components/organisms/Navbar";
 
+import ButtonIcon from "../components/molecules/ButtonIcon";
 
+import Image from "../components/atoms/Image";
+import Label from "../components/atoms/Label";
+import Icon from "../components/atoms/Icon";
 
 const CatalogDetailPage = () => {
     const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
     const [catalog, setCatalog] = useState<Catalog | null>(null);
     const [loading, setLoading] = useState(true);
     const [colors, setColors] = useState<string[]>([]);
-    const navigate = useNavigate();
-
 
     useEffect(() => {
         if (id) {
@@ -53,50 +54,22 @@ const CatalogDetailPage = () => {
     ];
 
     const getColor = (color: string) => {
-
         const value = color.toLowerCase();
-
-        if (value.includes("blanco")) {
-            return "white";
-        }
-
-        if (value.includes("negro")) {
-            return "black";
-        }
-
-        if (value.includes("gris")) {
-            return "gray";
-        }
-
-        if (value.includes("azul")) {
-            return "blue";
-        }
-
-        if (value.includes("rojo")) {
-            return "red";
-        }
-
-        if (value.includes("verde")) {
-            return "green";
-        }
-
-        if (value.includes("plateado")) {
-            return "silver";
-        }
-
-        if (
-            value.includes("cafe") ||
-            value.includes("marron")
-        ) {
-            return "brown";
-        }
-
+        if (value.includes("blanco")) return "white";
+        if (value.includes("negro")) return "black";
+        if (value.includes("gris")) return "gray";
+        if (value.includes("azul")) return "blue";
+        if (value.includes("rojo")) return "red";
+        if (value.includes("verde")) return "green";
+        if (value.includes("plateado")) return "silver";
+        if (value.includes("cafe") || value.includes("marron")) return "brown";
         return "lightgray";
     };
 
     return (
         <>
             <Navbar />
+
             <div style={{ minHeight: "100vh", backgroundColor: "#EEF1EF" }}>
 
                 <div style={{
@@ -161,6 +134,7 @@ const CatalogDetailPage = () => {
                             <p style={{ fontWeight: 600, color: "#1A2633", fontSize: "15px", margin: 0, textAlign: "center" }}>
                                 <Label label="Contáctanos" color="#1A2633" />
                             </p>
+
                             <ButtonIcon
                                 label="WhatsApp"
                                 color="#EEF1EF"
@@ -175,6 +149,7 @@ const CatalogDetailPage = () => {
                                 }
                                 onClick={() => window.open(`https://wa.me/${whatsappNumber}?text=${whatsappMsg}`, "_blank")}
                             />
+
                             <ButtonIcon
                                 label="Cotizar"
                                 color="#EEF1EF"
@@ -195,13 +170,24 @@ const CatalogDetailPage = () => {
 
                                 color="#1A2633"
                                 backgroundColor="#EEF1EF"
-                                hoverColor="A9B4C2 "
+                                hoverColor="#A9B4C2 "
 
                                 className="btn w-100"
                                 style={{ borderRadius: "4px", padding: "10px 0" }}
                                 icon={ <i  className="bi bi-cone-striped"/>}
                                 onClick={() => navigate("/testdrive", { state: { carName: catalog.carName } })}
 
+                            />
+
+                            <ButtonIcon
+                                label="Comprar"
+                                color="#EEF1EF"
+                                backgroundColor="#1A2633"
+                                hoverColor="#2C3E50"
+                                className="btn w-100"
+                                style={{ borderRadius: "4px", padding: "10px 0" }}
+                                icon={<i className="bi bi-cart2 text-white" />}
+                                onClick={() => navigate("/catalog/client/sales", { state: { idCatalog: catalog.idCatalog } })}
                             />
                         </div>
                     </div>
@@ -264,6 +250,7 @@ const CatalogDetailPage = () => {
 
                 </div>
             </div>
+
             <Footer />
         </>
     );
