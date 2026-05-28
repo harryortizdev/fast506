@@ -186,7 +186,7 @@ const CatalogDetailPage = () => {
                                 hoverColor="#2C3E50"
                                 className="btn w-100"
                                 style={{ borderRadius: "4px", padding: "10px 0" }}
-                                icon={<i className="bi bi-cart2 text-white" />}
+                                icon={<i className="bi bi-cart2 text-white  " />}
                                 onClick={() => navigate("/catalog/client/sales", { state: { idCatalog: catalog.idCatalog } })}
                             />
                         </div>
