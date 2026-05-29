@@ -964,7 +964,7 @@ DROP procedure IF EXISTS `getAllUnits`;
 -- Procedimiento para obtener todas las units donde is_active = 1
 DELIMITER $$
 USE `db_fast506`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `getAllUnits`()
+CREATE PROCEDURE `getAllUnits`()
 BEGIN
 	SELECT 
         id_car,
@@ -1071,7 +1071,7 @@ DROP procedure IF EXISTS `findUnitByVIN`;
 
 DELIMITER $$
 USE `db_fast506`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `findUnitByVIN`(IN p_VIN VARCHAR(17))
+CREATE  PROCEDURE `findUnitByVIN`(IN p_VIN VARCHAR(17))
 BEGIN
 	SELECT 
         id_car,
@@ -1285,7 +1285,7 @@ DROP procedure IF EXISTS `db_fast506`.`createBranch`;
 
 DELIMITER $$
 USE `db_fast506`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `createBranch`(
+CREATE  PROCEDURE `createBranch`(
 in nameB varchar(50),
 in ubicationb varchar(100),
 in directionB varchar (100),
@@ -1312,7 +1312,7 @@ DROP procedure IF EXISTS `db_fast506`.`getAllBranch`;
 
 DELIMITER $$
 USE `db_fast506`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `getAllBranch`()
+CREATE PROCEDURE `getAllBranch`()
 BEGIN
 SELECT id_Branch ,name ,ubication , direction ,branch_Phone_Number , operation_Schedule, coordinates ,id_user FROM Branch Where id_Active = 1;
 END$$
@@ -1331,7 +1331,7 @@ DROP procedure IF EXISTS `db_fast506`.`updateBranch`;
 
 DELIMITER $$
 USE `db_fast506`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `updateBranch`(
+CREATE PROCEDURE `updateBranch`(
 in id_BranchB int,
 in nameB varchar(50),
 in ubicationb varchar(100),
@@ -1380,7 +1380,7 @@ DROP procedure IF EXISTS `db_fast506`.`getAllBranch`;
 
 DELIMITER $$
 USE `db_fast506`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `getAllBranch`()
+CREATE  PROCEDURE `getAllBranch`()
 BEGIN
 SELECT id_Branch ,name ,ubication , direction ,branch_Phone_Number , operation_Schedule, id_active, coordinates ,id_user FROM Branch Where id_Active = 1;
 END$$
@@ -1504,7 +1504,7 @@ select * from catalogs;
 -- sp getAllCatalog 
 DELIMITER $$
 USE `db_fast506`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `getAllCatalogs`()
+CREATE PROCEDURE `getAllCatalogs`()
 BEGIN
     SELECT 
         id_catalog,
@@ -1559,7 +1559,7 @@ DELIMITER ;
 
 DELIMITER $$
 USE `db_fast506`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `deleteCatalog`(
+CREATE  PROCEDURE `deleteCatalog`(
     IN p_idCatalog INT
 )
 BEGIN
@@ -1606,7 +1606,7 @@ VALUES
 -- procedimiento para agrupar y comparar catalogos on unidades disponibles, este une las unidades por ciertos atributos y facilita para hacer un catalogo
 DELIMITER $$
 USE `db_fast506`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `units_groud_exists`()
+CREATE  PROCEDURE `units_groud_exists`()
 BEGIN
     SELECT 
         u.car_brand,
@@ -1667,7 +1667,7 @@ DROP procedure IF EXISTS `db_fast506`.`getOccupiedHoursByDate`;
 
 DELIMITER $$
 USE `db_fast506`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `getOccupiedHoursByDate`(IN scheduled_dateS DATE, IN id_branchP INT)
+CREATE  PROCEDURE `getOccupiedHoursByDate`(IN scheduled_dateS DATE, IN id_branchP INT)
 BEGIN
     SELECT DATE_FORMAT(initiation_Time, '%H:%i') AS occupied_hour
     FROM testdrive
@@ -1699,7 +1699,7 @@ DELIMITER ;
 -- Seleccionar segun su bodywork
 DELIMITER $$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `getCatalogsByBodyWork`(
+CREATE  PROCEDURE `getCatalogsByBodyWork`(
 	IN p_body_work VARCHAR(100)
     )
 BEGIN
@@ -2155,7 +2155,7 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `getColorsByCatalogAndTraction`(
+CREATE  PROCEDURE `getColorsByCatalogAndTraction`(
     IN idCatalogC INT,
     IN tractionC VARCHAR(50)
 )
