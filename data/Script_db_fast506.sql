@@ -2294,4 +2294,410 @@ END$$
 
 DELIMITER ;
 
+-- 27/05/2026 Creacion de la tabla de agendas del taller-Nolan
+CREATE TABLE workshop_schedule (
 
+    id_appointment INT AUTO_INCREMENT PRIMARY KEY,
+
+    number_reference INT NOT NULL,
+
+    license_plate VARCHAR(20) NOT NULL,
+
+    entry_date DATE NOT NULL,
+
+    reason_service VARCHAR(500) NOT NULL,
+
+    reception_mileage INT NOT NULL,
+
+    id_client INT NOT NULL,
+
+    id_branch INT NOT NULL,
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+
+    CONSTRAINT fk_workshop_client
+        FOREIGN KEY (id_client)
+        REFERENCES client(id_user),
+
+    CONSTRAINT fk_workshop_branch
+        FOREIGN KEY (id_branch)
+        REFERENCES branch(id_Branch)
+);
+
+-- Se crearon tambien los procedimientos necesarios (insert,delete,deactive, update, getAll, findById)
+
+DROP PROCEDURE IF EXISTS insertWorkshopSchedule;
+
+DELIMITER $$
+CREATE PROCEDURE insertWorkshopSchedule(
+    IN p_number_reference INT,
+    IN p_license_plate VARCHAR(20),
+    IN p_entry_date DATE,
+    IN p_reason_service VARCHAR(500),
+    IN p_reception_mileage INT,
+    IN p_id_client INT,
+    IN p_id_branch INT
+)
+BEGIN
+    INSERT INTO workshop_schedule (
+        number_reference,
+        license_plate,
+        entry_date,
+        reason_service,
+        reception_mileage,
+        id_client,
+        id_branch,
+        is_active
+    )
+    VALUES (
+        p_number_reference,
+        p_license_plate,
+        p_entry_date,
+        p_reason_service,
+        p_reception_mileage,
+        p_id_client,
+        p_id_branch,
+        TRUE
+    );
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS getAllWorkshopSchedules;
+
+DELIMITER $$
+CREATE PROCEDURE getAllWorkshopSchedules()
+BEGIN
+    SELECT
+        id_appointment,
+        number_reference,
+        license_plate,
+        entry_date,
+        reason_service,
+        reception_mileage,
+        id_client,
+        id_branch,
+        is_active
+    FROM workshop_schedule
+    WHERE is_active = TRUE;
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS updateWorkshopSchedule;
+
+DELIMITER $$
+CREATE PROCEDURE updateWorkshopSchedule(
+    IN p_id_appointment INT,
+    IN p_number_reference INT,
+    IN p_license_plate VARCHAR(20),
+    IN p_entry_date DATE,
+    IN p_reason_service VARCHAR(500),
+    IN p_reception_mileage INT,
+    IN p_id_client INT,
+    IN p_id_branch INT
+)
+BEGIN
+    UPDATE workshop_schedule
+    SET
+        number_reference = p_number_reference,
+        license_plate = p_license_plate,
+        entry_date = p_entry_date,
+        reason_service = p_reason_service,
+        reception_mileage = p_reception_mileage,
+        id_client = p_id_client,
+        id_branch = p_id_branch
+    WHERE id_appointment = p_id_appointment
+      AND is_active = TRUE;
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS deactivateWorkshopSchedule;
+
+DELIMITER $$
+CREATE PROCEDURE deactivateWorkshopSchedule(
+    IN p_id_appointment INT
+)
+BEGIN
+    UPDATE workshop_schedule
+    SET is_active = FALSE
+    WHERE id_appointment = p_id_appointment;
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS activateWorkshopSchedule;
+
+DELIMITER $$
+CREATE PROCEDURE activateWorkshopSchedule(
+    IN p_id_appointment INT
+)
+BEGIN
+    UPDATE workshop_schedule
+    SET is_active = TRUE
+    WHERE id_appointment = p_id_appointment;
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS findWorkshopScheduleById;
+
+DELIMITER $$
+CREATE PROCEDURE findWorkshopScheduleById(
+    IN p_id_appointment INT
+)
+BEGIN
+    SELECT
+        id_appointment,
+        number_reference,
+        license_plate,
+        entry_date,
+        reason_service,
+        reception_mileage,
+        id_client,
+        id_branch,
+        is_active
+    FROM workshop_schedule
+    WHERE id_appointment = p_id_appointment;
+END$$
+DELIMITER ;
+
+
+
+SELECT * FROM client;
+SELECT * FROM branch;
+
+-- 27/05/2026 Creacion de la tabla de informes de reparacion-Nolan
+
+CREATE TABLE repair_reports (
+
+    id_reparation INT AUTO_INCREMENT PRIMARY KEY,
+
+    number_reference INT NOT NULL,
+
+    technical_diagnosis VARCHAR(500),
+
+    spare_parts VARCHAR(500),
+
+    observations VARCHAR(500),
+
+    cost DOUBLE NOT NULL,
+
+    taxes DOUBLE NOT NULL,
+
+    total_payment DOUBLE NOT NULL,
+
+    completion_date DATE NOT NULL,
+
+    id_mechanic INT NOT NULL,
+
+    id_appointment INT NOT NULL,
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+
+    CONSTRAINT fk_reparation_mechanic
+        FOREIGN KEY (id_mechanic)
+        REFERENCES mechanic(id_user),
+
+    CONSTRAINT fk_repair_workshop
+        FOREIGN KEY (id_appointment)
+        REFERENCES workshop_schedule(id_appointment)
+);
+
+-- Se crearon tambien los procedimientos necesarios (insert,delete,deactive(borrado logico), update, getAll, findById y tambien getAllWorkshopSchedulesForReports para traer las citas inactivas)
+DROP PROCEDURE IF EXISTS insertRepairReport;
+
+DELIMITER $$
+CREATE PROCEDURE insertRepairReport(
+    IN p_number_reference INT,
+    IN p_technical_diagnosis VARCHAR(500),
+    IN p_spare_parts VARCHAR(500),
+    IN p_observations VARCHAR(500),
+    IN p_cost DOUBLE,
+    IN p_taxes DOUBLE,
+    IN p_total_payment DOUBLE,
+    IN p_completion_date DATE,
+    IN p_id_mechanic INT,
+    IN p_id_appointment INT
+)
+BEGIN
+    INSERT INTO repair_reports (
+        number_reference,
+        technical_diagnosis,
+        spare_parts,
+        observations,
+        cost,
+        taxes,
+        total_payment,
+        completion_date,
+        id_mechanic,
+        id_appointment,
+        is_active
+    )
+    VALUES (
+        p_number_reference,
+        p_technical_diagnosis,
+        p_spare_parts,
+        p_observations,
+        p_cost,
+        p_taxes,
+        p_total_payment,
+        p_completion_date,
+        p_id_mechanic,
+        p_id_appointment,
+        TRUE
+    );
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS getAllRepairReports;
+
+DELIMITER $$
+CREATE PROCEDURE getAllRepairReports()
+BEGIN
+    SELECT
+        id_reparation,
+        number_reference,
+        technical_diagnosis,
+        spare_parts,
+        observations,
+        cost,
+        taxes,
+        total_payment,
+        completion_date,
+        id_mechanic,
+        id_appointment,
+        is_active
+    FROM repair_reports
+    WHERE is_active = TRUE;
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS updateRepairReport;
+
+DELIMITER $$
+CREATE PROCEDURE updateRepairReport(
+    IN p_id_reparation INT,
+    IN p_number_reference INT,
+    IN p_technical_diagnosis VARCHAR(500),
+    IN p_spare_parts VARCHAR(500),
+    IN p_observations VARCHAR(500),
+    IN p_cost DOUBLE,
+    IN p_taxes DOUBLE,
+    IN p_total_payment DOUBLE,
+    IN p_completion_date DATE,
+    IN p_id_mechanic INT,
+    IN p_id_appointment INT
+)
+BEGIN
+    UPDATE repair_reports
+    SET
+        number_reference = p_number_reference,
+        technical_diagnosis = p_technical_diagnosis,
+        spare_parts = p_spare_parts,
+        observations = p_observations,
+        cost = p_cost,
+        taxes = p_taxes,
+        total_payment = p_total_payment,
+        completion_date = p_completion_date,
+        id_mechanic = p_id_mechanic,
+        id_appointment = p_id_appointment
+    WHERE id_reparation = p_id_reparation
+      AND is_active = TRUE;
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS deactivateRepairReport;
+
+DELIMITER $$
+CREATE PROCEDURE deactivateRepairReport(
+    IN p_id_reparation INT
+)
+BEGIN
+    UPDATE repair_reports
+    SET is_active = FALSE
+    WHERE id_reparation = p_id_reparation;
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS activateRepairReport;
+
+DELIMITER $$
+CREATE PROCEDURE activateRepairReport(
+    IN p_id_reparation INT
+)
+BEGIN
+    UPDATE repair_reports
+    SET is_active = TRUE
+    WHERE id_reparation = p_id_reparation;
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS findRepairReportById;
+
+DELIMITER $$
+CREATE PROCEDURE findRepairReportById(
+    IN p_id_reparation INT
+)
+BEGIN
+    SELECT
+        id_reparation,
+        number_reference,
+        technical_diagnosis,
+        spare_parts,
+        observations,
+        cost,
+        taxes,
+        total_payment,
+        completion_date,
+        id_mechanic,
+        id_appointment,
+        is_active
+    FROM repair_reports
+    WHERE id_reparation = p_id_reparation;
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS getAllWorkshopSchedulesForReports;
+
+DELIMITER $$
+
+CREATE PROCEDURE getAllWorkshopSchedulesForReports()
+BEGIN
+    SELECT
+        id_appointment,
+        number_reference,
+        license_plate,
+        entry_date,
+        reason_service,
+        reception_mileage,
+        id_client,
+        id_branch,
+        is_active
+    FROM workshop_schedule;
+END$$
+
+DELIMITER ;
+
+USE db_fast506;
+
+INSERT INTO supplier
+(name, company_name, legal_name, support_phone, bussines_contact_name, email, ubicacion, admin_id)
+VALUES
+('Repuestos del Caribe', 'Repuestos Caribe S.A.', 'Repuestos del Caribe Sociedad Anónima', '2710-8899', 'Luis Méndez', 'ventas@repuestoscaribe.com', 'Guápiles, Limón', 1),
+('Importadora Motor CR', 'Motor CR S.A.', 'Importadora Motor Costa Rica S.A.', '2222-3344', 'Andrea Solano', 'contacto@motorcr.com', 'La Uruca, San José', 1),
+('AutoFix Parts', 'AutoFix Parts Ltda.', 'AutoFix Parts Limitada', '2494-7788', 'Marcos Vargas', 'info@autofixparts.com', 'Grecia, Alajuela', 1);
+
+
+INSERT INTO workshop_schedule
+(number_reference, license_plate, entry_date, reason_service, reception_mileage, id_client, id_branch, is_active)
+VALUES
+(53030111, 'ABC123', '2026-05-30', 'Revisión general del vehículo y cambio de aceite.', 45200, 3, 1, TRUE),
+(53030122, 'XYZ789', '2026-05-31', 'Ruido en frenos delanteros.', 78500, 3, 2, TRUE),
+(60130133, 'GHI456', '2026-06-01', 'Diagnóstico por pérdida de potencia.', 63000, 3, 3, TRUE);
+
+
+INSERT INTO repair_reports
+(number_reference, technical_diagnosis, spare_parts, observations, cost, taxes, total_payment, completion_date, id_mechanic, id_appointment, is_active)
+VALUES
+(530202001, 'Se realizó revisión general. Se detectó aceite degradado y filtro sucio.', 'Filtro de aceite, aceite 10W-30', 'Vehículo entregado en buen estado.', 35000, 4550, 39550, '2026-05-30', 2, 1, TRUE),
+
+(531202002, 'Se identificó desgaste en pastillas de freno delanteras.', 'Pastillas de freno delanteras', 'Se recomienda revisión de discos en próxima visita.', 48000, 6240, 54240, '2026-05-31', 2, 2, TRUE),
+
+(601202003, 'Se detectó obstrucción parcial en filtro de aire y sensores con lectura irregular.', 'Filtro de aire, limpieza de sensores', 'Prueba de ruta realizada correctamente.', 42000, 5460, 47460, '2026-06-01', 2, 3, TRUE);

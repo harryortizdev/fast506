@@ -28,6 +28,8 @@ public class RepairReportService {
 
     public void update(RepairReport repairReport) {
         validate(repairReport);
+        repairReport.setIsActive(true);
+
         repairReportRepository.save(repairReport);
     }
 
@@ -74,6 +76,9 @@ public class RepairReportService {
 
         if (repairReport.getIdMechanic() <= 0) {
             throw new IllegalArgumentException("Debe seleccionar un mecánico.");
+        }
+        if (repairReport.getIdAppointment() <= 0) {
+            throw new IllegalArgumentException("Debe seleccionar una cita del taller.");
         }
     }
 }

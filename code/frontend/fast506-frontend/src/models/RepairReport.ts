@@ -9,5 +9,6 @@ export interface RepairReport {
   totalPayment: number;
   completionDate: string;
   idMechanic: number;
+  idAppointment: number;
   isActive?: boolean;
 }

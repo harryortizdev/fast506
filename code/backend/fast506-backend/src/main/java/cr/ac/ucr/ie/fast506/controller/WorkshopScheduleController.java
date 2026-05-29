@@ -79,4 +79,9 @@ public class WorkshopScheduleController {
                     .body("Error al actualizar: " + e.getMessage());
         }
     }
+
+    @GetMapping("/allForReports")
+    public List<WorkshopSchedule> getAllForReports() {
+        return workshopScheduleService.getAllForReports();
+    }
 }

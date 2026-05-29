@@ -40,3 +40,8 @@ export const updateWorkshopSchedule = async (workshopSchedule: WorkshopSchedule)
 
   return res.text();
 };
+
+export const getAllForReports = async () => {
+  const res = await fetch(`${API_URL}/allForReports`);
+  return res.json();
+};

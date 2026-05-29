@@ -44,9 +44,11 @@ public class RepairReport {
     @Column(name = "id_mechanic")
     private int idMechanic;
 
+    @Column(name = "id_appointment")
+    private int idAppointment;
+
     @Column(name = "is_active")
     private boolean isActive;
-
 
     public int getIdReparation() {
         return idReparation;
@@ -126,6 +128,14 @@ public class RepairReport {
 
     public void setIdMechanic(int idMechanic) {
         this.idMechanic = idMechanic;
+    }
+
+    public int getIdAppointment() {
+        return idAppointment;
+    }
+
+    public void setIdAppointment(int idAppointment) {
+        this.idAppointment = idAppointment;
     }
 
     public boolean isIsActive() {

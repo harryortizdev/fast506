@@ -25,7 +25,10 @@ const WorkshopScheduleForm = ({
     workshopScheduleToEdit || { isActive: true }
   );
 
-  const [errors, setErrors] = useState<Partial<Record<keyof WorkshopSchedule, string>>>({});
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof WorkshopSchedule, string>>
+  >({});
+
   const [clients, setClients] = useState<Client[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
   const [loadingClients, setLoadingClients] = useState(true);
@@ -60,13 +63,14 @@ const WorkshopScheduleForm = ({
     loadBranches();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
 
     setForm({
       ...form,
       [name]:
-        name === "numberReference" ||
         name === "receptionMileage" ||
         name === "idClient" ||
         name === "idBranch"
@@ -80,23 +84,45 @@ const WorkshopScheduleForm = ({
     });
   };
 
+const generateWorkshopReference = (): number => {
+  const selectedDate = form.entryDate
+    ? new Date(String(form.entryDate) + "T00:00:00")
+    : new Date();
+
+  const month = String(selectedDate.getMonth() + 1).padStart(2, "0");
+  const day = String(selectedDate.getDate()).padStart(2, "0");
+
+  const clientPart = String(form.idClient || 0).padStart(2, "0").slice(-2);
+  const branchPart = String(form.idBranch || 0).padStart(2, "0").slice(-2);
+
+  const randomPart = String(Math.floor(Math.random() * 90) + 10);
+
+  return Number(`${month}${day}${clientPart}${branchPart}${randomPart}`);
+};
+
   const validate = (): boolean => {
     const newErrors: Partial<Record<keyof WorkshopSchedule, string>> = {};
 
-    if (!form.numberReference || form.numberReference <= 0) {
-      newErrors.numberReference = "El número de referencia es requerido.";
-    }
-
-    if (!form.licensePlate || form.licensePlate.trim() === "" || form.licensePlate.length > 20) {
-      newErrors.licensePlate = "Placa inválida: no puede estar vacía, máximo 20 caracteres.";
+    if (
+      !form.licensePlate ||
+      form.licensePlate.trim() === "" ||
+      form.licensePlate.length > 20
+    ) {
+      newErrors.licensePlate =
+        "Placa inválida: no puede estar vacía, máximo 20 caracteres.";
     }
 
     if (!form.entryDate) {
       newErrors.entryDate = "La fecha de ingreso es requerida.";
     }
 
-    if (!form.reasonService || form.reasonService.trim() === "" || form.reasonService.length > 500) {
-      newErrors.reasonService = "Motivo inválido: no puede estar vacío, máximo 500 caracteres.";
+    if (
+      !form.reasonService ||
+      form.reasonService.trim() === "" ||
+      form.reasonService.length > 500
+    ) {
+      newErrors.reasonService =
+        "Motivo inválido: no puede estar vacío, máximo 500 caracteres.";
     }
 
     if (form.receptionMileage === undefined || form.receptionMileage < 0) {
@@ -121,7 +147,9 @@ const WorkshopScheduleForm = ({
     try {
       const dataToSend: any = {
         idAppointment: form.idAppointment,
-        numberReference: Number(form.numberReference),
+        numberReference: workshopScheduleToEdit
+          ? Number(form.numberReference)
+          : generateWorkshopReference(),
         licensePlate: form.licensePlate,
         entryDate: form.entryDate,
         reasonService: form.reasonService,
@@ -149,19 +177,24 @@ const WorkshopScheduleForm = ({
 
   return (
     <div className="container d-flex justify-content-center">
-      <div className="card p-4 shadow-sm" style={{ maxWidth: "500px", width: "100%" }}>
+      <div
+        className="card p-4 shadow-sm"
+        style={{ maxWidth: "500px", width: "100%" }}
+      >
         <h3 className="text-center mb-4">
           {workshopScheduleToEdit ? "Editar Cita de Taller" : "Nueva Cita de Taller"}
         </h3>
 
-        <FormField
-          label="Número de Referencia:"
-          name="numberReference"
-          value={form.numberReference?.toString() || ""}
-          onChange={handleChange}
-          type="number"
-        />
-        {errors.numberReference && <div className="invalid-feedback d-block">{errors.numberReference}</div>}
+        {workshopScheduleToEdit && (
+          <div className="mb-3">
+            <label className="form-label">Número de Referencia:</label>
+            <input
+              className="form-control"
+              value={form.numberReference?.toString() || ""}
+              disabled
+            />
+          </div>
+        )}
 
         <FormField
           label="Placa:"
@@ -169,7 +202,9 @@ const WorkshopScheduleForm = ({
           value={form.licensePlate || ""}
           onChange={handleChange}
         />
-        {errors.licensePlate && <div className="invalid-feedback d-block">{errors.licensePlate}</div>}
+        {errors.licensePlate && (
+          <div className="invalid-feedback d-block">{errors.licensePlate}</div>
+        )}
 
         <FormField
           label="Fecha de Ingreso:"
@@ -178,7 +213,9 @@ const WorkshopScheduleForm = ({
           onChange={handleChange}
           type="date"
         />
-        {errors.entryDate && <div className="invalid-feedback d-block">{errors.entryDate}</div>}
+        {errors.entryDate && (
+          <div className="invalid-feedback d-block">{errors.entryDate}</div>
+        )}
 
         <FormField
           label="Motivo del Servicio:"
@@ -186,7 +223,9 @@ const WorkshopScheduleForm = ({
           value={form.reasonService || ""}
           onChange={handleChange}
         />
-        {errors.reasonService && <div className="invalid-feedback d-block">{errors.reasonService}</div>}
+        {errors.reasonService && (
+          <div className="invalid-feedback d-block">{errors.reasonService}</div>
+        )}
 
         <FormField
           label="Kilometraje:"
@@ -195,7 +234,11 @@ const WorkshopScheduleForm = ({
           onChange={handleChange}
           type="number"
         />
-        {errors.receptionMileage && <div className="invalid-feedback d-block">{errors.receptionMileage}</div>}
+        {errors.receptionMileage && (
+          <div className="invalid-feedback d-block">
+            {errors.receptionMileage}
+          </div>
+        )}
 
         <div className="mb-3">
           <label className="form-label">Cliente:</label>
@@ -209,13 +252,16 @@ const WorkshopScheduleForm = ({
             <option value="">
               {loadingClients ? "Cargando clientes..." : "Seleccionar cliente"}
             </option>
-{clients.map((client) => (
-  <option key={client.idUser} value={client.idUser}>
-    {client.name || `Cliente #${client.idUser}`}
-  </option>
-))}
+
+            {clients.map((client) => (
+              <option key={client.idUser} value={client.idUser}>
+                {client.name || `Cliente #${client.idUser}`}
+              </option>
+            ))}
           </select>
-          {errors.idClient && <div className="invalid-feedback d-block">{errors.idClient}</div>}
+          {errors.idClient && (
+            <div className="invalid-feedback d-block">{errors.idClient}</div>
+          )}
         </div>
 
         <div className="mb-3">
@@ -230,13 +276,16 @@ const WorkshopScheduleForm = ({
             <option value="">
               {loadingBranches ? "Cargando sucursales..." : "Seleccionar sucursal"}
             </option>
+
             {branches.map((branch) => (
               <option key={branch.idBranch} value={branch.idBranch}>
                 {branch.name || `Sucursal #${branch.idBranch}`}
               </option>
             ))}
           </select>
-          {errors.idBranch && <div className="invalid-feedback d-block">{errors.idBranch}</div>}
+          {errors.idBranch && (
+            <div className="invalid-feedback d-block">{errors.idBranch}</div>
+          )}
         </div>
 
         <div className="text-center mt-4">

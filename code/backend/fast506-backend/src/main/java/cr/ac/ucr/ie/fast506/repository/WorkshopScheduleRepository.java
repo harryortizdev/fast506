@@ -23,4 +23,7 @@ public interface WorkshopScheduleRepository extends JpaRepository<WorkshopSchedu
     @Query(value = "CALL db_fast506.findWorkshopScheduleById(:idAppointment)", nativeQuery = true)
     WorkshopSchedule findWorkshopScheduleById(
             @Param("idAppointment") Integer idAppointment);
+
+    @Query(value = "CALL db_fast506.getAllWorkshopSchedulesForReports()", nativeQuery = true)
+    List<WorkshopSchedule> getAllForReports();
 }

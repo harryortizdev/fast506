@@ -36,6 +36,10 @@ public class WorkshopScheduleService {
         return workshopScheduleRepository.findWorkshopScheduleById(id);
     }
 
+    public List<WorkshopSchedule> getAllForReports() {
+        return workshopScheduleRepository.getAllForReports();
+    }
+
     private void validate(WorkshopSchedule workshopSchedule) {
 
         if (workshopSchedule.getNumberReference() <= 0) {
