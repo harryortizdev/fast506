@@ -46,8 +46,8 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
     if (!form.email || !emailRegex.test(form.email) || form.email.length > 100) {
       newErrors.email = "Email inválido: ingrese un email válido, máximo 100 caracteres.";
     }
-    if (!form.password || form.password.length < 8 || form.password.length > 100) {
-      newErrors.password = "Contraseña inválida: debe tener entre 8 y 100 caracteres.";
+    if (!form.password || form.password.length < 8 || form.password.length > 100 || !/[A-Z]/.test(form.password) || !/[a-z]/.test(form.password) || !/[0-9]/.test(form.password) || !/[!@#$%^&*(),.?":{}|<>]/.test(form.password)) {
+      newErrors.password = "Contraseña inválida: debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial.";
     }
     if (form.phoneNumber && (!numericOnly.test(form.phoneNumber.toString()) || form.phoneNumber.toString().length > 15)) {
       newErrors.phoneNumber = "El número de teléfono debe ser numérico y tener máximo 15 dígitos.";

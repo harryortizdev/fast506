@@ -45,10 +45,10 @@ const MechanicPage = () => {
     };
 
     const handleDelete = async (mechanic: Mechanic) => {
-        if (!mechanic.employeeId) return;
+        if (!mechanic.idUser) return;
         const confirmar = await AlertConfirm(`¿Desea eliminar el mecánico ${mechanic.name}?`);
         if (!confirmar) return;
-        await deleteMechanic(mechanic.employeeId!);
+        await deleteMechanic(mechanic.idUser!);
         await loadMechanics();
     };
 

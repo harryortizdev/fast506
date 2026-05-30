@@ -3,6 +3,7 @@ package cr.ac.ucr.ie.fast506.controller;
 import cr.ac.ucr.ie.fast506.domain.Administrator;
 import cr.ac.ucr.ie.fast506.service.AdministratorService;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,7 +25,7 @@ public class AdministratorController {
     private AdministratorService adminService;
 
     @GetMapping("/all")
-    public LinkedList<Administrator> getAll() {
+    public List<Administrator> getAll() {
 
         return adminService.getAll();
 

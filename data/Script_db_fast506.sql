@@ -1,7 +1,6 @@
 -- 22/04/2026 - Creación de la base de datos (Harry)
 CREATE DATABASE IF NOT EXISTS db_fast506;
 USE db_fast506;
-
 -- 02/05/2026 - Creación de la tabla Users (Allan)
 
 CREATE TABLE users (
@@ -95,6 +94,8 @@ BEGIN
         u.phone_number,
         u.date_birth,
         u.profile_image,
+        u.is_active,
+        u.password,
         a.employee_id,
         a.corporate_email
     FROM users u
@@ -411,6 +412,8 @@ BEGIN
         u.phone_number,
         u.date_birth,
         u.profile_image,
+        u.is_active,
+        u.password,
 
         m.employee_id,
         m.corporate_email,
@@ -639,6 +642,8 @@ BEGIN
         u.phone_number,
         u.date_birth,
         u.profile_image,
+        u.is_active,
+        u.password,
 
         c.comm_interest,
         c.physical_address,

@@ -2,15 +2,20 @@ package cr.ac.ucr.ie.fast506.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
+import java.util.Date;
 
 
 @Entity
 @Table(name = "client")
-@PrimaryKeyJoinColumn(name = "id_user") 
+@PrimaryKeyJoinColumn(name = "id_user")
 public class Client extends User {
 
+    //Atributos de la tabla client
     @Column(name = "comm_interest")
     private String commInterest;
 

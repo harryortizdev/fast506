@@ -1,8 +1,9 @@
 package cr.ac.ucr.ie.fast506.controller;
 
 import cr.ac.ucr.ie.fast506.domain.Mechanic;
+import cr.ac.ucr.ie.fast506.repository.MechanicRepository;
 import cr.ac.ucr.ie.fast506.service.MechanicService;
-import java.util.LinkedList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public class MechanicController {
 
     @GetMapping("/all")
 
-    public LinkedList<Mechanic> getAll() {
+    public List<Mechanic> getAll() {
 
         return mechanicService.getAll();
 
@@ -75,6 +76,7 @@ public class MechanicController {
 
         } catch (Exception e) {
 
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Error al actualizar el mecanico " + e.getMessage());
 
         }

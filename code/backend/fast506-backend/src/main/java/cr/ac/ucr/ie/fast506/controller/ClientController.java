@@ -3,6 +3,7 @@ package cr.ac.ucr.ie.fast506.controller;
 import cr.ac.ucr.ie.fast506.domain.Client;
 import cr.ac.ucr.ie.fast506.service.ClientService;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,7 +26,7 @@ public class ClientController {
 
     @GetMapping("/all")
 
-    public LinkedList<Client> getAll() {
+    public List<Client> getAll() {
 
         return clientService.getAll();
 

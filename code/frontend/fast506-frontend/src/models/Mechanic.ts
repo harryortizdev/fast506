@@ -9,7 +9,7 @@ export interface Mechanic {
     dateBirth: Date;
     profileImage: string;
     isActive: boolean;
-    employeeId: number;
+    employeeId: string;
     corporateEmail: string;
     specialty: string;
     certLevel: string;
