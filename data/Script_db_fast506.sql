@@ -96,6 +96,7 @@ BEGIN
         u.profile_image,
         u.is_active,
         u.password,
+        u.id_role,
         a.employee_id,
         a.corporate_email
     FROM users u
@@ -106,6 +107,7 @@ BEGIN
 END $$
 
 DELIMITER ;
+
 
 -- Buscar administrador por ID 
 
@@ -154,6 +156,7 @@ CREATE PROCEDURE insertAdministrator(
     IN p_phone_number VARCHAR(15),
     IN p_date_birth DATE,
     IN p_profile_image VARCHAR(500),
+    IN p_id_role INT,
 
     IN p_employee_id VARCHAR(10),
     IN p_corporate_email VARCHAR(100)
@@ -173,7 +176,8 @@ BEGIN
         phone_number,
         date_birth,
         profile_image,
-        is_active
+        is_active,
+        id_role
     )
     VALUES(
         p_name,
@@ -183,7 +187,8 @@ BEGIN
         p_phone_number,
         p_date_birth,
         p_profile_image,
-        TRUE
+        TRUE,
+        p_id_role
     );
 
     SET v_id_user = LAST_INSERT_ID();
@@ -239,6 +244,7 @@ CREATE PROCEDURE updateAdministrator(
     IN p_phone_number VARCHAR(15),
     IN p_date_birth DATE,
     IN p_profile_image VARCHAR(500),
+    IN p_id_role INT,
     IN p_employee_id VARCHAR(10),
     IN p_corporate_email VARCHAR(100)
 
@@ -260,7 +266,8 @@ BEGIN
         password = p_password,
         phone_number = p_phone_number,
         date_birth = p_date_birth,
-        profile_image = p_profile_image
+        profile_image = p_profile_image,
+        id_role = p_id_role
     WHERE id_user = p_id_user
       AND is_active = TRUE;
 
@@ -311,7 +318,7 @@ CREATE PROCEDURE insertMechanic(
     IN p_phone_number VARCHAR(15),
     IN p_date_birth DATE,
     IN p_profile_image VARCHAR(500),
-
+    IN p_id_Role INT,
     IN p_employee_id VARCHAR(10),
     IN p_corporate_email VARCHAR(100),
     IN p_specialty VARCHAR(50),
@@ -338,7 +345,8 @@ BEGIN
         phone_number,
         date_birth,
         profile_image,
-        is_active
+        is_active,
+        id_Role
     )
     VALUES(
         p_name,
@@ -348,7 +356,8 @@ BEGIN
         p_phone_number,
         p_date_birth,
         p_profile_image,
-        TRUE
+        TRUE,
+        p_id_role
     );
 
     SET v_id_user = LAST_INSERT_ID();
@@ -374,27 +383,6 @@ END$$
 
 DELIMITER ;
 
--- Datos de prueba mecanico
-
-CALL insertMechanic(
-
-    -- users
-    'Carlos Rodriguez',
-    987654321,
-    'carlos@gmail.com',
-    '12345',
-    '87776666',
-    '1998-06-20',
-    'carlos.png',
-
-    -- mechanic
-    'MEC001',
-    'carlos@fast506.com',
-    'Motor y Transmisión',
-    'Nivel Avanzado'
-
-);
-
 -- Obtener mecanicos
 
 DROP PROCEDURE IF EXISTS getAllMechanics;
@@ -414,6 +402,7 @@ BEGIN
         u.profile_image,
         u.is_active,
         u.password,
+        u.id_role,
 
         m.employee_id,
         m.corporate_email,
@@ -544,6 +533,7 @@ CREATE PROCEDURE insertClient(
     IN p_phone_number VARCHAR(15),
     IN p_date_birth DATE,
     IN p_profile_image VARCHAR(500),
+    IN p_id_Role INT,
 
     IN p_comm_interest VARCHAR(50),
     IN p_physical_address VARCHAR(255),
@@ -570,7 +560,8 @@ BEGIN
         phone_number,
         date_birth,
         profile_image,
-        is_active
+        is_active,
+        id_Role
     )
     VALUES(
         p_name,
@@ -580,7 +571,8 @@ BEGIN
         p_phone_number,
         p_date_birth,
         p_profile_image,
-        TRUE
+        TRUE,
+        p_id_Role
     );
 
     SET v_id_user = LAST_INSERT_ID();
@@ -604,27 +596,6 @@ END$$
 
 DELIMITER ;
 
--- Datos de prueba clientes
-
-
-CALL insertClient(
-
-    -- users
-    'Maria Fernandez',
-    456789123,
-    'maria@gmail.com',
-    '12345',
-    '86665555',
-    '2001-03-12',
-    'maria.png',
-
-    -- client
-    'Vehículos Deportivos',
-    'Guápiles, Limón, Costa Rica',
-    'Ingeniera de Software'
-
-);
-
 -- Obtener clientes
 
 DROP PROCEDURE IF EXISTS getAllClients;
@@ -644,6 +615,7 @@ BEGIN
         u.profile_image,
         u.is_active,
         u.password,
+        u.id_Role,
 
         c.comm_interest,
         c.physical_address,
@@ -2132,7 +2104,9 @@ DELIMITER ;
 
 -- 26/05/2026 sp para verificar si es admin
 
+DROP PROCEDURE IF EXISTS getAdminByCredentials;
 DELIMITER $$
+
 
 CREATE PROCEDURE getAdminByCredentials(IN p_email VARCHAR(255), IN p_password VARCHAR(255))
 BEGIN
@@ -2146,6 +2120,7 @@ BEGIN
         u.date_birth,
         u.profile_image,
         u.is_active,
+        u.id_role,
         a.employee_id,
         a.corporate_email
     FROM users u 
@@ -2706,3 +2681,157 @@ VALUES
 (531202002, 'Se identificó desgaste en pastillas de freno delanteras.', 'Pastillas de freno delanteras', 'Se recomienda revisión de discos en próxima visita.', 48000, 6240, 54240, '2026-05-31', 2, 2, TRUE),
 
 (601202003, 'Se detectó obstrucción parcial en filtro de aire y sensores con lectura irregular.', 'Filtro de aire, limpieza de sensores', 'Prueba de ruta realizada correctamente.', 42000, 5460, 47460, '2026-06-01', 2, 3, TRUE);
+
+-- 29/05/26 creacion de la tabla roles y permissions Allan
+USE db_fast506;
+CREATE TABLE roles (
+
+id_Role INT PRIMARY KEY AUTO_INCREMENT,
+role_Name VARCHAR (50) UNIQUE,
+description VARCHAR (255),
+create_Date DATE,
+level_Hierarchy INT,
+is_Worker BOOLEAN,
+have_Email BOOLEAN,
+is_Active BOOLEAN 
+
+);
+
+-- Relacionar Users con Role
+
+ALTER TABLE users
+ADD COLUMN id_role INT;
+
+ALTER TABLE users
+ADD CONSTRAINT fk_user_role
+FOREIGN KEY(id_role)
+REFERENCES roles(id_role);
+
+CREATE TABLE permissions (
+    id_Permissions INT PRIMARY KEY AUTO_INCREMENT,
+    id_Module VARCHAR(50),
+    create_Permission BOOLEAN,
+    read_Permission BOOLEAN,
+    update_Permission BOOLEAN,
+    delete_Permission BOOLEAN,
+    is_Active BOOLEAN
+);
+
+-- 30/05/26 procedimientos almacenados para el crud de roles (Allan)
+
+DROP PROCEDURE IF EXISTS insertRole;
+
+DELIMITER $$
+
+CREATE PROCEDURE insertRole(
+    IN p_role_Name VARCHAR(50),
+    IN p_description VARCHAR(255),
+    IN p_create_Date DATE,
+    IN p_level_Hierarchy INT,
+    IN p_is_Worker BOOLEAN,
+    IN p_have_Email BOOLEAN
+)
+BEGIN
+
+    INSERT INTO roles(
+        role_Name,
+        description,
+        create_Date,
+        level_Hierarchy,
+        is_Worker,
+        have_Email,
+        is_Active
+    )
+    VALUES(
+        p_role_Name,
+        p_description,
+        p_create_Date,
+        p_level_Hierarchy,
+        p_is_Worker,
+        p_have_Email,
+        TRUE
+    );
+
+END $$
+
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS getAllRoles;
+
+DELIMITER $$
+
+CREATE PROCEDURE getAllRoles()
+BEGIN
+
+    SELECT *
+    FROM roles
+    WHERE is_Active = TRUE
+    ORDER BY role_Name;
+
+END $$
+
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS updateRole;
+
+DELIMITER $$
+
+CREATE PROCEDURE updateRole(
+    IN p_id_Role INT,
+    IN p_role_Name VARCHAR(50),
+    IN p_description VARCHAR(255),
+    IN p_level_Hierarchy INT,
+    IN p_is_Worker BOOLEAN,
+    IN p_have_Email BOOLEAN
+)
+BEGIN
+
+    UPDATE roles
+    SET
+        role_Name = p_role_Name,
+        description = p_description,
+        level_Hierarchy = p_level_Hierarchy,
+        is_Worker = p_is_Worker,
+        have_Email = p_have_Email
+    WHERE id_Role = p_id_Role
+      AND is_Active = TRUE;
+
+END $$
+
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS deleteRole;
+
+DELIMITER $$
+
+CREATE PROCEDURE deleteRole(
+    IN p_id_Role INT
+)
+BEGIN
+
+    UPDATE roles
+    SET is_Active = FALSE
+    WHERE id_Role = p_id_Role;
+
+END $$
+
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS getRoleById;
+
+DELIMITER $$
+
+CREATE PROCEDURE getRoleById(
+    IN p_id_Role INT
+)
+BEGIN
+
+    SELECT *
+    FROM roles
+    WHERE id_Role = p_id_Role
+      AND is_Active = TRUE;
+
+END $$
+
+DELIMITER ;
+ 

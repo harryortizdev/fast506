@@ -107,6 +107,7 @@ const Navbar = () => {
                   <li><Link className="dropdown-item" to="/admin/units">UNIDADES</Link></li>
                   <li><Link className="dropdown-item" to="/admin/sales">VENTAS</Link></li>
                   <li><Link className="dropdown-item" to="/admin/workshop-schedules">CITAS TALLER</Link></li>
+                  <li><Link className="dropdown-item" to="/admin/roles">ROLES</Link></li>
 
                 </ul>
               </li>

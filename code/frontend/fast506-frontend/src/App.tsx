@@ -19,6 +19,7 @@ import SalesClientPage from "./pages/SalesClientPage";
 import WorkshopSchedulePage from "./pages/WorkshopSchedulePage";
 import CreateWorkshopSchedule from "./pages/CreateWorkshopSchedule";
 import RepairReportPage from "./pages/RepairReportPage";
+import RolePage from "./pages/RolePage";
 
 
 function App() {
@@ -45,7 +46,7 @@ function App() {
         <Route path="/admin/repair-reports" element={<RepairReportPage />} />
         <Route path="/workshop-schedules/create" element={<CreateWorkshopSchedule />} />
         <Route path="/admin/workshop-schedules" element={<WorkshopSchedulePage />} />
-        
+        <Route path="/admin/roles" element={<RolePage />} />
       </Routes>
     </BrowserRouter>
   );

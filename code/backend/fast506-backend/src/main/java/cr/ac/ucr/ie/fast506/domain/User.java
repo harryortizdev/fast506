@@ -36,6 +36,7 @@ public class User {
 
     @Column(name = "is_active")
     private boolean isActive;
+
     
     public int getIdUser() {
         return idUser;

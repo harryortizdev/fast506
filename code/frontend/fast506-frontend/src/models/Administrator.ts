@@ -9,6 +9,7 @@ export interface Administrator {
     dateBirth: Date;
     profileImage: string;
     isActive: boolean;
+    idRole: number;
     employeeId: string;
     corporateEmail: string;
 

@@ -21,8 +21,12 @@ export const create = async (administrator: Partial<Administrator>) => {
         body: JSON.stringify(administrator),
     });
     if (!res.ok) {
+        
         console.error("Respuesta del servidor:", res.status, res.statusText);
+        const errorText = await res.text();
+        console.error("Error del servidor:", errorText);
         throw new Error(`Error creating administrator: ${res.statusText}`);
+        
     }
     return res.text();
 
