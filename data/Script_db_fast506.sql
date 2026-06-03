@@ -1,4 +1,6 @@
 -- 22/04/2026 - Creación de la base de datos (Harry)
+
+
 CREATE DATABASE IF NOT EXISTS db_fast506;
 USE db_fast506;
 -- 02/05/2026 - Creación de la tabla Users (Allan)
@@ -66,14 +68,6 @@ CREATE TABLE client (
     ON UPDATE CASCADE
     
 );
-
--- lo puso Nolan para probar
--- Insertar un usuario en la tabla users
-
--- INSERT INTO `db_fast506`.`users`  (name, id, email, password, phone_number, date_birth, profile_image)
--- VALUES 
--- ('Administrador de Prueba', 123456, 'admin@prueba.com', 'password123', '800-123-4567', '1985-10-15', 'profile.jpg');
--- -----------------------------------------------------------------------------------------
 
 -- 07/05/26 Creacion de procedimientos para la tabla Administrator (Allan)
 
@@ -209,23 +203,6 @@ BEGIN
 END $$
 
 DELIMITER ;
-
--- Datos de prueba
-
-CALL insertAdministrator(
-
-    'Allan Mejia',
-    123456789,
-    'allan@gmail.com',
-    '12345',
-    '88887777',
-    '2005-10-15',
-    'allan.png',
-
-    'ADM001',
-    'allan@fast506.com'
-
-);
 
 
 -- Editar administrador
@@ -750,28 +727,7 @@ CREATE TABLE supplier (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
-
--- 07/05/2026 - Crear datos de prueba proveedor (Nolan)
-
-INSERT INTO `db_fast506`.`supplier` 
-(name, company_name, legal_name, support_phone, bussines_contact_name, email, ubicacion, admin_id)
-VALUES
-    ('Auto Parts S.A.', 'Auto Parts S.A.', 'Auto Parts S.A.', 
-    '800-123-4567', 'Carlos González', 'cgonzalez@autoparts.com', 'San José, Costa Rica', 1);
-  
-  
-  CALL insertAdministrator(
-    'Administrador de Prueba',
-    1983737,
-    'admin@prueba.com',
-    'password123',
-    '800-123-4567',
-    '1990-01-01',
-    'profile_picture.jpg',
-    'EMP001',
-    'admin@fast506.com'
-);
-
+ 
   
 -- 07/05/2026 - Crear procedimientos de la tabla proveedor (Nolan)
 -- Procedimiento para agregar un supplier (Nolan)
@@ -814,6 +770,7 @@ BEGIN
         bussines_contact_name,
         email,
         ubicacion,
+        is_active,
         admin_id
     FROM supplier
     WHERE is_active = 1;
@@ -926,12 +883,6 @@ CREATE TABLE `db_fast506`.`units` (
     ON UPDATE NO ACTION);
     
     
-
-    -- Insertar datos de prueba a tabla units
-    INSERT INTO `db_fast506`.`units` 
-  (`VIN`, `engine_number`, `car_brand`, `car_name`, `legal_brand_name`, `year_Manufacture`, `color`, `transmission`, `traction`, `body_work`, `engine_size`, `fuel_type`, `stock_status`, `is_active`, `id_supplier`)
-VALUES 
-  ('1HGBH41JXMN109186', 'K24Z7-1234567', 'Honda', 'Civic EX', 'American Honda Motor Co.', '2021', 'Blanco Perla', 'Automática', 'FWD', 'Sedán', '1.5L Turbo', 'Gasolina', 1, 1, NULL);
 
 -- 05/05/2026 - Creación de procedimientos de tabla units (Harry)
 
@@ -1177,7 +1128,7 @@ DELIMITER $$
 USE `db_fast506`$$
 CREATE PROCEDURE `getAllBranch` ()
 BEGIN
-SELECT id_Branch ,name ,ubication , direction ,branch_Phone_Number , operation_Schedule ,id_user FROM Branch Where id_Active = 1;
+SELECT id_Branch ,name ,ubication , direction ,branch_Phone_Number , operation_Schedule ,id_user FROM branch Where id_Active = 1;
 END$$
 
 DELIMITER ;
@@ -1291,7 +1242,7 @@ DELIMITER $$
 USE `db_fast506`$$
 CREATE PROCEDURE `getAllBranch`()
 BEGIN
-SELECT id_Branch ,name ,ubication , direction ,branch_Phone_Number , operation_Schedule, coordinates ,id_user FROM Branch Where id_Active = 1;
+SELECT id_Branch ,name ,ubication , direction ,branch_Phone_Number , operation_Schedule, coordinates ,id_user FROM branch Where id_Active = 1;
 END$$
 
 DELIMITER ;
@@ -1334,17 +1285,6 @@ DELIMITER ;
 ;
 
 
--- Datos con 'coordinates' después de 'id_Active' y antes de 'id_user'
-INSERT INTO branch (name, ubication, direction, branch_Phone_Number, operation_Schedule, id_Active, coordinates, id_user) VALUES
-('Fast506 Guápiles', 'Limón, Pococí', 'Frente a la UCR Recinto de Guápiles', '+506 2710 1234', 'L-V: 8:00am-6:00pm, S: 9:00am-2:00pm', '1', '10.211306686307188, -83.77130550738062', 1),
-('Fast506 San José', 'San José, La Uruca', 'Frente a las instalaciones de Repretel', '+506 2222 5678', 'L-V: 7:30am-5:30pm, S: 8:00am-12:00pm', '1', '9.955604275880729, -84.1164932910103', 1),
-('Fast506 Grecia', 'Alajuela, Grecia', '600 metros Oeste del Hospital de Grecia', '+506 2494 0011', 'L-V: 8:00am-5:00pm, S: Cerrado', '1', '10.070330987790673, -84.32156284301192', 1),
-('Fast506 Escazú', 'San José, Escazú', 'Centro Comercial Escazu Village', '+506 2288 9900', 'L-D: 10:00am-8:00pm', '1', '9.933832242947375, -84.12909517764673', 1),
-('Fast506 Pérez Zeledón', 'San José, San Isidro', 'Contiguo a la gasolinera El Jorón', '+506 2771 4433', 'L-V: 8:00am-6:00pm, S: 9:00am-4:00pm', '1', '9.330757708994817, -83.669410048738', 1),
-('Fast506 Liberia', 'Guanacaste, Liberia', 'Frente a la entrada al Aeropuerto Daniel Oduber', '+506 2665 9000', 'L-V: 8:00am-5:30pm, S: 9:00am-1:00pm', '1', '10.596253373403933, -85.52703150704106', 1);
-
-
-
 -- ILIAN 18/5/2026
 -- Cambio del PA getAllBranch para agregar isActive
 
@@ -1359,7 +1299,7 @@ DELIMITER $$
 USE `db_fast506`$$
 CREATE  PROCEDURE `getAllBranch`()
 BEGIN
-SELECT id_Branch ,name ,ubication , direction ,branch_Phone_Number , operation_Schedule, id_active, coordinates ,id_user FROM Branch Where id_Active = 1;
+SELECT id_Branch ,name ,ubication , direction ,branch_Phone_Number , operation_Schedule, id_active, coordinates ,id_user FROM branch Where id_Active = 1;
 END$$
 
 DELIMITER ;
@@ -1448,35 +1388,6 @@ CHANGE COLUMN `transmission` `transmission` VARCHAR(255) NOT NULL ,
 CHANGE COLUMN `fuel_type` `fuel_type` VARCHAR(255) NOT NULL ,
 CHANGE COLUMN `engine_size` `engine_size` VARCHAR(255) NOT NULL ;
 
-  -- pruebas
-  
-  INSERT INTO catalogs (
-    car_name,
-    brand_name,
-    body_work,
-    technical_description,
-    base_price,
-    image,
-    year_manufacture,
-    transmission,
-    fuel_type,
-    engine_size,
-    is_active
-) VALUES (
-    'Corolla',
-    'Toyota',
-    'Sedan',
-    'Sedan compacto con motor 1.8L, ideal para ciudad y carretera, bajo consumo de combustible.',
-    25000.00,
-    'corolla.jpg',
-    2022,
-    'Automático',
-    'Gasolina',
-    '1.8L',
-    1
-);
-
-select * from catalogs;
 
 -- sp getAllCatalog 
 DELIMITER $$
@@ -1801,7 +1712,8 @@ END$$
 
 DELIMITER ;
 
--- PA DEVUELVE UNA UNIDAD REPETIDA O NO PERO SIN REPETIR SU TRACCION
+/*
+-- PA DEVUELVE UNA UNIDAD REPETIDA O NO PERO SIN REPETIR SU TRACCION (METODO ANTIGUO)
 USE `db_fast506`;
 DROP procedure IF EXISTS `getUnitsByCatalog`;
 
@@ -1829,7 +1741,55 @@ END$$
 
 DELIMITER ;
 
+*/
 
+-- PA DEVUELVE UNA UNIDAD REPETIDA O NO PERO SIN REPETIR SU TRACCION
+
+USE `db_fast506`;
+DROP procedure IF EXISTS `getUnitsByCatalog`;
+
+DELIMITER $$
+
+CREATE PROCEDURE `getUnitsByCatalog` (IN idCatalogC INT)
+BEGIN
+    SELECT 
+        ANY_VALUE(u.id_car) AS id_car,
+        ANY_VALUE(u.vin) AS vin,
+        ANY_VALUE(u.engine_number) AS engine_number,
+        ANY_VALUE(u.car_brand) AS car_brand,
+        ANY_VALUE(u.car_name) AS car_name,
+        ANY_VALUE(u.legal_brand_name) AS legal_brand_name,
+        ANY_VALUE(u.year_manufacture) AS year_manufacture,
+        ANY_VALUE(u.color) AS color,
+        ANY_VALUE(u.transmission) AS transmission,
+        ANY_VALUE(u.body_work) AS body_work,
+        ANY_VALUE(u.engine_size) AS engine_size,
+        ANY_VALUE(u.fuel_type) AS fuel_type,
+        ANY_VALUE(u.stock_status) AS stock_status,
+        ANY_VALUE(u.is_active) AS is_active,
+        ANY_VALUE(u.id_supplier) AS id_supplier,
+        u.traction
+    FROM units u
+    INNER JOIN catalogs c ON 
+        u.car_brand = c.brand_name AND u.car_name = c.car_name AND u.year_Manufacture = c.year_manufacture
+        AND (
+            
+        (LOWER(c.transmission) = 'automático' AND LOWER(u.transmission) IN ('automatico', 'automático', 'cvt'))
+            OR 
+            (LOWER(c.transmission) != 'automático' AND LOWER(u.transmission) = LOWER(c.transmission))
+        )
+        AND (
+            
+        (LOWER(c.fuel_type) = 'combustible' AND LOWER(u.fuel_type) IN ('gasolina', 'diesel', 'diésel'))
+            OR 
+            (LOWER(c.fuel_type) != 'combustible' AND LOWER(u.fuel_type) = LOWER(c.fuel_type))
+        )
+    WHERE c.id_catalog = idCatalogC 
+	AND u.is_active = 1
+    GROUP BY u.traction;
+END$$
+
+DELIMITER ;
 
 
 -- 23-05-26 CREACION TABLA AD
@@ -2057,7 +2017,7 @@ ADD CONSTRAINT `fk_sales_admin_id`
 
   -- 25/05/2026 sp de listar ventas (harry)
   
-  DELIMITER $$
+DELIMITER $$
 
 CREATE PROCEDURE `getAllSales`()
 BEGIN
@@ -2087,7 +2047,7 @@ DELIMITER ;
  
   -- 25/05/2026 sp de eliminar ventas (harry)
   
- DELIMITER $$
+DELIMITER $$
 
 CREATE PROCEDURE deleteSales(
     IN p_id_sales INT
@@ -2656,31 +2616,7 @@ END$$
 DELIMITER ;
 
 USE db_fast506;
-
-INSERT INTO supplier
-(name, company_name, legal_name, support_phone, bussines_contact_name, email, ubicacion, admin_id)
-VALUES
-('Repuestos del Caribe', 'Repuestos Caribe S.A.', 'Repuestos del Caribe Sociedad Anónima', '2710-8899', 'Luis Méndez', 'ventas@repuestoscaribe.com', 'Guápiles, Limón', 1),
-('Importadora Motor CR', 'Motor CR S.A.', 'Importadora Motor Costa Rica S.A.', '2222-3344', 'Andrea Solano', 'contacto@motorcr.com', 'La Uruca, San José', 1),
-('AutoFix Parts', 'AutoFix Parts Ltda.', 'AutoFix Parts Limitada', '2494-7788', 'Marcos Vargas', 'info@autofixparts.com', 'Grecia, Alajuela', 1);
-
-
-INSERT INTO workshop_schedule
-(number_reference, license_plate, entry_date, reason_service, reception_mileage, id_client, id_branch, is_active)
-VALUES
-(53030111, 'ABC123', '2026-05-30', 'Revisión general del vehículo y cambio de aceite.', 45200, 3, 1, TRUE),
-(53030122, 'XYZ789', '2026-05-31', 'Ruido en frenos delanteros.', 78500, 3, 2, TRUE),
-(60130133, 'GHI456', '2026-06-01', 'Diagnóstico por pérdida de potencia.', 63000, 3, 3, TRUE);
-
-
-INSERT INTO repair_reports
-(number_reference, technical_diagnosis, spare_parts, observations, cost, taxes, total_payment, completion_date, id_mechanic, id_appointment, is_active)
-VALUES
-(530202001, 'Se realizó revisión general. Se detectó aceite degradado y filtro sucio.', 'Filtro de aceite, aceite 10W-30', 'Vehículo entregado en buen estado.', 35000, 4550, 39550, '2026-05-30', 2, 1, TRUE),
-
-(531202002, 'Se identificó desgaste en pastillas de freno delanteras.', 'Pastillas de freno delanteras', 'Se recomienda revisión de discos en próxima visita.', 48000, 6240, 54240, '2026-05-31', 2, 2, TRUE),
-
-(601202003, 'Se detectó obstrucción parcial en filtro de aire y sensores con lectura irregular.', 'Filtro de aire, limpieza de sensores', 'Prueba de ruta realizada correctamente.', 42000, 5460, 47460, '2026-06-01', 2, 3, TRUE);
+  
 
 -- 29/05/26 creacion de la tabla roles y permissions Allan
 USE db_fast506;
@@ -2834,4 +2770,81 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+
+-- INSERTAR ROLES
+INSERT INTO roles (role_Name, description, create_Date, level_Hierarchy, is_Worker, have_Email, is_Active)
+VALUES ('Administrador', 'Acceso total a todos los módulos', '2026-06-02', 1, TRUE, TRUE, TRUE);
+
+
+-- INSERTAR ROLES
+INSERT INTO roles (role_Name, description, create_Date, level_Hierarchy, is_Worker, have_Email, is_Active)
+VALUES 
+('Mecánico', 'Personal técnico encargado de las reparaciones en el taller', '2026-06-02', 2, TRUE, FALSE, TRUE),
+('Cliente', 'Usuario externo que consulta catálogo y agenda citas de taller', '2026-06-02', 3, FALSE, TRUE, TRUE);
+
+-- INSERT ADMINISTRADOR
+
+CALL insertAdministrator(
+    'Allan Mejia',123456789,'allan@gmail.com','12345','88887777','2005-10-15','allan.png',1,'ADM001','allan@fast506.com'
+
+);
+
+-- INSERT MECANICO
+
+CALL insertMechanic(
+    'Felipe Quirós',101111111,'felipe.mecanico@gmail.com','12345', '88881111','1995-04-12','allan.png',2,'MEC-001','felipe.q@autosphere.com','Frenos y Suspensión','Avanzado'
+);
+
+-- INSERT PROVEDOR
+INSERT INTO `db_fast506`.`supplier` 
+(name, company_name, legal_name, support_phone, bussines_contact_name, email, ubicacion, admin_id)
+VALUES
+    ('Auto Parts S.A.', 'Auto Parts S.A.', 'Auto Parts S.A.', 
+    '800-123-4567', 'Carlos González', 'cgonzalez@autoparts.com', 'San José, Costa Rica', 1);
+
+
+INSERT INTO supplier
+(name, company_name, legal_name, support_phone, bussines_contact_name, email, ubicacion, admin_id)
+VALUES
+('Repuestos del Caribe', 'Repuestos Caribe S.A.', 'Repuestos del Caribe Sociedad Anónima', '2710-8899', 'Luis Méndez', 'ventas@repuestoscaribe.com', 'Guápiles, Limón', 1),
+('Importadora Motor CR', 'Motor CR S.A.', 'Importadora Motor Costa Rica S.A.', '2222-3344', 'Andrea Solano', 'contacto@motorcr.com', 'La Uruca, San José', 1),
+('AutoFix Parts', 'AutoFix Parts Ltda.', 'AutoFix Parts Limitada', '2494-7788', 'Marcos Vargas', 'info@autofixparts.com', 'Grecia, Alajuela', 1);
+  
+-- INSERT SUCURSALES
+INSERT INTO branch (name, ubication, direction, branch_Phone_Number, operation_Schedule, id_Active, coordinates, id_user) VALUES
+('Fast506 Guápiles', 'Limón, Pococí', 'Frente a la UCR Recinto de Guápiles', '+506 2710 1234', 'L-V: 8:00am-6:00pm, S: 9:00am-2:00pm', '1', '10.211306686307188, -83.77130550738062', 1),
+('Fast506 San José', 'San José, La Uruca', 'Frente a las instalaciones de Repretel', '+506 2222 5678', 'L-V: 7:30am-5:30pm, S: 8:00am-12:00pm', '1', '9.955604275880729, -84.1164932910103', 1),
+('Fast506 Grecia', 'Alajuela, Grecia', '600 metros Oeste del Hospital de Grecia', '+506 2494 0011', 'L-V: 8:00am-5:00pm, S: Cerrado', '1', '10.070330987790673, -84.32156284301192', 1),
+('Fast506 Escazú', 'San José, Escazú', 'Centro Comercial Escazu Village', '+506 2288 9900', 'L-D: 10:00am-8:00pm', '1', '9.933832242947375, -84.12909517764673', 1),
+('Fast506 Pérez Zeledón', 'San José, San Isidro', 'Contiguo a la gasolinera El Jorón', '+506 2771 4433', 'L-V: 8:00am-6:00pm, S: 9:00am-4:00pm', '1', '9.330757708994817, -83.669410048738', 1),
+('Fast506 Liberia', 'Guanacaste, Liberia', 'Frente a la entrada al Aeropuerto Daniel Oduber', '+506 2665 9000', 'L-V: 8:00am-5:30pm, S: 9:00am-1:00pm', '1', '10.596253373403933, -85.52703150704106', 1);
+
+
+-- INSERT CLIENTES
+CALL insertClient('Adán Céspedes', 102222222, 'adan@gmail.com', '12345', '88882222', '1985-08-24', 'avatar2.png', 3, 'SUV', 'Guápiles, Limón', 'Profesor');
+CALL insertClient('Enrique Ramírez', 103333333, 'enrique@gmail.com', '12345', '88883333', '2000-01-15', 'avatar3.png', 3, '4x4', 'Grecia, Alajuela', 'Estudiante');
+CALL insertClient('Wilber Edison', 104444444, 'wilber@gmail.com', '12345', '88884444', '1992-11-05', 'avatar4.png', 3, 'Pick-up', 'La Uruca, San José', 'Mecánico');
+CALL insertClient('Joshua Solano', 105555555, 'joshua@gmail.com', '12345', '88885555', '1997-06-30', 'avatar5.png', 3, 'Deportivo', 'Heredia, Centro', 'Comerciante');
+
+-- INSER CITAS
+INSERT INTO workshop_schedule 
+(number_reference, license_plate, entry_date, reason_service, reception_mileage, id_client, id_branch, is_active)
+VALUES
+(53030111, 'ABC123', '2026-05-30', 'Revisión general del vehículo y cambio de aceite.', 45200, 3, 1, TRUE),
+(53030122, 'XYZ789', '2026-05-31', 'Ruido en frenos delanteros.', 78500, 3, 2, TRUE),
+(60130133, 'GHI456', '2026-06-01', 'Diagnóstico por pérdida de potencia.', 63000, 3, 3, TRUE);
+
+-- INSERT REPORTES REPARACION
+INSERT INTO repair_reports
+(number_reference, technical_diagnosis, spare_parts, observations, cost, taxes, total_payment, completion_date, id_mechanic, id_appointment, is_active)
+VALUES
+(530202001, 'Se realizó revisión general. Se detectó aceite degradado y filtro sucio.', 'Filtro de aceite, aceite 10W-30', 'Vehículo entregado en buen estado.', 35000, 4550, 39550, '2026-05-30', 2, 1, TRUE),
+
+(531202002, 'Se identificó desgaste en pastillas de freno delanteras.', 'Pastillas de freno delanteras', 'Se recomienda revisión de discos en próxima visita.', 48000, 6240, 54240, '2026-05-31', 2, 2, TRUE),
+
+(601202003, 'Se detectó obstrucción parcial en filtro de aire y sensores con lectura irregular.', 'Filtro de aire, limpieza de sensores', 'Prueba de ruta realizada correctamente.', 42000, 5460, 47460, '2026-06-01', 2, 3, TRUE);
+
+
+
  
