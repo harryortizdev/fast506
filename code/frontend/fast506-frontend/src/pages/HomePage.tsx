@@ -37,7 +37,7 @@ const HomePage = () => {
 
       <main style={{ flex: 1 }} className="container my-4">
 
-        <CarouselForAds ads={adAdvertisement} />
+        <CarouselForAds ads={adAdvertisement} id="carouselAdvertisement"  />
 
         <br></br>
         <br></br>
@@ -94,7 +94,7 @@ const HomePage = () => {
 
           </strong>
         </h1>
-        <CarouselForAds ads={adBrand} />
+        <CarouselForAds ads={adBrand} id='carouselBranchCar' />
 
 
 
