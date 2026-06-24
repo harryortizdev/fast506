@@ -24,10 +24,10 @@ public interface AdministratorRespository extends JpaRepository<Administrator, I
 
     @Modifying
     @Transactional
-    @Query(value = "call db_fast506.deleteAdministrator(:id_Admin)", nativeQuery = true)
-    void deleteAdministrator(@Param("id_Admin") Integer id_Admin);
+    @Query(value = "call db_fast506.deleteUser(:id)", nativeQuery = true)
+    void deleteAdministrator(@Param("id") int id);
 
-    @Query(value = "call db_fast506.findAdministratorById(:id_Admin)", nativeQuery = true)
-    Administrator findAdministratorById(@Param("id_Admin") Integer id_Admin);
+    @Query(value = "call db_fast506.findAdministratorById(:id)", nativeQuery = true)
+    Administrator findAdministratorById(@Param("id") int id);
 
 }

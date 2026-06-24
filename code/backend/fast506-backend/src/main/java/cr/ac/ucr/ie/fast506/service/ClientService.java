@@ -92,11 +92,6 @@ public class ClientService {
 
         }
 
-        if (client.getProfileImage() == null) {
-
-            throw new IllegalArgumentException("La foto de perfil es requerida.");
-
-        }
 
         if (client.getCommInterest() == null || !client.getCommInterest().matches("Sedán|SUV|Camioneta|Deportivo|Híbrido|Eléctrico|Convertible|Todoterreno")) {
 

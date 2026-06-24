@@ -50,18 +50,16 @@ const AdministratorForm = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
+    if (name === "idRole") {
+      setForm({ ...form, role: value === "" ? undefined : { idRole: Number(value) } });
+      return;
+    }
     const parsedValue =
       name === "dateBirth"
         ? new Date(value)
         : name === "id"
-          ? value === ""
-            ? ""
-            : Number(value)
-          : name === "idRole"
-            ? value === ""
-              ? ""
-              : Number(value)
-            : value;
+          ? value === "" ? "" : Number(value)
+          : value;
     setForm({ ...form, [name]: parsedValue });
   };
 
@@ -290,9 +288,9 @@ const AdministratorForm = ({
         <div className="mb-3">
           <label>Rol</label>
           <select
-            className={`form-control ${errors.idRole ? "is-invalid" : ""}`}
+            className={`form-control ${errors.role ? "is-invalid" : ""}`}
             name="idRole"
-            value={form.idRole || ""}
+            value={form.role?.idRole || ""}
             onChange={handleChange}
           >
             <option value="">Seleccione un rol</option>
@@ -302,8 +300,8 @@ const AdministratorForm = ({
               </option>
             ))}
           </select>
-          {errors.idRole && (
-            <div className="invalid-feedback">{errors.idRole}</div>
+          {errors.role && (
+            <div className="invalid-feedback">{errors.role}</div>
           )}
         </div>
 

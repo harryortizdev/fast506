@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import ButtonNew from "../components/ButtonNew";
 import RoleForm from "../components/organisms/RoleForm";
 import TableGeneric from "../components/organisms/TableGeneric";
+import PermissionModal from "../components/organisms/PermissionModal";
 import { getAll, deleteRole } from "../services/RoleService";
 import { Role } from "../models/Role";
 import Navbar from "../components/organisms/Navbar";
@@ -13,6 +14,7 @@ const RolePage = () => {
   const [roles, setRoles] = useState<Role[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [roleToEdit, setRoleToEdit] = useState<Role | undefined>(undefined);
+  const [roleForPermissions, setRoleForPermissions] = useState<Role | undefined>(undefined);
 
   const loadRoles = async () => {
     const data = await getAll();
@@ -68,6 +70,12 @@ const RolePage = () => {
         backgroundColor: "#EEF1EF",
       }}
     >
+      {roleForPermissions && (
+        <PermissionModal
+          role={roleForPermissions}
+          onClose={() => setRoleForPermissions(undefined)}
+        />
+      )}
       <Navbar />
 
       <main style={{ flex: 1 }}>
@@ -112,6 +120,18 @@ const RolePage = () => {
                   columns={columns}
                   onDelete={handleDelete}
                   onEdit={handleEdit}
+                  extraActions={[
+                    {
+                      label: "Permisos",
+                      icon: <i className="bi bi-key" />,
+                      onClick: (role) => setRoleForPermissions(role),
+                      backgroundColor: "transparent",
+                      hoverColor: "#0d6efd",
+                      color: "#0d6efd",
+                      buttonClass:
+                        "btn btn-outline-primary btn-sm d-flex align-items-center justify-content-center gap-2",
+                    },
+                  ]}
                 />
               ) : (
                 <RoleForm

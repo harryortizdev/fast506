@@ -5,12 +5,10 @@
 package cr.ac.ucr.ie.fast506.repository;
 
 import cr.ac.ucr.ie.fast506.domain.User;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-/**
- *
- * @author ediso
- */
 public interface UserRepository extends JpaRepository<User, Integer> {
-    
+
+    Optional<User> findByEmail(String email);
 }

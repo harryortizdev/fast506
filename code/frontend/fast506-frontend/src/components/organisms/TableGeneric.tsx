@@ -1,12 +1,23 @@
 import React from "react";
 import ButtonIcon from "../molecules/ButtonIcon";
 
+interface ExtraAction<T> {
+  label: string;
+  icon: React.ReactNode;
+  onClick: (item: T) => void;
+  backgroundColor?: string;
+  hoverColor?: string;
+  color?: string;
+  buttonClass?: string;
+}
+
 interface TableGenericProps<T> {
   data?: T[];
   columns: { key: keyof T; label: string }[];
   onDelete?: (item: T) => void;
   onEdit?: (item: T) => void;
   disabledActions?: boolean;
+  extraActions?: ExtraAction<T>[];
 }
 
 const stickyRight = (
@@ -25,6 +36,7 @@ const TableGeneric = <T extends object>({
   onDelete,
   onEdit,
   disabledActions = false,
+  extraActions = [],
 }: TableGenericProps<T>) => {
 
   return (
@@ -138,6 +150,19 @@ const TableGeneric = <T extends object>({
                 >
 
                   <div className="d-flex flex-column flex-sm-row gap-2">
+
+                    {extraActions.map((action, i) => (
+                      <ButtonIcon
+                        key={i}
+                        label={action.label}
+                        onClick={() => action.onClick(item)}
+                        icon={action.icon}
+                        className={action.buttonClass ?? "btn btn-sm d-flex align-items-center justify-content-center gap-2"}
+                        backgroundColor={action.backgroundColor ?? "transparent"}
+                        hoverColor={action.hoverColor ?? "#2C3E50"}
+                        color={action.color ?? "#EEF1EF"}
+                      />
+                    ))}
 
                     <ButtonIcon
                       label="Editar"

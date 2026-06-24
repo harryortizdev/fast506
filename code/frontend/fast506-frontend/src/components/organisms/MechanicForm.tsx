@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Mechanic } from "../../models/Mechanic";
 import { create, updateMechanic } from "../../services/MechanicService";
 import AlertSuccess from "../atoms/AlertSuccess";
 import AlertWarning from "../atoms/AlertWarning";
 import FormField from "../molecules/FormField";
 import Button from "../atoms/Button";
+import { Role } from "../../models/Role";
+import * as RoleService from "../../services/RoleService";
 
 interface MechanicFormProps {
   onClose: () => void;
@@ -17,16 +19,34 @@ const MechanicForm = ({ onClose, onRefresh, mechanicToEdit }: MechanicFormProps)
     mechanicToEdit || { isActive: true }
   );
   const [errors, setErrors] = useState<Partial<Record<keyof Mechanic, string>>>({});
+  const [roles, setRoles] = useState<Role[]>([]);
+
+  useEffect(() => {
+    const loadRoles = async () => {
+      try {
+        const rolesData = await RoleService.getAll();
+        setRoles(rolesData);
+      } catch {
+        AlertWarning("Error al cargar los roles");
+      }
+    };
+    loadRoles();
+  }, []);
 
   const specialtyOptions = ["Motor", "Transmisión", "Electricidad", "Suspensión", "Frenos"];
   const certLevelOptions = ["Básico", "Intermedio", "Avanzado", "Experto"];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    const parsedValue = name === "dateBirth"
-      ? new Date(value)
-      : name === "id"
-        ? (value === "" ? "" : Number(value))
+    if (name === "idRole") {
+      setForm({ ...form, role: value === "" ? undefined : { idRole: Number(value) } });
+      return;
+    }
+    const parsedValue =
+      name === "dateBirth"
+        ? new Date(value)
+        : name === "id"
+        ? value === "" ? "" : Number(value)
         : value;
     setForm({ ...form, [name]: parsedValue });
   };
@@ -234,6 +254,22 @@ const MechanicForm = ({ onClose, onRefresh, mechanicToEdit }: MechanicFormProps)
             ))}
           </select>
           {errors.certLevel && <div className="invalid-feedback">{errors.certLevel}</div>}
+        </div>
+
+        <div className="mb-3">
+          <label>Rol:</label>
+          <select
+            className={`form-control ${errors.role ? "is-invalid" : ""}`}
+            name="idRole"
+            value={form.role?.idRole || ""}
+            onChange={handleChange}
+          >
+            <option value="">Seleccione un rol</option>
+            {roles.map((role) => (
+              <option key={role.idRole} value={role.idRole}>{role.name}</option>
+            ))}
+          </select>
+          {errors.role && <div className="invalid-feedback">{errors.role}</div>}
         </div>
 
         <div className="text-center mt-4">

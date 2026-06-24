@@ -9,7 +9,7 @@ export interface Administrator {
     dateBirth: Date;
     profileImage: string;
     isActive: boolean;
-    idRole: number;
+    role: { idRole: number };
     employeeId: string;
     corporateEmail: string;
 

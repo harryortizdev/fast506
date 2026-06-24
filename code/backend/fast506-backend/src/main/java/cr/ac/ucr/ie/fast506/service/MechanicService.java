@@ -87,11 +87,6 @@ public class MechanicService {
 
         }
 
-        if (mechanic.getProfileImage() == null) {
-
-            throw new IllegalArgumentException("La foto de perfil es requerida.");
-
-        }
 
         if (mechanic.getEmployeeId() == null || !mechanic.getEmployeeId().matches("^[a-zA-Z0-9]{1,20}$")) {
 

@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package cr.ac.ucr.ie.fast506.service;
 
 import cr.ac.ucr.ie.fast506.domain.User;
@@ -9,14 +5,11 @@ import cr.ac.ucr.ie.fast506.repository.UserRepository;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-/**
- *
- * @author ediso
- */
 @Service
 public class UserService {
-    
+
     @Autowired
     UserRepository userRepository;
 
@@ -24,4 +17,9 @@ public class UserService {
         return userRepository.findById(id);
     }
 
+    @Transactional(readOnly = true)
+    public Optional<User> login(String email, String password) {
+        return userRepository.findByEmail(email)
+                .filter(user -> user.isIsActive() && user.getPassword().equals(password));
+    }
 }

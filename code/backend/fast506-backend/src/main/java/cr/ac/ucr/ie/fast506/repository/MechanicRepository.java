@@ -19,7 +19,7 @@ Mechanic getMechanicById(@Param("id") int id);
 
 @Modifying
 @Transactional
-@Query(value = "call db_fast506.deleteMechanicById(:id)", nativeQuery = true)
+@Query(value = "call db_fast506.deleteUser(:id)", nativeQuery = true)
 void deleteMechanicById(@Param("id") Integer id);
 
 }

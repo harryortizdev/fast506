@@ -1,4 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import PrivateRoute from "./components/common/PrivateRoute";
+
 import HomePage from "./pages/HomePage";
 import UnitPage from "./pages/UnitPage";
 import BranchPage from "./pages/BranchPage";
@@ -20,34 +23,87 @@ import WorkshopSchedulePage from "./pages/WorkshopSchedulePage";
 import CreateWorkshopSchedule from "./pages/CreateWorkshopSchedule";
 import RepairReportPage from "./pages/RepairReportPage";
 import RolePage from "./pages/RolePage";
-
+import LoginForm from "./components/organisms/LoginForm";
+import RegisterForm from "./components/organisms/RegisterForm";
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/admin/units" element={<UnitPage />} />
-        <Route path="/admin/testdrive" element={<TestdrivePage />} />
-        <Route path="/admin/branches" element={<BranchPage />} />
-        <Route path="/admin/suppliers" element={<SupplierPage />} />
-        <Route path="/branches" element={<ShowBranches />} />
-        <Route path="/admin/administrators" element={<AdministratorPage />} />
-        <Route path="/admin/clients" element={<ClientPage />} />
-        <Route path="/admin/mechanics" element={<MechanicPage />} />
-        <Route path="/admin/catalogs" element={<CatalogPage />} />
-        <Route path="/testdrive" element={<CreateTestdrive />} />
-        <Route path="/admin/quotations" element={<QuotationPage />} />
-        <Route path="/quotation" element={<CreateQuotation />} />
-        <Route path="/admin/ad" element={<AdPage />} />
-        <Route path="/catalog/detail/:id" element={<CatalogDetailPage />} />
-        <Route path="/admin/sales" element={<SalesPage />} />
-        <Route path="/catalog/client/sales" element={<SalesClientPage />} />
-        <Route path="/admin/repair-reports" element={<RepairReportPage />} />
-        <Route path="/workshop-schedules/create" element={<CreateWorkshopSchedule />} />
-        <Route path="/admin/workshop-schedules" element={<WorkshopSchedulePage />} />
-        <Route path="/admin/roles" element={<RolePage />} />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          
+          {/* Rutas públicas */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/register" element={<RegisterForm />} />
+          <Route path="/branches" element={<ShowBranches />} />
+          <Route path="/catalog/detail/:id" element={<CatalogDetailPage />} />
+          <Route path="/catalog/client/sales" element={<SalesClientPage />} />
+
+          {/* Rutas que requieren inicio de sesión */}
+          <Route path="/testdrive" element={
+            <PrivateRoute><CreateTestdrive /></PrivateRoute>
+          } />
+          <Route path="/quotation" element={
+            <PrivateRoute><CreateQuotation /></PrivateRoute>
+          } />
+          <Route path="/workshop-schedules/create" element={
+            <PrivateRoute><CreateWorkshopSchedule /></PrivateRoute>
+          } />
+
+          {/* Rutas de mecánico */}
+          <Route path="/mechanic/repair-reports" element={
+            <PrivateRoute allowedModules={["repairreport"]}><RepairReportPage /></PrivateRoute>
+          } />
+          <Route path="/mechanic/workshop-schedules" element={
+            <PrivateRoute allowedModules={["mechanic"]}><WorkshopSchedulePage /></PrivateRoute>
+          } />
+
+          {/* Rutas de administración */}
+          <Route path="/admin/units" element={
+            <PrivateRoute allowedModules={["units"]}><UnitPage /></PrivateRoute>
+          } />
+          <Route path="/admin/testdrive" element={
+            <PrivateRoute allowedModules={["testdrive"]}><TestdrivePage /></PrivateRoute>
+          } />
+          <Route path="/admin/branches" element={
+            <PrivateRoute allowedModules={["branches"]}><BranchPage /></PrivateRoute>
+          } />
+          <Route path="/admin/suppliers" element={
+            <PrivateRoute allowedModules={["suppliers"]}><SupplierPage /></PrivateRoute>
+          } />
+          <Route path="/admin/administrators" element={
+            <PrivateRoute allowedModules={["users"]}><AdministratorPage /></PrivateRoute>
+          } />
+          <Route path="/admin/clients" element={
+            <PrivateRoute allowedModules={["users"]}><ClientPage /></PrivateRoute>
+          } />
+          <Route path="/admin/mechanics" element={
+            <PrivateRoute allowedModules={["users"]}><MechanicPage /></PrivateRoute>
+          } />
+          <Route path="/admin/catalogs" element={
+            <PrivateRoute allowedModules={["catalog"]}><CatalogPage /></PrivateRoute>
+          } />
+          <Route path="/admin/quotations" element={
+            <PrivateRoute allowedModules={["quotation"]}><QuotationPage /></PrivateRoute>
+          } />
+          <Route path="/admin/ad" element={
+            <PrivateRoute allowedModules={["adds"]}><AdPage /></PrivateRoute>
+          } />
+          <Route path="/admin/sales" element={
+            <PrivateRoute allowedModules={["sales"]}><SalesPage /></PrivateRoute>
+          } />
+          <Route path="/admin/repair-reports" element={
+            <PrivateRoute allowedModules={["repairreport"]}><RepairReportPage /></PrivateRoute>
+          } />
+          <Route path="/admin/workshop-schedules" element={
+            <PrivateRoute allowedModules={["mechanic"]}><WorkshopSchedulePage /></PrivateRoute>
+          } />
+          <Route path="/admin/roles" element={
+            <PrivateRoute allowedModules={["roles"]}><RolePage /></PrivateRoute>
+          } />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

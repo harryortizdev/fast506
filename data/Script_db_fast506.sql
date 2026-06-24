@@ -3,8 +3,8 @@
 
 CREATE DATABASE IF NOT EXISTS db_fast506;
 USE db_fast506;
--- 02/05/2026 - Creación de la tabla Users (Allan)
 
+-- 02/05/2026 - Creación de la tabla Users (Allan)
 CREATE TABLE users (
 
 	id_user INT PRIMARY KEY UNIQUE AUTO_INCREMENT,
@@ -137,6 +137,10 @@ DELIMITER ;
 -- Insertar en administrator
 
 DROP PROCEDURE IF EXISTS insertAdministrator;
+
+call insertAdministrator(
+'adminfast',777777777,'adminfast@gmail.com','Admin1713*',88776655,'2000-05-17',null,1,'ADMIN00','adminfast@agenciafast.cr'
+);
 
 DELIMITER $$
 USE `db_fast506`$$
@@ -2645,12 +2649,16 @@ REFERENCES roles(id_role);
 
 CREATE TABLE permissions (
     id_Permissions INT PRIMARY KEY AUTO_INCREMENT,
+    id_role INT NOT NULL,
     id_Module VARCHAR(50),
     create_Permission BOOLEAN,
     read_Permission BOOLEAN,
     update_Permission BOOLEAN,
     delete_Permission BOOLEAN,
-    is_Active BOOLEAN
+    is_Active BOOLEAN,
+    FOREIGN KEY(id_role)
+    REFERENCES roles(id_role),
+    UNIQUE(id_role,id_Module)
 );
 
 -- 30/05/26 procedimientos almacenados para el crud de roles (Allan)
@@ -2771,6 +2779,102 @@ END $$
 
 DELIMITER ;
 
+-- Procedimientos para la tabla de permisos
+
+DROP PROCEDURE IF EXISTS getPermissionsByRole;
+
+DELIMITER $$
+
+CREATE PROCEDURE getPermissionsByRole(
+
+    IN p_id_role INT
+
+)
+
+BEGIN
+
+    SELECT *
+    FROM permissions
+    WHERE
+        id_role =
+        p_id_role
+        AND
+        is_Active = TRUE
+    ORDER BY id_Module;
+
+END $$
+
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS deletePermissionsByRole;
+
+DELIMITER $$
+
+CREATE PROCEDURE deletePermissionsByRole(
+    IN p_id_role INT
+)
+
+BEGIN
+    UPDATE permissions
+    SET
+        is_Active = FALSE
+    WHERE
+        id_role =
+        p_id_role;
+END $$
+
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS savePermissionByRole;
+
+DELIMITER $$
+
+CREATE PROCEDURE savePermissionByRole(
+    IN p_id_role INT,
+    IN p_id_Module VARCHAR(50),
+    IN p_create BOOLEAN,
+    IN p_read BOOLEAN,
+    IN p_update BOOLEAN,
+    IN p_delete BOOLEAN
+)
+
+BEGIN
+
+    INSERT INTO permissions(
+        id_role,
+        id_Module,
+        create_Permission,
+        read_Permission,
+        update_Permission,
+        delete_Permission,
+        is_Active
+    )
+
+    VALUES(
+        p_id_role,
+        p_id_Module,
+        p_create,
+        p_read,
+        p_update,
+        p_delete,
+        TRUE
+    )
+
+    ON DUPLICATE KEY UPDATE
+    
+        create_Permission =
+        VALUES(create_Permission),
+        read_Permission =
+        VALUES(read_Permission),
+        update_Permission =
+        VALUES(update_Permission),
+        delete_Permission =
+        VALUES(delete_Permission),
+        is_Active = TRUE;
+
+END $$
+
+DELIMITER ;
 
 -- INSERTAR ROLES
 INSERT INTO roles (role_Name, description, create_Date, level_Hierarchy, is_Worker, have_Email, is_Active)

@@ -24,7 +24,7 @@ public interface ClientRepository extends JpaRepository<Client, Integer> {
     @Query(value = "call getClientByCredentials(:email, :password)", nativeQuery = true)
     Client findByEmailAndPassword(@Param("email") String email, @Param("password") String password);
     
-    @Query(value= "call db_fast506.deleteClientById(:id)", nativeQuery = true)
+    @Query(value= "call db_fast506.deleteUser(:id)", nativeQuery = true)
     void deleteClientById(@Param("id") int id);
 
     @Query(value = "call db_fast506.getAllClients()", nativeQuery = true)

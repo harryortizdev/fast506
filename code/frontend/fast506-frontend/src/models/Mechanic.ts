@@ -11,6 +11,7 @@ export interface Mechanic {
     isActive: boolean;
     employeeId: string;
     corporateEmail: string;
+    role: { idRole: number };
     specialty: string;
     certLevel: string;
 

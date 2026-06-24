@@ -102,12 +102,6 @@ public class AdministratorService {
 
         }
 
-        if (admin.getProfileImage() == null) {
-
-            throw new IllegalArgumentException("La foto de perfil es requerida.");
-
-        }
-
         if (admin.getEmployeeId() == null || !admin.getEmployeeId().matches("^[a-zA-Z0-9]{1,20}$")) {
 
             throw new IllegalArgumentException("ID de empleado inválido: debe tener unicamente letras y números, máximo 20 caracteres.");

@@ -37,6 +37,10 @@ public class User {
     @Column(name = "is_active")
     private boolean isActive;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_role")
+    private Role role;
+
     
     public int getIdUser() {
         return idUser;
@@ -110,6 +114,14 @@ public class User {
 
     public void setIsActive(boolean isActive) {
         this.isActive = isActive;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
 }

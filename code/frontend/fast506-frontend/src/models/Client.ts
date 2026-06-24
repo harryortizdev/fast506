@@ -9,6 +9,7 @@ export interface Client {
     dateBirth: Date;
     profileImage: string;
     isActive: boolean;
+    role: { idRole: number };
     commInterest: string;
     physicalAddress: string;
     occupation: string;
