@@ -139,7 +139,7 @@ const TestdrivePage = () => {
   const transformedTestDrive: TestdriveTable[] = testdrive.map((q) => ({
     ...q, // Copia la cotización original intacta (¡así no se rompe el Editar!)
     creationDateFormatted: formatDate(q.creationDate),
-    scheduledDateFormatted: formatDate(q.creationDate),
+    scheduledDateFormatted: formatDate(q.scheduledDate),
     clientName: getUserName(q.idUser),
     carName: getUnitName(q.idCar),
     branchName: getBranchName(q.idBranch),

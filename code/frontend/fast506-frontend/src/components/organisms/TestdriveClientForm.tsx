@@ -11,13 +11,14 @@ import { updateTestdrive } from "../../services/TestdriveService";
 import AlertWarning from "../atoms/AlertWarning";
 import ButtonIcon from "../molecules/ButtonIcon";
 import Input from "../atoms/Input";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 interface TestdriveFormProps {
     onClose: () => void;
     onRefresh: () => void;
     testdriveToEdit?: Testdrive;
     carName?: string;
-
 }
 
 const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit, carName }: TestdriveFormProps) => {
@@ -33,25 +34,52 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit, carName }: T
     const [clientName, setClientName] = useState("");
 
     const RANGO_HORAS = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00"];
+
+//Obtener la fecha de HOY REAL para comparar en el select de horas 
+    const hoyReal = new Date();
+    const anioHoy = hoyReal.getFullYear();
+    const mesHoy = String(hoyReal.getMonth() + 1).padStart(2, '0');
+    const diaHoy = String(hoyReal.getDate()).padStart(2, '0');
+    const fechaHoyReal = `${anioHoy}-${mesHoy}-${diaHoy}`;
+
+    //Obtener la hora actual 
+    const horaActual = `${String(hoyReal.getHours()).padStart(2, '0')}:${String(hoyReal.getMinutes()).padStart(2, '0')}`;
+
+    //mínima para el calendario 
     const hoy = new Date();
+    if (hoyReal.getHours() >= 15) {
+        hoy.setDate(hoy.getDate() + 1);
+    }
     const anio = hoy.getFullYear();
     const mes = String(hoy.getMonth() + 1).padStart(2, '0');
     const dia = String(hoy.getDate()).padStart(2, '0');
     const fechaMinima = `${anio}-${mes}-${dia}`;
 
-    const proximoMes = new Date();
-    proximoMes.setMonth(hoy.getMonth() + 1);
+    const proximoMes = new Date(hoy);
+    proximoMes.setMonth(proximoMes.getMonth() + 1);
     const anioMax = proximoMes.getFullYear();
     const mesMax = String(proximoMes.getMonth() + 1).padStart(2, '0');
     const diaMax = String(proximoMes.getDate()).padStart(2, '0');
-
     const fechaMaxima = `${anioMax}-${mesMax}-${diaMax}`;
-    const horaActual = `${String(hoy.getHours()).padStart(2, '0')}:${String(hoy.getMinutes()).padStart(2, '0')}`;
 
     useEffect(() => {
         getAllUnits().then(setUnits).catch(() => console.error("Error cargando vehículos"));
         getAllBranches().then(setBranch).catch(() => console.error("Error cargando sucursales"));
     }, []);
+
+    useEffect(() => {
+        if (testdriveToEdit && testdriveToEdit.idUser) {
+            getClientById(testdriveToEdit.idUser)
+                .then((client) => {
+                    if (client) {
+                        setIsClientVerified(true);
+                        setClientName(client.name);
+                        setId(String(client.idUser));
+                    }
+                })
+                .catch(() => console.error("Error al precargar cliente en edición"));
+        }
+    }, [testdriveToEdit]);
 
     useEffect(() => {
         if (carName && units.length > 0) {
@@ -63,7 +91,7 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit, carName }: T
                 setForm((f) => ({ ...f, idCar: matchedVehicle.idCar }));
             }
         }
-    }, [carName, units]); 
+    }, [carName, units]);
 
     useEffect(() => {
         if (form.scheduledDate && form.idBranch) {
@@ -108,6 +136,14 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit, carName }: T
             [name]: name === "idUser" || name === "idCar" || name === "idBranch" ? Number(value) : value
         };
 
+        if (name === "idBranch") {
+            updatedForm = {
+                ...updatedForm,
+                initiationTime: undefined,
+                finalizationTime: undefined
+            };
+        }
+
         if (name === "initiationTime") {
             if (value) {
                 const [horas, minutos] = value.split(":").map(Number);
@@ -150,13 +186,18 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit, carName }: T
 
         try {
             if (testdriveToEdit) {
-                await updateTestdrive({ ...form } as Testdrive);
-                sendEmailUpdate({ ...form } as Testdrive);
+                const updatedTestdrive = {
+                    ...testdriveToEdit,
+                    ...form
+                } as Testdrive;
+
+                await updateTestdrive(updatedTestdrive);
+                sendEmailUpdate(updatedTestdrive);
                 AlertSuccess("Los cambios fueron guardados.");
             } else {
                 const newTestdrive = {
                     ...form,
-                    creationDate: fechaMinima,
+                    creationDate: fechaHoyReal,
                     statusAppointment: "Agendada",
                     isActive: 1
                 } as Testdrive;
@@ -196,8 +237,6 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit, carName }: T
                             icon={<i className="bi bi-check-lg"></i>}
                             className={""}
                         />
-
-
                     </div>
                     {isClientVerified && (
                         <div className="text-success small mt-2 fw-bold ">
@@ -205,7 +244,6 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit, carName }: T
                         </div>
                     )}
                 </div>
-
 
                 <div className="mb-2">
                     <label className="form-label">Vehículo</label>
@@ -219,12 +257,13 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit, carName }: T
                         <option value="">Seleccione un vehículo</option>
                         {units.map((u) => (
                             <option key={u.idCar} value={u.idCar}>
-                                {u.carName}
+                                {u.carName + " "+ u.transmission + " " + u.fuelType}
                             </option>
                         ))}
                     </select>
                     {errors.idCar && <div className="invalid-feedback d-block">{errors.idCar}</div>}
                 </div>
+
                 <div className="row">
                     <div className="col-6">
                         <div className="mb-2">
@@ -234,7 +273,7 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit, carName }: T
                                 name="idBranch"
                                 value={form.idBranch ?? ""}
                                 onChange={handleChange}
-                                disabled={!isClientVerified} // Desactivado hasta verificar
+                                disabled={!isClientVerified}
                             >
                                 <option value="">Seleccione una Sucursal</option>
                                 {branches.map((b) => (
@@ -248,22 +287,42 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit, carName }: T
 
                         <div className="mb-2">
                             <label className="form-label">Fecha de la cita</label>
-                            <input
-                                type="date"
-                                className={`form-control ${errors.scheduledDate ? "is-invalid" : ""}`}
-                                name="scheduledDate"
-                                value={form.scheduledDate || ""}
-                                onChange={handleChange}
-                                min={fechaMinima}
-                                max={fechaMaxima}
-                                disabled={!isClientVerified} // Desactivado hasta verificar
+                            <DatePicker
+                                wrapperClassName="w-100"
+                                className={`form-control w-100 ${errors.scheduledDate ? "is-invalid" : ""}`}
+                                placeholderText="Seleccione una fecha"
+                                dateFormat="dd/MM/yyyy"
+                                selected={form.scheduledDate ? new Date(form.scheduledDate + "T00:00:00") : null}
+                                minDate={new Date(fechaMinima + "T00:00:00")}
+                                maxDate={new Date(fechaMaxima + "T00:00:00")}
+                                disabled={!isClientVerified}
+                                onChange={(date: Date | null) => {
+                                    if (date) {
+                                        const year = date.getFullYear();
+                                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                                        const day = String(date.getDate()).padStart(2, '0');
+
+                                        setForm({
+                                            ...form,
+                                            scheduledDate: `${year}-${month}-${day}`,
+                                            initiationTime: undefined,   
+                                            finalizationTime: undefined 
+                                        });
+                                    } else {
+                                        setForm({
+                                            ...form,
+                                            scheduledDate: undefined,
+                                            initiationTime: undefined,
+                                            finalizationTime: undefined
+                                        });
+                                    }
+                                }}
                             />
                             {errors.scheduledDate && <div className="invalid-feedback d-block">{errors.scheduledDate}</div>}
                         </div>
                     </div>
 
                     <div className="col-6">
-
                         <div className="mb-2">
                             <label className="form-label">Hora de Inicio</label>
                             <select
@@ -271,7 +330,7 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit, carName }: T
                                 name="initiationTime"
                                 value={form.initiationTime || ""}
                                 onChange={handleChange}
-                                disabled={!isClientVerified || !form.scheduledDate || !form.idBranch} // Desactivado hasta verificar e ingresar fecha
+                                disabled={!isClientVerified || !form.scheduledDate || !form.idBranch}
                             >
                                 <option value="">
                                     {form.scheduledDate && form.idBranch ? "Seleccione una hora" : "Seleccione fecha y sucursal"}
@@ -279,7 +338,7 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit, carName }: T
                                 {RANGO_HORAS
                                     .filter(hora => {
                                         if (occupiedHours.includes(hora)) return false;
-                                        if (form.scheduledDate === fechaMinima) {
+                                        if (form.scheduledDate === fechaHoyReal) {
                                             return hora > horaActual;
                                         }
                                         return true;
@@ -295,7 +354,6 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit, carName }: T
                         </div>
 
                         <div className="mb-2">
-
                             <label className="form-label">Hora de Finalización</label>
                             <Input
                                 name="finalizationTime"
@@ -304,12 +362,9 @@ const ClientTestdriveForm = ({ onClose, onRefresh, testdriveToEdit, carName }: T
                                 type="time"
                                 disabled={true}
                             />
-
                         </div>
                     </div>
                 </div>
-
-
 
                 <div className="mt-2 d-flex justify-content-center">
                     <Button

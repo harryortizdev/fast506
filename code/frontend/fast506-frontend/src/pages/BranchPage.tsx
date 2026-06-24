@@ -80,7 +80,7 @@ const BranchPage = () => {
   };
 
    const transformedBranchTable: branchTable[] = branch.map((q) => ({
-    ...q, // Copia la original intacta (¡así no se rompe el Editar!)
+    ...q, // Copia la original intacta 
     administratorName: geAdministratorName(q.idUser),
   }));
 

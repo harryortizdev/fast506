@@ -9,10 +9,11 @@ import FormField from "../molecules/FormField";
 import AlertWarning from "../atoms/AlertWarning";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+
 interface AdFormProps {
-    onClose: () => void;
-    onRefresh: () => void;
-    adToEdit?: Ad;
+    onClose: () => void;     // Función para cerrar la ventana modal
+    onRefresh: () => void;   // Función para recargar la lista de anuncios
+    adToEdit?: Ad;           // El anuncio a edita
 }
 
 const AdForm = ({ onClose, onRefresh, adToEdit }: AdFormProps) => {
@@ -25,8 +26,8 @@ const AdForm = ({ onClose, onRefresh, adToEdit }: AdFormProps) => {
 
     const hoy = new Date();
     const anio = hoy.getFullYear();
-    const mes = String(hoy.getMonth() + 1).padStart(2, '0');
-    const dia = String(hoy.getDate()).padStart(2, '0');
+    const mes = String(hoy.getMonth() + 1).padStart(2, '0'); // Suma 1 porque enero es 0
+    const dia = String(hoy.getDate()).padStart(2, '0');      // Agrega un cero a la izquierda si es menor a 10
     const fechaMinima = `${anio}-${mes}-${dia}`;
 
     useEffect(() => {
@@ -35,6 +36,7 @@ const AdForm = ({ onClose, onRefresh, adToEdit }: AdFormProps) => {
 
     useEffect(() => {
         if (adToEdit) {
+            // Si hay un anuncio para editar y tiene imagen ponemos su URL de previsualización
             if (adToEdit?.image) {
                 setImagePreview(
                     adToEdit.image.startsWith("http")
@@ -43,6 +45,7 @@ const AdForm = ({ onClose, onRefresh, adToEdit }: AdFormProps) => {
                 );
             }
         } else {
+            // Si no hay anuncio para editar, limpiamos todo el formulario
             setForm({});
             setImage(null);
             setImagePreview("");
@@ -58,11 +61,11 @@ const AdForm = ({ onClose, onRefresh, adToEdit }: AdFormProps) => {
     };
 
     const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
+        const file = e.target.files?.[0]; // obtenemos el primer archivo seleccionado
         if (!file) return;
 
-        setImage(file);
-        setImagePreview(URL.createObjectURL(file));
+        setImage(file); // Guardamos el archivo
+        setImagePreview(URL.createObjectURL(file)); // URL temporal local para mostrarla
     };
 
     const validate = (): boolean => {
@@ -85,15 +88,17 @@ const AdForm = ({ onClose, onRefresh, adToEdit }: AdFormProps) => {
         }
 
         setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
+        return Object.keys(newErrors).length === 0; 
     };
 
     const handleSubmit = async () => {
-        if (!validate()) return;
+        if (!validate()) return; 
 
         try {
+            //usamos formData en vez de un json
             const formData = new FormData();
 
+            // metemo los campos de texto al FormData
             formData.append("title", form.title || "");
             formData.append("category", form.category || "");
             formData.append("isActive", "true");
@@ -118,7 +123,7 @@ const AdForm = ({ onClose, onRefresh, adToEdit }: AdFormProps) => {
             }
 
             onRefresh();
-            onClose();
+            onClose(); 
 
         } catch (error) {
             console.error("Error al guardar:", error);
@@ -146,11 +151,10 @@ const AdForm = ({ onClose, onRefresh, adToEdit }: AdFormProps) => {
                     <DatePicker
                         wrapperClassName="w-100"
                         className={`form-control w-100 ${errors.expirationDate ? "is-invalid" : ""}`}
-
                         placeholderText="Seleccione una fecha"
                         dateFormat="dd/MM/yyyy"
                         selected={form.expirationDate ? new Date(form.expirationDate + "T00:00:00") : null}
-                        minDate={new Date()}
+                        minDate={new Date()} 
                         onChange={(date: Date | null) => {
                             setForm({
                                 ...form,

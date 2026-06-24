@@ -12,7 +12,7 @@ import { getAll as getAllAdministrators } from "../services/AdministratorService
 import { Administrator } from "../models/Administrator";
 
 
-type adTable = Ad & {
+type adTable = Ad & { //tabla ajustable 
   administratorName: string;
 };
 
@@ -22,14 +22,14 @@ const AdPage = () => {
   const [ad, setAd] = useState<Ad[]>([]); //guarda la lista de anuncios
   const [showForm, setShowForm] = useState(false); //formulario off
   const [adToEdit, setAdToEdit] = useState<Ad | undefined>(undefined); //resguarda el anuncio
-  const [administrators, setAdministrators] = useState<Administrator[]>([]);
+  const [administrators, setAdministrators] = useState<Administrator[]>([]); //lista administradores
 
   const loadAd = async () => {
     const data = await getAll();//pide lista anuncios
     setAd(data);//las setea
   };
 
-  const loadDetails = async () => {
+  const loadDetails = async () => { //cargo datos extra, en este caso lista de administradores
     try {
       const administratorsData = await getAllAdministrators();
       setAdministrators(Array.isArray(administratorsData) ? administratorsData : []);
@@ -47,7 +47,7 @@ const AdPage = () => {
 
   const handleSaveAndClose = async () => {
     await loadAd(); //lista de anuncios
-    loadDetails();
+    await loadDetails(); //ajusta id a nombre
 
     setAdToEdit(undefined); //limpia la unidad de editar
     setShowForm(false); //limpia formulario
@@ -71,7 +71,7 @@ const AdPage = () => {
     await deleteAd(ad.idAd!); //señal de eliminar
     AlertWarning("Anuncio eliminado correctamente."); //alert de eliminado correctamente
     await loadAd();//recargar la lista
-    loadDetails();
+    await loadDetails();
 
   };
 

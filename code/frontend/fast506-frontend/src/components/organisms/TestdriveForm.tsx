@@ -11,6 +11,8 @@ import AlertSuccess from "../atoms/AlertSuccess";
 import Button from "../atoms/Button";
 import FormField from "../molecules/FormField";
 import { updateTestdrive } from "../../services/TestdriveService";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 interface TestdriveFormProps {
     onClose: () => void;
@@ -27,23 +29,36 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
     const [occupiedHours, setOccupiedHours] = useState<string[]>([]); // Estado para almacenar horas ocupadas del día
     const [errors, setErrors] = useState<Partial<Record<keyof Testdrive, string>>>({});
 
-
     const RANGO_HORAS = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00"];
+
+    // 1. Obtener la fecha de HOY REAL (para comparar abajo en el select de horas)
+    const hoyReal = new Date();
+    const anioHoy = hoyReal.getFullYear();
+    const mesHoy = String(hoyReal.getMonth() + 1).padStart(2, '0');
+    const diaHoy = String(hoyReal.getDate()).padStart(2, '0');
+    const fechaHoyReal = `${anioHoy}-${mesHoy}-${diaHoy}`;
+
+    // 2. Obtener la hora actual para el filtro de horas
+    const horaActual = `${String(hoyReal.getHours()).padStart(2, '0')}:${String(hoyReal.getMinutes()).padStart(2, '0')}`;
+
+    // 3. Lógica para mover el CALENDARIO (fechaMinima) si ya pasaron las 3:00 PM
     const hoy = new Date();
+    if (hoyReal.getHours() >= 15) {
+        hoy.setDate(hoy.getDate() + 1);
+    }
+
     const anio = hoy.getFullYear();
     const mes = String(hoy.getMonth() + 1).padStart(2, '0');
     const dia = String(hoy.getDate()).padStart(2, '0');
     const fechaMinima = `${anio}-${mes}-${dia}`;
 
-    const proximoMes = new Date();
-    proximoMes.setMonth(hoy.getMonth() + 1);
+    // 4. Lógica para la fechaMaxima del calendario
+    const proximoMes = new Date(hoy);
+    proximoMes.setMonth(proximoMes.getMonth() + 1);
     const anioMax = proximoMes.getFullYear();
     const mesMax = String(proximoMes.getMonth() + 1).padStart(2, '0');
     const diaMax = String(proximoMes.getDate()).padStart(2, '0');
-
     const fechaMaxima = `${anioMax}-${mesMax}-${diaMax}`;
-
-    const horaActual = `${String(hoy.getHours()).padStart(2, '0')}:${String(hoy.getMinutes()).padStart(2, '0')}`;
 
     // Carga inicial de catálogos
     useEffect(() => {
@@ -70,20 +85,26 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
         const { name, value } = e.target;
 
         let updatedForm = {
-            ...form, [name]: name === "idUser" || name === "idCar" || name === "idBranch" ? Number(value) : value
+            ...form,
+            [name]: name === "idUser" || name === "idCar" || name === "idBranch" ? Number(value) : value
         };
 
-        // Lógica de automatización de la hora de finalización
+        // NUEVO: Si cambian la sucursal, reseteamos las horas acumuladas para obligar a re-elegir
+        if (name === "idBranch") {
+            updatedForm = {
+                ...updatedForm,
+                initiationTime: undefined,
+                finalizationTime: undefined
+            };
+        }
+
         if (name === "initiationTime") {
             if (value) {
                 const [horas, minutos] = value.split(":").map(Number);
                 const horaFinCalculada = `${String(horas + 1).padStart(2, '0')}:${String(minutos).padStart(2, '0')}`;
-
                 updatedForm = { ...updatedForm, finalizationTime: horaFinCalculada };
             } else {
-                updatedForm = {
-                    ...updatedForm, finalizationTime: ""
-                };
+                updatedForm = { ...updatedForm, finalizationTime: "" };
             }
         }
 
@@ -129,7 +150,7 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
             } else {
                 const newTestdrive = {
                     ...form,
-                    creationDate: fechaMinima,
+                    creationDate: fechaHoyReal,
                     statusAppointment: "Agendada",
                     isActive: 1
                 } as Testdrive;
@@ -152,14 +173,41 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
 
                 <div className="mb-2">
                     <label className="form-label">Fecha de la cita</label>
-                    <input
-                        type="date"
-                        className={`form-control ${errors.scheduledDate ? "is-invalid" : ""}`}
-                        name="scheduledDate"
-                        value={form.scheduledDate || ""}
-                        onChange={handleChange}
-                        min={fechaMinima}
-                        max={fechaMaxima}
+                    <DatePicker
+                        wrapperClassName="w-100"
+                        className={`form-control w-100 ${errors.scheduledDate ? "is-invalid" : ""}`}
+                        placeholderText="Seleccione una fecha"
+                        dateFormat="dd/MM/yyyy"
+
+                        // 1. Renderiza la fecha actual del formulario usando la hora local fija
+                        selected={form.scheduledDate ? new Date(form.scheduledDate + "T00:00:00") : null}
+
+                        // 2. Mapea tus variables string a objetos Date locales para bloquear el calendario
+                        minDate={new Date(fechaMinima + "T00:00:00")}
+                        maxDate={new Date(fechaMaxima + "T00:00:00")}
+
+                        // 3. Al seleccionar, parsea de forma local para no romper el filtro de horas (form.scheduledDate === fechaMinima)
+                        onChange={(date: Date | null) => {
+                            if (date) {
+                                const year = date.getFullYear();
+                                const month = String(date.getMonth() + 1).padStart(2, '0');
+                                const day = String(date.getDate()).padStart(2, '0');
+
+                                setForm({
+                                    ...form,
+                                    scheduledDate: `${year}-${month}-${day}`,
+                                    initiationTime: undefined, 
+                                    finalizationTime: undefined 
+                                });
+                            } else {
+                                setForm({
+                                    ...form,
+                                    scheduledDate: undefined,
+                                    initiationTime: undefined,
+                                    finalizationTime: undefined
+                                });
+                            }
+                        }}
                     />
                     {errors.scheduledDate && <div className="invalid-feedback d-block">{errors.scheduledDate}</div>}
                 </div>
@@ -211,7 +259,7 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
                         <option value="">Seleccione un vehículo</option>
                         {units.map((u) => (
                             <option key={u.idCar} value={u.idCar}>
-                                {u.carName}
+                                {u.carName + " "+ u.transmission + " " + u.fuelType}
                             </option>
                         ))}
                     </select>
@@ -228,17 +276,19 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
                         disabled={!form.scheduledDate || !form.idBranch}
                     >
                         <option value="">
-                            {form.scheduledDate && form.idBranch ? "Seleccione una hora": "Primero seleccione una fecha y una sucursal"}
+                            {form.scheduledDate && form.idBranch ? "Seleccione una hora" : "Primero seleccione una fecha y una sucursal"}
                         </option>
                         {RANGO_HORAS
                             .filter(hora => {
-                                //  Filtro del backend: Si la hora ya está ocupada en la base de datos, se descarta
+                                // Filtro del backend: Si la hora ya está ocupada, se descarta
                                 if (occupiedHours.includes(hora)) return false;
-                                //  Filtro de tiempo real: Si la fecha elegida es HOY, ocultamos las horas menores o iguales a la actual
-                                if (form.scheduledDate === fechaMinima) {
+
+                                // Comparamos contra la fecha real de hoy, no contra la del calendario
+                                if (form.scheduledDate === fechaHoyReal) {
                                     return hora > horaActual;
                                 }
-                                // Si es para otro día pasa la validación 
+
+                                // Si es para otro día (como mañana), muestra todo el rango de horas libre
                                 return true;
                             })
                             .map((hora) => (

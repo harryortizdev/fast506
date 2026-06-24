@@ -17,11 +17,11 @@ import { Catalog } from "../models/Catalog";
 
 
 
-type QuotationTable = Quotation & {
-  dateFormatted: string;      // Para el día/mes/año
-  userName: string;           // Para el nombre de la persona
-  carName: string;            // Para el nombre del vehículo
-  catalogName: string;         // Para el nombre de la sucursal (catálogo)
+type QuotationTable = Quotation & { //lista personalizada
+  dateFormatted: string;
+  userName: string;
+  carName: string;
+  catalogName: string;
 };
 
 
@@ -86,39 +86,39 @@ const QuotationPage = () => {
     await loadDetails(); //recarga datos extra
   };
 
-  const formatDate = (date?: any) => {
+const formatDate = (date?: any) => {
     if (!date) return "";
 
     let dateObject: Date;
 
-    // Si viene como array [año, mes, día] desde el backend
+    //    Si la fecha viene como un arreglo de número[2026, 6, 23]
     if (Array.isArray(date)) {
       const [year, month, day] = date;
+      
       dateObject = new Date(year, month - 1, day);
     } else {
-      // Si viene como string ISO
+
       dateObject = new Date(String(date).split("T")[0] + "T00:00:00");
     }
 
+    // corrupto o algo que no se pudo parsear bien getTime() devolve NaN es así, devolvemos el string original 
     if (isNaN(dateObject.getTime())) {
       return String(date);
     }
 
-    // Esto te lo devuelve en formato: "23 de junio de 2026" o similar
-    // Si preferís estrictamente "23/06/2026", avisame y lo cambiamos a una sola línea
     const formatted = dateObject.toLocaleDateString("es-CR", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
+      weekday: "long", 
+      day: "numeric", 
+      month: "long", 
       year: "numeric",
     });
 
     return formatted;
-  };
+};
 
   const getUserName = (idUser?: number) => {
     const c = clients.find((c) => Number(c.idUser) === Number(idUser));
-    return c?.name || `Usuario #${idUser}`; // Si no lo encuentra, pone el ID por defecto
+    return c?.name || `Usuario #${idUser}`;
   };
 
   const getUnitName = (idCar?: number) => {
@@ -132,7 +132,7 @@ const QuotationPage = () => {
   };
 
   const transformedQuotations: QuotationTable[] = quotation.map((q) => ({
-    ...q, // Copia la cotización original intacta (¡así no se rompe el Editar!)
+    ...q, // Copia la cotización original intact
     dateFormatted: formatDate(q.date),
     userName: getUserName(q.idUser),
     carName: getUnitName(q.idCar),
