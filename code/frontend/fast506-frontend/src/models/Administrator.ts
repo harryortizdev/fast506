@@ -1,6 +1,6 @@
 export interface Administrator {
 
-    idUser: number;
+    idUser?: number;
     name: string;
     id: number;
     email: string;

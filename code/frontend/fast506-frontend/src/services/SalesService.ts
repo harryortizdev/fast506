@@ -1,16 +1,17 @@
-import { Sales } from "../models/Sales";
+import { Sales } from '../models/Sales';
 const API_URL = "http://localhost:8080/api/sales";
+const API_URL_EMAIL= "http://localhost:8080/api/email";
 
 export const getAll = async () => { //async llamada asincronica que puede tardar tiempo (sin esto no se puede usar await)
   const res = await fetch(`${API_URL}/all`); //hace una petición al http get y await pausa la función hasta que responda el servidor
   return res.json(); //la respuesta se convierte a .json para que react lo pueda utilizar
 }
 
-export const create = async (unit: Partial<Sales>) => { //llamada asincronica
+export const create = async (sales: Partial<Sales>) => { //llamada asincronica
   const res = await fetch(`${API_URL}/create`, { //hace la comunicación al http create 
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(unit),
+    body: JSON.stringify(sales),
   });
   return res.text();
 };
@@ -50,4 +51,13 @@ export const getUnitsByColor = async (idCatalog: number, traction: string) => {
     return data.units;
   }
   return [];
+};
+
+export const sendEmailCreate = async (sales: Partial<Sales>) => { //llamada asincronica
+  const res = await fetch(`${API_URL_EMAIL}/sales`, { //hace la comunicación al http create 
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(sales),
+  });
+  return res.text();
 };

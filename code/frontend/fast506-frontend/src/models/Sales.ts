@@ -1,5 +1,5 @@
 export interface Sales {
-    idSales: number,
+    idSales?: number,
     invoiceNumber: number | null,
     transactionDate: Date | string,
     paymentMethod: string,

@@ -5,6 +5,7 @@
 package cr.ac.ucr.ie.fast506.controller;
 
 import cr.ac.ucr.ie.fast506.domain.Quotation;
+import cr.ac.ucr.ie.fast506.domain.Sales;
 import cr.ac.ucr.ie.fast506.domain.Testdrive;
 import cr.ac.ucr.ie.fast506.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,16 @@ public class EmailController {
         try {
             emailService.sendTestdrive(testdrive);
             return ResponseEntity.ok("Correo de testdrive enviado");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Error al enviar: " + e.getMessage());
+        }
+    }
+    
+     @PostMapping("/sales")
+    public ResponseEntity<String> create(@RequestBody Sales sales) {
+        try {
+            emailService.sendSales(sales);
+            return ResponseEntity.ok("Correo de venta enviado");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Error al enviar: " + e.getMessage());
         }

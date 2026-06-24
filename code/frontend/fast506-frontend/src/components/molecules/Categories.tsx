@@ -5,7 +5,6 @@ import { getCatalogByBodyWork } from "../../services/CatalogService";
 import CardWithButton from "./CardWithButton";
 import { useNavigate } from "react-router-dom";
 
-
 interface CategoriesProps {
   categories: CategoriesCatalog[];
   selectedCategory: string;
@@ -21,7 +20,6 @@ const Categories = ({
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
-
   useEffect(() => {
     if (selectedCategory) {
       setLoading(true);
@@ -31,12 +29,13 @@ const Categories = ({
     }
   }, [selectedCategory]);
 
-  const handleSelect = async (bodyWork: string) => {
+  const handleSelect = (bodyWork: string) => {
     onSelectCategory(bodyWork);
   };
 
   return (
     <div style={{ padding: "0 40px", backgroundColor: "#EEF1EF" }}>
+      {/* CATEGORÍAS */}
       <div
         style={{
           display: "flex",
@@ -48,6 +47,7 @@ const Categories = ({
       >
         {categories.map((category, index) => {
           const isActive = selectedCategory === category.bodyWork;
+
           return (
             <div
               key={index}
@@ -58,11 +58,11 @@ const Categories = ({
                 fontWeight: isActive ? "bold" : 400,
                 cursor: "pointer",
                 color: "#2C3E50",
-                transition: "0.3s",
                 fontSize: "0.85rem",
               }}
             >
               {category.bodyWork} ({category.total})
+
               {isActive && (
                 <div
                   style={{
@@ -80,6 +80,7 @@ const Categories = ({
         })}
       </div>
 
+      {/* LOADING */}
       {loading ? (
         <div className="text-center my-4">
           <div className="spinner-border" style={{ color: "#A9B4C3" }} />
@@ -104,7 +105,15 @@ const Categories = ({
               image={`http://localhost:8080/${catalog.image}`}
               model={catalog.carName}
               price={catalog.basePrice}
-              onCotizar={() => navigate("/quotation", { state: { idCatalog: catalog.idCatalog } })} />
+              onCotizar={() =>
+                navigate("/quotation", {
+                  state: { idCatalog: catalog.idCatalog },
+                })
+              }
+              onDetails={() =>
+                navigate(`/catalog/detail/${catalog.idCatalog}`)
+              }
+            />
           ))}
         </div>
       )}

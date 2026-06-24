@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva Venta</title>
+</head>
+
+<body style="margin:0; padding:0; background-color:#f4f4f4; font-family: Arial, sans-serif;">
+
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" style="padding: 20px 0;">
+
+                <table border="0" cellpadding="0" cellspacing="0" width="600"
+                    style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+
+                    <tr>
+                        <td align="center" bgcolor="#2C3E50"
+                            style="padding: 25px; color: #ffffff; font-size: 22px; font-weight: bold; letter-spacing: 1px;">
+                            Fast506 - Detalles de tu Compra
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 20px; color: #333333; font-size: 16px; line-height: 1.5;">
+
+                            <p>Hola <strong th:text="${user.name}">Cliente</strong></p>
+
+                            <p>
+                                Hemos procesado tu compra. A continuación podés revisar el detalle de la transacción:
+                            </p>
+
+                            <table cellpadding="8" cellspacing="0" width="100%"
+                                style="border-collapse: collapse; margin-top: 15px;">
+
+                                <tr>
+                                    <td style="border-bottom: 1px solid #ddd;"><strong>N° Factura:</strong></td>
+                                    <td style="border-bottom: 1px solid #ddd;"
+                                        th:text="${sales.invoiceNumber}">1001</td>
+                                </tr>
+
+                                <tr>
+                                    <td style="border-bottom: 1px solid #ddd;"><strong>Fecha de transacción:</strong></td>
+                                    <td style="border-bottom: 1px solid #ddd;"
+                                        th:text="${sales.transactionDate}">2026-06-23</td>
+                                </tr>
+
+                                <tr>
+                                    <td style="border-bottom: 1px solid #ddd;"><strong>Método de pago:</strong></td>
+                                    <td style="border-bottom: 1px solid #ddd;"
+                                        th:text="${sales.paymentMethod}">Tarjeta</td>
+                                </tr>
+
+                                <tr>
+                                    <td style="border-bottom: 1px solid #ddd;"><strong>Estado de venta:</strong></td>
+                                    <td style="border-bottom: 1px solid #ddd;"
+                                        th:text="${sales.salesStatus}">Completada</td>
+                                </tr>
+
+                                <!-- VEHÍCULO -->
+                                <tr>
+                                    <td style="border-bottom: 1px solid #ddd;"><strong>Vehículo:</strong></td>
+                                    <td style="border-bottom: 1px solid #ddd;"
+                                        th:text="|${car.carName} ${car.yearManufacture}|">
+                                        Toyota RAV4 2024
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="border-bottom: 1px solid #ddd;"><strong>Transmisión:</strong></td>
+                                    <td style="border-bottom: 1px solid #ddd;"
+                                        th:text="${car.transmission}">
+                                        Automática
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="border-bottom: 1px solid #ddd;"><strong>Tracción:</strong></td>
+                                    <td style="border-bottom: 1px solid #ddd;"
+                                        th:text="${car.traction}">
+                                        4x4
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="border-bottom: 1px solid #ddd;"><strong>Precio base:</strong></td>
+                                    <td style="border-bottom: 1px solid #ddd; color:#28a745; font-weight:bold;">
+                                        $<span th:text="${sales.basePrice}">0.00</span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="border-bottom: 1px solid #ddd;"><strong>Impuestos (IVA):</strong></td>
+                                    <td style="border-bottom: 1px solid #ddd; color:#28a745; font-weight:bold;">
+                                        $<span th:text="${sales.salesTax}">0.00</span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="border-bottom: 1px solid #ddd;"><strong>Extras:</strong></td>
+                                    <td style="border-bottom: 1px solid #ddd; color:#28a745; font-weight:bold;">
+                                        $<span th:text="${sales.extras}">0.00</span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="border-bottom: 1px solid #ddd;"><strong>Costo de transferencia:</strong></td>
+                                    <td style="border-bottom: 1px solid #ddd; color:#28a745; font-weight:bold;">
+                                        $<span th:text="${sales.transferCost}">0.00</span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="border-bottom: 1px solid #ddd;"><strong>Total pagado:</strong></td>
+                                    <td style="border-bottom: 1px solid #ddd; color:#28a745; font-weight:bold;">
+                                        $<span th:text="${sales.totalPayment}">0.00</span>
+                                    </td>
+                                </tr>
+
+                            </table>
+
+                            <p style="margin-top: 25px; text-align: center;">
+                                Si tenés alguna duda podés responder a este correo o contactarnos por WhatsApp.
+                            </p>
+
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td bgcolor="#f8f9fa"
+                            style="padding: 20px; font-size: 12px; color: #777777; text-align: center; border-top: 1px solid #eeeeee;">
+                            Fast506. Todos los derechos reservados.<br>
+                            <span style="color: #999999;">Este es un correo automático del sistema de ventas.</span>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>
