@@ -12,7 +12,8 @@ import {
   create,
   getUnitsByCatalog,
   getUnitsByColor,
-  updateSales
+  updateSales,
+  sendEmailCreate
 } from "../../services/SalesService";
 
 import AlertSuccess from "../atoms/AlertSuccess";
@@ -239,7 +240,8 @@ const SalesForm = ({ onClose, onRefresh, salesToEdit }: any) => {
         AlertSuccess("Venta actualizada correctamente");
       } else {
         await create(payload);
-        AlertSuccess("Venta creada correctamente");
+        await sendEmailCreate(payload);
+        AlertSuccess("Venta creada correctamenste");
       }
 
       onRefresh();

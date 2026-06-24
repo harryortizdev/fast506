@@ -1,25 +1,58 @@
 import { useEffect, useState } from "react";
 import TableGeneric from "../components/organisms/TableGeneric";
 import { deleteSales, getAll } from "../services/SalesService";
-import { Sales } from "../models/Sales";
+import { Sales } from '../models/Sales';
 import Navbar from "../components/organisms/Navbar";
 import Footer from "../components/organisms/Footer";
 import AlertConfirm from "../components/atoms/AlertConfirm";
 import SalesForm from "../components/organisms/SalesForm";
 import ButtonIcon from "../components/molecules/ButtonIcon";
+import { Administrator } from "../models/Administrator";
+import { Client } from "../models/Client";
+import { Unit } from "../models/Unit";
+import { getAll as getAllClients } from "../services/ClientService";
+import { getAll as getAllUnits } from "../services/UnitService";
+import { getAll as getAllAdmins } from "../services/AdministratorService";
+
+type SalesTable = Sales & {
+  transactionDateFormatted: string;      // Para el día/mes/año
+  clientName: string;           // Para el nombre de la persona
+  carName: string;            // Para el nombre del vehículo
+  adminName: string;         // Para el nombre del admin
+};
 
 const SalesPage = () => {
-    const [catalogs, setCatalogs] = useState<Sales[]>([]);
+    const [sales, setSales] = useState<Sales[]>([]);
     const [showForm, setShowForm] = useState(false);
     const [selectedSales, setSelectedSales] = useState<Sales | null>(null);
 
+    const [clients, setClients] = useState<Client[]>([]);
+    const [units, setUnits] = useState<Unit[]>([]);
+    const [admins, setAdmins] = useState<Administrator[]>([]);
+
     const loadCatalogs = async () => {
         const data = await getAll();
-        setCatalogs(data);
+        setSales(data);
     };
+
+     const loadDetails = async () => {
+        try {
+          const clientsData = await getAllClients();
+          setClients(Array.isArray(clientsData) ? clientsData : []);
+    
+          const unitsData = await getAllUnits();
+          setUnits(Array.isArray(unitsData) ? unitsData : []);
+    
+          const adminsData = await getAllAdmins();
+          setAdmins(Array.isArray(adminsData) ? adminsData : []);
+        } catch (error) {
+          console.error("Error cargando datos ", error);
+        }
+      };
 
     useEffect(() => {
         loadCatalogs();
+        loadDetails();
     }, []);
 
     const handleDelete = async (sales: Sales) => {
@@ -29,6 +62,7 @@ const SalesPage = () => {
         if (!confirmar) return;
         await deleteSales(sales.idSales);
         await loadCatalogs();
+        await loadDetails();
     };
 
     const handleEdit = (sales: Sales) => {
@@ -45,21 +79,75 @@ const SalesPage = () => {
         loadCatalogs();
         setShowForm(false);
         setSelectedSales(null);
+        loadDetails();
     };
 
-    const columns: { key: keyof Sales; label: string }[] = [
-        { key: "idSales", label: "ID" },
+    const formatDate = (date?: any) => {
+    if (!date) return "";
+
+    let dateObject: Date;
+
+    // Si viene como array [año, mes, día] desde el backend
+    if (Array.isArray(date)) {
+      const [year, month, day] = date;
+      dateObject = new Date(year, month - 1, day);
+    } else {
+      // Si viene como string ISO
+      dateObject = new Date(String(date).split("T")[0] + "T00:00:00");
+    }
+
+    if (isNaN(dateObject.getTime())) {
+      return String(date);
+    }
+
+    // Esto te lo devuelve en formato: "23 de junio de 2026" o similar
+    // Si preferís estrictamente "23/06/2026", avisame y lo cambiamos a una sola línea
+    const formatted = dateObject.toLocaleDateString("es-CR", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+
+     return formatted;
+    };
+
+    const getClientName = (idUser?: number) => {
+        const c = clients.find((c) => Number(c.idUser) === Number(idUser));
+        return c?.name || `Usuario #${idUser}`; // Si no lo encuentra, pone el ID por defecto
+    };
+
+    const getUnitName = (idCar?: number) => {
+        const u = units.find((c) => Number(c.idCar) === Number(idCar));
+        return u?.carName + " " + u?.transmission + " " + u?.fuelType || `Unidad #${idCar}`;
+    };
+
+    const getAdminName = (idUser?: number) => {
+        const a = admins.find((a) => Number(a.idUser) === Number(idUser));
+        return a?.name || `Usuario #${idUser}`; // Si no lo encuentra, pone el ID por defecto
+    };
+
+    const transformedSales: SalesTable[] = sales.map((q) => ({
+        ...q, // Copia la cotización original intacta (¡así no se rompe el Editar!)
+        transactionDateFormatted: formatDate(q.transactionDate),
+        clientName: getClientName(q.idClient),
+        carName: getUnitName(q.idCar),
+       adminName: getAdminName(q.idAdmin ?? undefined),
+    }));
+
+
+    const columns: { key: keyof SalesTable; label: string }[] = [
         { key: "invoiceNumber", label: "Factura" },
-        { key: "transactionDate", label: "Fecha" },
+        { key: "transactionDateFormatted", label: "Fecha" },
         { key: "paymentMethod", label: "Método de pago" },
         { key: "basePrice", label: "Precio Base ($)" },
         { key: "salesTax", label: "IVA ($)" },
         { key: "totalPayment", label: "Total ($)" },
         { key: "transferCost", label: "Traspaso ($)" },
         { key: "salesStatus", label: "Estado" },
-        { key: "idClient", label: "Cliente" },
-        { key: "idAdmin", label: "Administrador" },
-        { key: "idCar", label: "Unidad" },
+        { key: "clientName", label: "Cliente" },
+        { key: "adminName", label: "Administrador" },
+        { key: "carName", label: "Unidad" },
     ];
 
     return (
@@ -108,7 +196,7 @@ const SalesPage = () => {
                         >
                             {!showForm ? (
                                 <TableGeneric
-                                    data={catalogs}
+                                    data={transformedSales}
                                     columns={columns}
                                     onDelete={handleDelete}
                                     onEdit={handleEdit}

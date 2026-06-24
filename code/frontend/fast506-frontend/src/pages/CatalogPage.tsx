@@ -48,7 +48,6 @@ const CatalogPage = () => {
     };
 
     const columns: { key: keyof Catalog; label: string }[] = [
-        { key: "idCatalog", label: "ID" },
         { key: "carName", label: "Nombre" },
         { key: "brandName", label: "Marca" },
         { key: "bodyWork", label: "Carrocería" },

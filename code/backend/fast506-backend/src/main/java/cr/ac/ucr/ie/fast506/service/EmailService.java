@@ -7,6 +7,7 @@ package cr.ac.ucr.ie.fast506.service;
 import cr.ac.ucr.ie.fast506.domain.Branch;
 import cr.ac.ucr.ie.fast506.domain.Catalog;
 import cr.ac.ucr.ie.fast506.domain.Quotation;
+import cr.ac.ucr.ie.fast506.domain.Sales;
 import cr.ac.ucr.ie.fast506.domain.Testdrive;
 import cr.ac.ucr.ie.fast506.domain.Unit;
 import cr.ac.ucr.ie.fast506.domain.User;
@@ -41,7 +42,7 @@ public class EmailService {
 
     @Autowired
     QuotationRepository quotationRepository;
-    
+
     @Autowired
     TestdriveRepository testdriveRepository;
 
@@ -98,13 +99,13 @@ public class EmailService {
             Unit unit = unitVerification.get();
             Branch branch = branchVerification.get();
 
-        int total = (int) testdriveRepository.count();
-        int month = testdrive.getScheduledDate().getMonthValue();
-        int day = testdrive.getScheduledDate().getDayOfMonth();
+            int total = (int) testdriveRepository.count();
+            int month = testdrive.getScheduledDate().getMonthValue();
+            int day = testdrive.getScheduledDate().getDayOfMonth();
 
-        int combination = (total * 10000) + (day * 100) + month;
+            int combination = (total * 10000) + (day * 100) + month;
 
-        testdrive.setNumberReference(combination);
+            testdrive.setNumberReference(combination);
 
             Context context = new Context();// variables para el HTML
             context.setVariable("user", user);
@@ -121,6 +122,44 @@ public class EmailService {
 
             helper.setTo(user.getEmail());
             helper.setSubject("Tu Testdrive en Fast506");
+            helper.setText(htmlContent, true); // true es HTML y no texto 
+
+            mailSender.send(message);
+        } else {
+            throw new Exception("No se pudo encontrar datos necesarios para enviar el correo");
+        }
+    }
+
+    public void sendSales(Sales sales) throws MessagingException, Exception {
+        Optional<Unit> unitVerification = unitService.findById(sales.getIdCar());
+        Optional<User> clientVerification = userService.findById(sales.getIdClient());
+
+        if (unitVerification.isPresent() && clientVerification.isPresent()) {
+            Unit unit = unitVerification.get();
+            User client = clientVerification.get();
+
+            int year = sales.getTransactionDate().getYear();
+            int month = sales.getTransactionDate().getMonthValue();
+            int day = sales.getTransactionDate().getDayOfMonth();
+            int unique = (int) (System.currentTimeMillis() % 10000);
+            int combination = (year % 100) * 1000000 + month * 10000 + day * 100 + unique;
+
+            sales.setInvoiceNumber(combination);
+
+            Context context = new Context();// variables para el HTML
+            context.setVariable("unit", unit);
+            context.setVariable("client", client);
+            context.setVariable("sales", sales);
+
+            // busca en templates/email/sale.html
+            String htmlContent = templateEngine.process("email/sale", context);
+
+            MimeMessage message = mailSender.createMimeMessage();        //objeto de correo
+
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(client.getEmail());
+            helper.setSubject("Tu Venta en Fast506");
             helper.setText(htmlContent, true); // true es HTML y no texto 
 
             mailSender.send(message);

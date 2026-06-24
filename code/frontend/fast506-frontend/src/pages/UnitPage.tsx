@@ -7,11 +7,19 @@ import Navbar from "../components/organisms/Navbar";
 import Footer from "../components/organisms/Footer";
 import AlertConfirm from "../components/atoms/AlertConfirm";
 import ButtonIcon from "../components/molecules/ButtonIcon";
+import { Supplier } from "../models/Supplier";
+import { getAll as getAllSuppliers } from "../services/SupplierService";
+
+type UnitTable = Unit & {
+  supplierName: string;           // Para el nombre del proveedor
+};
 
 const UnitPage = () => {
   const [units, setUnits] = useState<Unit[]>([]);//guardo la lista
   const [showForm, setShowForm] = useState(false);//controlo el formulario
   const [unitToEdit, setUnitToEdit] = useState<Unit | undefined>(undefined);//guarda la unidad que desea editar
+
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);//trae los proveedores
 
   const loadUnits = async () => { 
     const data = await getAll();//pide al backend la lista
@@ -19,12 +27,24 @@ const UnitPage = () => {
     setUnits(data);//las guarda
   };
 
+  const loadDetails = async () => {
+      try {
+        const suppliersData = await getAllSuppliers();
+        setSuppliers(Array.isArray(suppliersData) ? suppliersData : []);
+      }catch (error) {
+      console.error("Error cargando datos ", error);
+      }
+  };
+  
+
   useEffect(() => {//cuando la pagina carga por primera vez
     loadUnits();//carga la lista
+    loadDetails();//carga los proveedores
   }, []);//solo se ejecuta una vez
 
   const handleSaveAndClose = async () => {
     await loadUnits();//recargo la lista actualizada
+    await loadDetails();//recarga la lista actualizada
     setUnitToEdit(undefined);//limpio la unidad que se estaba editando
     setShowForm(false);//limpio el formulario
   };
@@ -45,10 +65,20 @@ const UnitPage = () => {
     if (!confirmar) return;//si cancela no hago nada
     await deleteUnit(unit.idCar!);//envia la señal al backend de eliminar
     await loadUnits();//recargo la lista 
+    await loadDetails();//recarga la lista
   };
 
-  const columns: { key: keyof Unit; label: string }[] = [//defino las columnas a mostrar en la tabla
-    { key: "idCar", label: "ID" },
+   const getSupplierName = (idSupplier?: number) => {
+    const s = suppliers.find((s) => Number(s.idSupplier) === Number(idSupplier));
+    return s?.companyName|| `Proveedor #${idSupplier}`; // Si no lo encuentra, pone el ID por defecto
+  };
+
+  const transformedUnit: UnitTable[] = units.map((q) => ({
+    ...q, // Copia la cotización original intacta (¡así no se rompe el Editar!)
+    supplierName: getSupplierName(q.idSupplier),
+  }));
+
+  const columns: { key: keyof UnitTable; label: string }[] = [//defino las columnas a mostrar en la tabla
     { key: "VIN", label: "VIN" },
     { key: "carBrand", label: "Marca" },
     { key: "carName", label: "Nombre" },
@@ -62,7 +92,7 @@ const UnitPage = () => {
     { key: "traction", label: "Tracción" },
     { key: "bodyWork", label: "Carrocería" },
     { key: "engineSize", label: "Cilindraje" },
-    { key: "idSupplier", label: "Proovedor" },
+    { key: "supplierName", label: "Proovedor" },
   ];
 
   return (
@@ -105,7 +135,7 @@ const UnitPage = () => {
             >
               {!showForm ? (
                 <TableGeneric
-                  data={units}
+                  data={transformedUnit}
                   columns={columns}
                   onDelete={handleDelete}
                   onEdit={handleEdit}
