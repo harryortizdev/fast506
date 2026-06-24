@@ -8,62 +8,152 @@ import ButtonIcon from "../components/molecules/ButtonIcon";
 import TableGeneric from "../components/organisms/TableGeneric";
 import Footer from "../components/organisms/Footer";
 import QuotationForm from "../components/organisms/QuotationForm";
+import { Client } from "../models/Client";
+import { Unit } from "../models/Unit";
+import { getAll as getAllCatalog } from "../services/CatalogService";
+import { getAll as getAllClients } from "../services/ClientService";
+import { getAll as getAllUnits } from "../services/UnitService";
+import { Catalog } from "../models/Catalog";
+
+
+
+type QuotationTable = Quotation & {
+  dateFormatted: string;      // Para el día/mes/año
+  userName: string;           // Para el nombre de la persona
+  carName: string;            // Para el nombre del vehículo
+  catalogName: string;         // Para el nombre de la sucursal (catálogo)
+};
 
 
 const QuotationPage = () => {
-    const [quotation, setQuotation] = useState<Quotation[]>([]);
-    const [showForm, setShowForm] = useState(false);
-    const [quotationToEdit, setQuotationToEdit] = useState<Quotation | undefined>(undefined);
+  const [quotation, setQuotation] = useState<Quotation[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  const [quotationToEdit, setQuotationToEdit] = useState<Quotation | undefined>(undefined);
 
-    const loadQuotation = async () => {
-        const data = await getAll();
-        setQuotation(data);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [units, setUnits] = useState<Unit[]>([]);
+  const [catalogs, setCatalog] = useState<Catalog[]>([]);
+
+  const loadQuotation = async () => {
+    const data = await getAll();
+    setQuotation(data);
+  }
+
+  const loadDetails = async () => {
+    try {
+      const clientsData = await getAllClients();
+      setClients(Array.isArray(clientsData) ? clientsData : []);
+
+      const unitsData = await getAllUnits();
+      setUnits(Array.isArray(unitsData) ? unitsData : []);
+
+      const catalogData = await getAllCatalog();
+      setCatalog(Array.isArray(catalogData) ? catalogData : []);
+    } catch (error) {
+      console.error("Error cargando datos ", error);
+    }
+  };
+
+  useEffect(() => {
+    loadQuotation();
+    loadDetails();
+  }, []);
+
+  const handleSaveAndClose = async () => {
+    await loadQuotation(); //lista de sucursales
+    await loadDetails(); //lista de datos extra
+    setQuotationToEdit(undefined); //limpia la unidad de editar
+    setShowForm(false); //limpia formulario
+  };
+
+  const handleClose = () => { //cancelar 
+    setQuotationToEdit(undefined); //limpia los datos de sucursal
+    setShowForm(false);//esconde el formulario
+  };
+
+  const handleEdit = (quotation: Quotation) => { //editar
+    setQuotationToEdit(quotation);//pone los datos de la sucursal en sus respectivas casillas
+    setShowForm(true);//abre el formulario
+  };
+
+  const handleDelete = async (quotation: Quotation) => {//eliminar
+    if (!quotation.idQuotation) return;// sin id no trabaja
+    const confirmar = await AlertConfirm(`¿Desea eliminar la Cotizacion ${quotation.referenceNumber}?`); //alerta de confirmacion
+    if (!confirmar) return;//si no selecciona confirmar cancela 
+    await deleteQuotation(quotation.idQuotation!); //señal de eliminar
+    AlertWarning("Sucursal eliminada correctamente."); //alert de eliminado correctamente
+    await loadQuotation();//recargar la lista
+    await loadDetails(); //recarga datos extra
+  };
+
+  const formatDate = (date?: any) => {
+    if (!date) return "";
+
+    let dateObject: Date;
+
+    // Si viene como array [año, mes, día] desde el backend
+    if (Array.isArray(date)) {
+      const [year, month, day] = date;
+      dateObject = new Date(year, month - 1, day);
+    } else {
+      // Si viene como string ISO
+      dateObject = new Date(String(date).split("T")[0] + "T00:00:00");
     }
 
-    useEffect(() => {
-        loadQuotation();
-    }, []);
+    if (isNaN(dateObject.getTime())) {
+      return String(date);
+    }
 
-    const handleSaveAndClose = async () => {
-        await loadQuotation(); //lista de sucursales
-        setQuotationToEdit(undefined); //limpia la unidad de editar
-        setShowForm(false); //limpia formulario
-    };
+    // Esto te lo devuelve en formato: "23 de junio de 2026" o similar
+    // Si preferís estrictamente "23/06/2026", avisame y lo cambiamos a una sola línea
+    const formatted = dateObject.toLocaleDateString("es-CR", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
 
-    const handleClose = () => { //cancelar 
-        setQuotationToEdit(undefined); //limpia los datos de sucursal
-        setShowForm(false);//esconde el formulario
-    };
+    return formatted;
+  };
 
-    const handleEdit = (quotation: Quotation) => { //editar
-        setQuotationToEdit(quotation);//pone los datos de la sucursal en sus respectivas casillas
-        setShowForm(true);//abre el formulario
-    };
+  const getUserName = (idUser?: number) => {
+    const c = clients.find((c) => Number(c.idUser) === Number(idUser));
+    return c?.name || `Usuario #${idUser}`; // Si no lo encuentra, pone el ID por defecto
+  };
 
-    const handleDelete = async (quotation: Quotation) => {//eliminar
-        if (!quotation.idQuotation) return;// sin id no trabaja
-        const confirmar = await AlertConfirm(`¿Desea eliminar la Cotizacion ${quotation.referenceNumber}?`); //alerta de confirmacion
-        if (!confirmar) return;//si no selecciona confirmar cancela 
-        await deleteQuotation(quotation.idQuotation!); //señal de eliminar
-        AlertWarning("Sucursal eliminada correctamente."); //alert de eliminado correctamente
-        await loadQuotation();//recargar la lista
-    };
+  const getUnitName = (idCar?: number) => {
+    const u = units.find((c) => Number(c.idCar) === Number(idCar));
+    return u?.carName + " " + u?.transmission + " " + u?.fuelType || `Unidad #${idCar}`;
+  };
+
+  const getCatalogName = (idCatalog?: number) => {
+    const c = catalogs.find((b) => Number(b.idCatalog) === Number(idCatalog));
+    return c?.carName + " " + c?.transmission + " " + c?.fuelType || `Sucursal #${idCatalog}`;
+  };
+
+  const transformedQuotations: QuotationTable[] = quotation.map((q) => ({
+    ...q, // Copia la cotización original intacta (¡así no se rompe el Editar!)
+    dateFormatted: formatDate(q.date),
+    userName: getUserName(q.idUser),
+    carName: getUnitName(q.idCar),
+    catalogName: getCatalogName(q.idCatalog),
+  }));
 
 
-    const columns: { key: keyof Quotation; label: string }[] = [ //columnas
-        { key: "idQuotation", label: "ID" },
-        { key: "referenceNumber", label: "Num. Referencia" },
-        { key: "date", label: "Fecha" },
-        { key: "initialPrice", label: "Precio Inicial" },
-        { key: "salesTax", label: "IVA" },
-        { key: "transferCost", label: "Costo Traspaso" },
-        { key: "totalPayment", label: "Pago Total" },
-        { key: "idUser", label: "Usuario" },
-        { key: "idCatalog", label: "Catalogo" },
-        { key: "idCar", label: "Unidad" },
-    ];
+  const columns: { key: keyof QuotationTable; label: string }[] = [ //columnas
+    { key: "idQuotation", label: "ID" },
+    { key: "referenceNumber", label: "Num. Referencia" },
+    { key: "dateFormatted", label: "Fecha" },
+    { key: "initialPrice", label: "Precio Inicial" },
+    { key: "salesTax", label: "IVA" },
+    { key: "transferCost", label: "Costo Traspaso" },
+    { key: "totalPayment", label: "Pago Total" },
+    { key: "userName", label: "Usuario" },
+    { key: "catalogName", label: "Catalogo" },
+    { key: "carName", label: "Unidad" },
+  ];
 
-    
+
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", backgroundColor: "#EEF1EF", }}>
 
@@ -108,7 +198,7 @@ const QuotationPage = () => {
             >
               {!showForm ? (
                 <TableGeneric
-                  data={quotation}
+                  data={transformedQuotations}
                   columns={columns}
                   onDelete={handleDelete}
                   onEdit={handleEdit}
@@ -117,8 +207,8 @@ const QuotationPage = () => {
                 <QuotationForm
                   onClose={handleClose}
                   onRefresh={handleSaveAndClose}
-                 quotationToEdit={quotationToEdit}
-               />
+                  quotationToEdit={quotationToEdit}
+                />
               )}
             </div>
 

@@ -7,7 +7,8 @@ import AlertSuccess from "../atoms/AlertSuccess";
 import Button from "../atoms/Button";
 import FormField from "../molecules/FormField";
 import AlertWarning from "../atoms/AlertWarning";
-
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 interface AdFormProps {
     onClose: () => void;
     onRefresh: () => void;
@@ -142,14 +143,20 @@ const AdForm = ({ onClose, onRefresh, adToEdit }: AdFormProps) => {
 
                 <div className="mb-2">
                     <label className="form-label">Fecha de expiración (Opcional)</label>
-                    <input
-                        type="date"
-                        className={`form-control ${errors.expirationDate ? "is-invalid" : ""}`}
-                        name="expirationDate"
-                        value={form.expirationDate || ""}
-                        onChange={handleChange}
-                        min={fechaMinima}
+                    <DatePicker
+                        wrapperClassName="w-100"
+                        className={`form-control w-100 ${errors.expirationDate ? "is-invalid" : ""}`}
 
+                        placeholderText="Seleccione una fecha"
+                        dateFormat="dd/MM/yyyy"
+                        selected={form.expirationDate ? new Date(form.expirationDate + "T00:00:00") : null}
+                        minDate={new Date()}
+                        onChange={(date: Date | null) => {
+                            setForm({
+                                ...form,
+                                expirationDate: date ? date.toISOString().split("T")[0] : undefined
+                            });
+                        }}
                     />
                     {errors.expirationDate && <div className="invalid-feedback d-block">{errors.expirationDate}</div>}
                 </div>

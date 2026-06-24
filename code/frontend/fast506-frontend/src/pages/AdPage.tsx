@@ -8,7 +8,13 @@ import ButtonIcon from "../components/molecules/ButtonIcon";
 import { Ad } from "../models/Ad";
 import { deleteAd, getAll } from "../services/AdService";
 import AdForm from "../components/organisms/AdForm";
+import { getAll as getAllAdministrators } from "../services/AdministratorService";
+import { Administrator } from "../models/Administrator";
 
+
+type adTable = Ad & {
+  administratorName: string;
+};
 
 
 
@@ -16,21 +22,36 @@ const AdPage = () => {
   const [ad, setAd] = useState<Ad[]>([]); //guarda la lista de anuncios
   const [showForm, setShowForm] = useState(false); //formulario off
   const [adToEdit, setAdToEdit] = useState<Ad | undefined>(undefined); //resguarda el anuncio
-
+  const [administrators, setAdministrators] = useState<Administrator[]>([]);
 
   const loadAd = async () => {
     const data = await getAll();//pide lista anuncios
     setAd(data);//las setea
   };
 
+  const loadDetails = async () => {
+    try {
+      const administratorsData = await getAllAdministrators();
+      setAdministrators(Array.isArray(administratorsData) ? administratorsData : []);
+
+    } catch (error) {
+      console.error("Error cargando datos ", error);
+    }
+  };
+
   useEffect(() => { //Carga la lista una sola vez al iniciar el programa
     loadAd();
+    loadDetails();
+
   }, []);
 
   const handleSaveAndClose = async () => {
     await loadAd(); //lista de anuncios
+    loadDetails();
+
     setAdToEdit(undefined); //limpia la unidad de editar
     setShowForm(false); //limpia formulario
+
   };
 
   const handleClose = () => { //cancelar 
@@ -50,15 +71,26 @@ const AdPage = () => {
     await deleteAd(ad.idAd!); //señal de eliminar
     AlertWarning("Anuncio eliminado correctamente."); //alert de eliminado correctamente
     await loadAd();//recargar la lista
+    loadDetails();
+
   };
 
+  const geAdministratorName = (idUser?: number) => {
+    const a = administrators.find((a) => Number(a.idUser) === Number(idUser));
+    return a?.name || `Usuario #${idUser}`; // Si no lo encuentra, pone el ID por defecto
+  };
 
-  const columns: { key: keyof Ad; label: string }[] = [ //columnas
+  const transformedAdTable: adTable[] = ad.map((q) => ({
+    ...q, // Copia la original intacta (¡así no se rompe el Editar!)
+    administratorName: geAdministratorName(q.idUser),
+  }));
+
+  const columns: { key: keyof adTable; label: string }[] = [ //columnas
     { key: "idAd", label: "ID" },
     { key: "title", label: "Título" },
     { key: "category", label: "Categoria" },
     { key: "publicationStatus", label: "¿Publicado?" },
-    { key: "idUser", label: "Creador" },
+    { key: "administratorName", label: "Creador" },
 
   ];
 
@@ -106,7 +138,7 @@ const AdPage = () => {
             >
               {!showForm ? (
                 <TableGeneric
-                  data={ad}
+                  data={transformedAdTable}
                   columns={columns}
                   onDelete={handleDelete}
                   onEdit={handleEdit}

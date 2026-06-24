@@ -9,14 +9,19 @@ import Footer from "../components/organisms/Footer";
 import AlertConfirm from "../components/atoms/AlertConfirm";
 import AlertWarning from "../components/atoms/AlertWarning";
 import ButtonIcon from "../components/molecules/ButtonIcon";
+import { Administrator } from "../models/Administrator";
+import { getAll as getAllAdministrators } from "../services/AdministratorService";
 
 
-
-
+type branchTable = Branch & {
+  administratorName: string;
+};
 const BranchPage = () => {
   const [branch, setBranch] = useState<Branch[]>([]); //guarda la lista de Sucursales
   const [showForm, setShowForm] = useState(false); //formulario off
   const [branchToEdit, setBranchToEdit] = useState<Branch | undefined>(undefined); //resguarda la sucursal a ediaatr
+  const [administrators, setAdministrators] = useState<Administrator[]>([]);
+
 
 
   const loadBranch = async () => {
@@ -24,12 +29,26 @@ const BranchPage = () => {
     setBranch(data);//las setea
   };
 
+  const loadDetails = async () => {
+    try {
+      const administratorsData = await getAllAdministrators();
+      setAdministrators(Array.isArray(administratorsData) ? administratorsData : []);
+
+    } catch (error) {
+      console.error("Error cargando datos ", error);
+    }
+  };
+
   useEffect(() => { //Carga la lista una sola vez al iniciar el programa
     loadBranch();
+    loadDetails();
+
   }, []);
 
   const handleSaveAndClose = async () => {
     await loadBranch(); //lista de sucursales
+     loadDetails();
+
     setBranchToEdit(undefined); //limpia la unidad de editar
     setShowForm(false); //limpia formulario
   };
@@ -51,16 +70,28 @@ const BranchPage = () => {
     await deleteBranch(branch.idBranch!); //señal de eliminar
     AlertWarning("Sucursal eliminada correctamente."); //alert de eliminado correctamente
     await loadBranch();//recargar la lista
+   loadDetails();
+
   };
 
-  const columns: { key: keyof Branch; label: string }[] = [ //columnas
+  const geAdministratorName = (idUser?: number) => {
+    const a = administrators.find((a) => Number(a.idUser) === Number(idUser));
+    return a?.name || `Usuario #${idUser}`; // Si no lo encuentra, pone el ID por defecto
+  };
+
+   const transformedBranchTable: branchTable[] = branch.map((q) => ({
+    ...q, // Copia la original intacta (¡así no se rompe el Editar!)
+    administratorName: geAdministratorName(q.idUser),
+  }));
+
+  const columns: { key: keyof branchTable; label: string }[] = [ //columnas
     { key: "idBranch", label: "ID" },
     { key: "name", label: "Nombre" },
     { key: "ubication", label: "Ubicacion" },
     { key: "direction", label: "Direccion" },
     { key: "branchPhoneNumber", label: "Numero de telefono" },
     { key: "operationSchedule", label: "Horario" },
-    { key: "idUser", label: "Creador" },
+    { key: "administratorName", label: "Creador" },
 
   ];
 
@@ -108,7 +139,7 @@ const BranchPage = () => {
             >
               {!showForm ? (
                 <TableGeneric
-                  data={branch}
+                  data={transformedBranchTable}
                   columns={columns}
                   onDelete={handleDelete}
                   onEdit={handleEdit}
