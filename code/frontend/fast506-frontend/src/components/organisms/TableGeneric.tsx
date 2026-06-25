@@ -197,11 +197,11 @@ const TableGeneric = <T extends object>({
                       label="Eliminar"
                       onClick={() => !disabledActions && onDelete?.(item)}
                       backgroundColor="transparent"
-                        hoverColor={disabledActions ? "#6c757d" : "#dc3545"}
-                        color={disabledActions ? "#6c757d" : "#dc3545"}
-                        icon={
-                          <i className="bi bi-trash3" />
-                        }
+                      hoverColor={disabledActions ? "#6c757d" : "#dc3545"}
+                      color={disabledActions ? "#6c757d" : "#dc3545"}
+                      icon={
+                        <i className="bi bi-trash3" />
+                      }
                       className="btn btn-outline-danger btn-sm d-flex align-items-center justify-content-center gap-2"
                       style={{
                         backgroundColor: "transparent",

@@ -44,8 +44,7 @@ const UnitPage = () => {
     loadDetails();//carga los proveedores
   }, []);//solo se ejecuta una vez
 
-// este es un useEffect para el datatables
-useEffect(() => {
+  useEffect(() => {
         let table: any;
 
         if (units.length > 0) {

@@ -53,15 +53,63 @@ const SalesForm = ({ onClose, onRefresh, salesToEdit }: any) => {
   const uniqueTractions = [...new Set(filteredUnit.map(u => u.traction))];
   const availableColors = [...new Set(colorUnits.map(u => u.color))];
 
+  // Carga clientes y catálogo al montar
   useEffect(() => {
     getAllClients().then(data =>
       setClients(Array.isArray(data) ? data : [])
     );
-
     getAllCatalog().then(data =>
       setCatalog(Array.isArray(data) ? data : [])
     );
   }, []);
+
+useEffect(() => {
+  if (!salesToEdit) return;
+  if (catalog.length === 0) return;
+
+  setForm({
+    idClient: Number(salesToEdit.idClient),
+    idCatalog: Number(salesToEdit.idCatalog),
+    idCar: Number(salesToEdit.idCar),
+    paymentMethod: salesToEdit.paymentMethod,
+    idAdmin: salesToEdit.idAdmin,
+    basePrice: salesToEdit.basePrice,
+    extras: salesToEdit.extras,
+    salesTax: salesToEdit.salesTax,
+    transferCost: salesToEdit.transferCost,
+    totalPayment: salesToEdit.totalPayment,
+  });
+
+  if (salesToEdit.idCatalog) {
+    getUnitsByCatalog(Number(salesToEdit.idCatalog)).then(units => {
+      const list = Array.isArray(units) ? units : [];
+      setFilteredUnit(list);
+
+      const unitActual = list.find((u: Unit) => u.idCar === Number(salesToEdit.idCar));
+
+      if (unitActual) {
+        setSelectedTraction(unitActual.traction ?? "");
+
+        getUnitsByColor(Number(salesToEdit.idCatalog), unitActual.traction).then(colors => {
+          const colorList = Array.isArray(colors) ? colors : [];
+          setColorUnits(colorList);
+
+          const colorActual = colorList.find((u: Unit) => u.idCar === Number(salesToEdit.idCar));
+          if (colorActual) {
+            setSelectedColor(colorActual.color ?? "");
+          }
+        });
+      }
+    });
+  }
+
+}, [salesToEdit, catalog]);
+
+useEffect(() => {
+  if (!salesToEdit) return;
+  console.log("idCatalog del form:", form.idCatalog, typeof form.idCatalog);
+  console.log("catalog options:", catalog.map(c => ({ id: c.idCatalog, tipo: typeof c.idCatalog })));
+}, [form.idCatalog, catalog]);
 
   const handleLogin = async () => {
 
@@ -122,7 +170,6 @@ const SalesForm = ({ onClose, onRefresh, salesToEdit }: any) => {
 
       setSelectedTraction("");
       setSelectedColor("");
-
       setFilteredUnit([]);
       setColorUnits([]);
 
@@ -200,7 +247,6 @@ const SalesForm = ({ onClose, onRefresh, salesToEdit }: any) => {
     if (!selCatalog || !selUnit) return;
 
     const basePrice = selCatalog.basePrice || 0;
-
     const traction = (selUnit.traction || "").toUpperCase();
 
     const extrasPercentage =
@@ -241,7 +287,7 @@ const SalesForm = ({ onClose, onRefresh, salesToEdit }: any) => {
       } else {
         await create(payload);
         await sendEmailCreate(payload);
-        AlertSuccess("Venta creada correctamenste");
+        AlertSuccess("Venta creada correctamente");
       }
 
       onRefresh();
@@ -337,11 +383,12 @@ const SalesForm = ({ onClose, onRefresh, salesToEdit }: any) => {
               </option>
             ))}
           </select>
+          {errors.idClient && <div className="invalid-feedback d-block">{errors.idClient}</div>}
         </div>
 
         <div className="mb-2">
           <label className="form-label">Vehículo</label>
-          <select
+         <select
             className={`form-select ${errors.idCatalog ? "is-invalid" : ""}`}
             name="idCatalog"
             value={form.idCatalog ?? ""}
@@ -349,11 +396,12 @@ const SalesForm = ({ onClose, onRefresh, salesToEdit }: any) => {
           >
             <option value="">Seleccione un vehículo</option>
             {catalog.map(c => (
-              <option key={c.idCatalog} value={c.idCatalog}>
+              <option key={c.idCatalog} value={Number(c.idCatalog)}>
                 {c.brandName} {c.carName}
               </option>
             ))}
           </select>
+          {errors.idCatalog && <div className="invalid-feedback d-block">{errors.idCatalog}</div>}
         </div>
 
         <div className="mb-2">
@@ -384,6 +432,7 @@ const SalesForm = ({ onClose, onRefresh, salesToEdit }: any) => {
               <option key={c} value={c}>{c}</option>
             ))}
           </select>
+          {errors.idCar && <div className="invalid-feedback d-block">{errors.idCar}</div>}
         </div>
 
         <div className="mb-2">
@@ -399,6 +448,7 @@ const SalesForm = ({ onClose, onRefresh, salesToEdit }: any) => {
             <option value="Transferencia">Transferencia</option>
             <option value="Tarjeta">Tarjeta</option>
           </select>
+          {errors.paymentMethod && <div className="invalid-feedback d-block">{errors.paymentMethod}</div>}
         </div>
 
         <FormField label="Base" name="basePrice" value={String(form.basePrice ?? "")} onChange={handleChange} type="number" disabled />
@@ -434,4 +484,4 @@ const SalesForm = ({ onClose, onRefresh, salesToEdit }: any) => {
   );
 };
 
-export default SalesForm; 
+export default SalesForm;
