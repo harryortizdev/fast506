@@ -14,6 +14,7 @@ import AlertSuccess from "../atoms/AlertSuccess";
 import AlertWarning from "../atoms/AlertWarning";
 import FormField from "../molecules/FormField";
 import Button from "../atoms/Button";
+import { useAuth } from "../../context/AuthContext";
 
 interface RepairReportFormProps {
   onClose: () => void;
@@ -28,8 +29,15 @@ const RepairReportForm = ({
   repairReportToEdit,
   idAppointmentFromWorkshop,
 }: RepairReportFormProps) => {
+  const { user } = useAuth();
+  const normalizedRole = (user?.roleName ?? "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const isMechanic = normalizedRole.includes("mecanico") || normalizedRole.includes("mechanic");
+
   const [form, setForm] = useState<Partial<RepairReport>>(
-    repairReportToEdit || { isActive: true }
+    repairReportToEdit || {
+      isActive: true,
+      idMechanic: isMechanic ? user?.userId : undefined,
+    }
   );
 
   const [errors, setErrors] =
@@ -417,21 +425,29 @@ const generateRepairReference = (): number => {
 
         <div className="mb-3">
           <label className="form-label">Mecánico:</label>
-          <select
-            name="idMechanic"
-            value={form.idMechanic?.toString() || ""}
-            onChange={handleChange}
-            className={`form-control ${
-              errors.idMechanic ? "is-invalid" : ""
-            }`}
-          >
-            <option value="">Selecciona un mecánico</option>
-            {mechanics.map((mechanic) => (
-              <option key={mechanic.idUser} value={mechanic.idUser}>
-                {mechanic.name}
-              </option>
-            ))}
-          </select>
+          {isMechanic ? (
+            <input
+              className="form-control"
+              value={mechanics.find((m) => Number(m.idUser) === Number(user?.userId))?.name || `Mecánico #${user?.userId}`}
+              disabled
+            />
+          ) : (
+            <select
+              name="idMechanic"
+              value={form.idMechanic?.toString() || ""}
+              onChange={handleChange}
+              className={`form-control ${
+                errors.idMechanic ? "is-invalid" : ""
+              }`}
+            >
+              <option value="">Selecciona un mecánico</option>
+              {mechanics.map((mechanic) => (
+                <option key={mechanic.idUser} value={mechanic.idUser}>
+                  {mechanic.name}
+                </option>
+              ))}
+            </select>
+          )}
           {errors.idMechanic && (
             <div className="invalid-feedback d-block">
               {errors.idMechanic}

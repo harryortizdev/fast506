@@ -12,6 +12,7 @@ import { Mechanic } from "../models/Mechanic";
 import Navbar from "../components/organisms/Navbar";
 import Footer from "../components/organisms/Footer";
 import AlertConfirm from "../components/atoms/AlertConfirm";
+import AlertSuccess from "../components/atoms/AlertSuccess";
 import ButtonIcon from "../components/molecules/ButtonIcon";
 import { deduplicateByKey } from "../utils/arrayUtils";
 import { filterWorkshopSchedulesWithoutReport } from "../utils/repairReportUtils";
@@ -208,6 +209,7 @@ const formatDate = (date?: any) => {
     if (!confirmar) return;
 
     await deleteRepairReport(repairReport.idReparation);
+    AlertSuccess("Reporte eliminado correctamente.");
     await loadRepairReports();
     await loadWorkshopSchedules();
     setRefreshKey((prev) => prev + 1);
