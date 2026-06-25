@@ -9,7 +9,7 @@ import Navbar from "../components/organisms/Navbar";
 import Footer from "../components/organisms/Footer";
 import AlertConfirm from "../components/atoms/AlertConfirm";
 import DataTable from "datatables.net-bs5";
-//import "database.net-bs5/css/dataTables.bootstrap5.min.css";
+//import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
 
 type ClientTable = Client & {
   dateFormatted: string;
@@ -90,6 +90,29 @@ const ClientPage = () => {
     ...c,
     dateFormatted: formatDate(c.dateBirth),
   }));
+
+  useEffect(() => {
+    let table: any;
+
+    if (clients.length > 0) {
+      table = new DataTable('#myTable', {
+        language: {
+          search: "Buscar:",
+          searchPlaceholder: "Escribe aquí...",
+          lengthMenu: "Mostrar _MENU_ registros",
+          info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+          infoEmpty: "No hay registros",
+          zeroRecords: "No se encontraron resultados",
+
+        }
+      });
+    }
+    return () => {
+      if (table) {
+        table.destroy();
+      }
+    };
+  }, [clients]);
 
   const columns: { key: keyof ClientTable; label: string }[] = [
     { key: "index" as keyof Client, label: "#" },

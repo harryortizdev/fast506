@@ -99,7 +99,7 @@ const Navbar = () => {
                   </li>
 
                   <li className="nav-item">
-                    <Link className={`nav-link magic-link ${isActive("/workshopSchedules") ? "active-link" : ""}`} to="/workshop-schedules/create">
+                    <Link className={`nav-link magic-link ${isActive("/workshopSchedules") ? "active-link" : ""}`} to="/workshopSchedules">
                       CITAS TALLER
                     </Link>
                   </li>
