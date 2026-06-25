@@ -37,7 +37,9 @@ public class WorkshopScheduleService {
     }
 
     public List<WorkshopSchedule> getAllForReports() {
-        return workshopScheduleRepository.getAllForReports();
+        return workshopScheduleRepository.getAllForReports().stream()
+                .filter(workshopSchedule -> workshopSchedule != null && workshopSchedule.isIsActive())
+                .toList();
     }
 
     private void validate(WorkshopSchedule workshopSchedule) {

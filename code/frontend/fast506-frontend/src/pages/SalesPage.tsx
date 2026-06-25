@@ -82,15 +82,16 @@ const SalesPage = () => {
 
     const handleDelete = async (sales: Sales) => {
         if (!sales.idSales) return;
-        const confirmar = await AlertConfirm(`¿Desea eliminar el vehículo ${sales.idSales}?`
-        );
+        const confirmar = await AlertConfirm(`¿Desea eliminar la venta ${sales.invoiceNumber}?`);
         if (!confirmar) return;
         await deleteSales(sales.idSales);
         await loadCatalogs();
         await loadDetails();
     };
 
-    const handleEdit = (sales: Sales) => {
+    const handleEdit = async (sales: Sales) => {
+        const confirmar = await AlertConfirm(`¿Desea editar la venta ${sales.invoiceNumber}?`);
+        if (!confirmar) return;
         setSelectedSales(sales);
         setShowForm(true);
     };

@@ -81,7 +81,7 @@ useEffect(() => {
   };
 
   const handleEdit = async (unit: Unit) => {//cuando presiono el boton editar
-    const confirmar = await AlertConfirm(`¿Desea editar el vehículo`);//confirmación del usuario
+    const confirmar = await AlertConfirm(`¿Desea editar el vehículo ${unit.VIN}?`);//confirmación del usuario
     if (!confirmar) return;//si cancela no hago nada
     setUnitToEdit(unit);//guardo la unidad que quiero editar
     setShowForm(true);//abro el formulario
@@ -89,7 +89,7 @@ useEffect(() => {
 
   const handleDelete = async (unit: Unit) => {// cuando presiono el boton eliminar
     if (!unit.idCar) return;//  si no tiene id no haga nada
-    const confirmar = await AlertConfirm(`¿Desea eliminar el vehículo`);//confirmación del usuario
+    const confirmar = await AlertConfirm(`¿Desea eliminar el vehículo ${unit.VIN}?`);//confirmación del usuario
     if (!confirmar) return;//si cancela no hago nada
     await deleteUnit(unit.idCar!);//envia la señal al backend de eliminar
     await loadUnits();//recargo la lista 

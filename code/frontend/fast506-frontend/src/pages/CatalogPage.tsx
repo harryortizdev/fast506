@@ -50,14 +50,16 @@ const CatalogPage = () => {
 
     const handleDelete = async (catalog: Catalog) => {
         if (!catalog.idCatalog) return;
-        const confirmar = await AlertConfirm(`¿Desea eliminar el vehículo ${catalog.idCatalog}?`
+        const confirmar = await AlertConfirm(`¿Desea eliminar el cátalogo de ${catalog.carName}?`
         );
         if (!confirmar) return;
         await deleteCatalog(catalog.idCatalog);
         await loadCatalogs();
     };
 
-    const handleEdit = (catalog: Catalog) => {
+    const handleEdit = async (catalog: Catalog) => {
+         const confirmar = await AlertConfirm(`¿Desea editar el cátalogo de ${catalog.carName}?`);
+        if (!confirmar) return;
         setSelectedCatalog(catalog);
         setShowForm(true);
     };

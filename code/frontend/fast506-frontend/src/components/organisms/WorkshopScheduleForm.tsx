@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { WorkshopSchedule } from "../../models/WorkshopSchedule";
 import { create, updateWorkshopSchedule } from "../../services/WorkshopScheduleService";
 import { getAll as getAllClients } from "../../services/ClientService";
@@ -35,6 +37,11 @@ const WorkshopScheduleForm = ({
   const [loadingBranches, setLoadingBranches] = useState(true);
 
   useEffect(() => {
+    setForm(workshopScheduleToEdit || { isActive: true });
+    setErrors({});
+  }, [workshopScheduleToEdit]);
+
+  useEffect(() => {
     const loadClients = async () => {
       try {
         const data = await getAllClients();
@@ -62,6 +69,36 @@ const WorkshopScheduleForm = ({
     loadClients();
     loadBranches();
   }, []);
+
+  const parseDateValue = (value?: string | Date | number[] | null) => {
+    if (!value) return null;
+
+    if (value instanceof Date) {
+      return Number.isNaN(value.getTime()) ? null : value;
+    }
+
+    if (Array.isArray(value)) {
+      const [year, month, day] = value.map(Number);
+      return new Date(year, month - 1, day);
+    }
+
+    const rawValue = String(value).trim();
+    const normalizedValue = rawValue.includes("T") ? rawValue.split("T")[0] : rawValue;
+    const [year, month, day] = normalizedValue.split(/[-/]/).map(Number);
+
+    if (year && month && day) {
+      return new Date(year, month - 1, day);
+    }
+
+    const parsed = new Date(rawValue);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  };
+
+  const formatDateValue = (date: Date | null) => {
+    if (!date) return undefined;
+
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -102,38 +139,34 @@ const generateWorkshopReference = (): number => {
 
   const validate = (): boolean => {
     const newErrors: Partial<Record<keyof WorkshopSchedule, string>> = {};
+    const plate = String(form.licensePlate ?? "").trim().toUpperCase();
+    const reasonService = String(form.reasonService ?? "").trim();
+    const parsedEntryDate = parseDateValue(form.entryDate);
+    const mileage = Number(form.receptionMileage);
 
-    if (
-      !form.licensePlate ||
-      form.licensePlate.trim() === "" ||
-      form.licensePlate.length > 20
-    ) {
+    if (!plate || plate.length > 20 || !/^[A-Z0-9-]{2,20}$/.test(plate)) {
       newErrors.licensePlate =
-        "Placa inválida: no puede estar vacía, máximo 20 caracteres.";
+        "Placa inválida: debe tener un formato válido y máximo 20 caracteres.";
     }
 
-    if (!form.entryDate) {
+    if (!parsedEntryDate) {
       newErrors.entryDate = "La fecha de ingreso es requerida.";
     }
 
-    if (
-      !form.reasonService ||
-      form.reasonService.trim() === "" ||
-      form.reasonService.length > 500
-    ) {
+    if (!reasonService || reasonService.length < 3 || reasonService.length > 500) {
       newErrors.reasonService =
-        "Motivo inválido: no puede estar vacío, máximo 500 caracteres.";
+        "Motivo inválido: debe tener entre 3 y 500 caracteres.";
     }
 
-    if (form.receptionMileage === undefined || form.receptionMileage < 0) {
-      newErrors.receptionMileage = "El kilometraje no puede ser negativo.";
+    if (!Number.isFinite(mileage) || mileage < 0) {
+      newErrors.receptionMileage = "El kilometraje debe ser un número válido y no puede ser negativo.";
     }
 
-    if (!form.idClient || form.idClient <= 0) {
+    if (!form.idClient || Number(form.idClient) <= 0) {
       newErrors.idClient = "Debe ingresar un cliente válido.";
     }
 
-    if (!form.idBranch || form.idBranch <= 0) {
+    if (!form.idBranch || Number(form.idBranch) <= 0) {
       newErrors.idBranch = "Debe ingresar una sucursal válida.";
     }
 
@@ -150,9 +183,9 @@ const generateWorkshopReference = (): number => {
         numberReference: workshopScheduleToEdit
           ? Number(form.numberReference)
           : generateWorkshopReference(),
-        licensePlate: form.licensePlate,
+        licensePlate: String(form.licensePlate ?? "").trim().toUpperCase(),
         entryDate: form.entryDate,
-        reasonService: form.reasonService,
+        reasonService: String(form.reasonService ?? "").trim(),
         receptionMileage: Number(form.receptionMileage),
         idClient: Number(form.idClient),
         idBranch: Number(form.idBranch),
@@ -206,16 +239,29 @@ const generateWorkshopReference = (): number => {
           <div className="invalid-feedback d-block">{errors.licensePlate}</div>
         )}
 
-        <FormField
-          label="Fecha de Ingreso:"
-          name="entryDate"
-          value={form.entryDate || ""}
-          onChange={handleChange}
-          type="date"
-        />
-        {errors.entryDate && (
-          <div className="invalid-feedback d-block">{errors.entryDate}</div>
-        )}
+        <div className="mb-3">
+          <label className="form-label">Fecha de Ingreso:</label>
+          <DatePicker
+            wrapperClassName="w-100"
+            className={`form-control w-100 ${errors.entryDate ? "is-invalid" : ""}`}
+            placeholderText="Seleccione una fecha"
+            dateFormat="dd/MM/yyyy"
+            selected={parseDateValue(form.entryDate)}
+            onChange={(date: Date | null) => {
+              setForm({
+                ...form,
+                entryDate: formatDateValue(date),
+              });
+              setErrors({
+                ...errors,
+                entryDate: "",
+              });
+            }}
+          />
+          {errors.entryDate && (
+            <div className="invalid-feedback d-block">{errors.entryDate}</div>
+          )}
+        </div>
 
         <FormField
           label="Motivo del Servicio:"

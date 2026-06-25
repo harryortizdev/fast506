@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { RepairReport } from "../../models/RepairReport";
 import { Mechanic } from "../../models/Mechanic";
 import {
@@ -106,6 +108,36 @@ const RepairReportForm = ({
     repairReportToEdit,
   ]);
 
+  const parseDateValue = (value?: string | Date | number[] | null) => {
+    if (!value) return null;
+
+    if (value instanceof Date) {
+      return Number.isNaN(value.getTime()) ? null : value;
+    }
+
+    if (Array.isArray(value)) {
+      const [year, month, day] = value.map(Number);
+      return new Date(year, month - 1, day);
+    }
+
+    const rawValue = String(value).trim();
+    const normalizedValue = rawValue.includes("T") ? rawValue.split("T")[0] : rawValue;
+    const [year, month, day] = normalizedValue.split(/[-/]/).map(Number);
+
+    if (year && month && day) {
+      return new Date(year, month - 1, day);
+    }
+
+    const parsed = new Date(rawValue);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  };
+
+  const formatDateValue = (date: Date | null) => {
+    if (!date) return undefined;
+
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  };
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -147,44 +179,55 @@ const generateRepairReference = (): number => {
 
   const validate = (): boolean => {
     const newErrors: Partial<Record<keyof RepairReport, string>> = {};
+    const technicalDiagnosis = String(form.technicalDiagnosis ?? "").trim();
+    const spareParts = String(form.spareParts ?? "").trim();
+    const observations = String(form.observations ?? "").trim();
+    const cost = Number(form.cost);
+    const taxes = Number(form.taxes);
+    const totalPayment = Number(form.totalPayment);
+    const parsedCompletionDate = parseDateValue(form.completionDate);
 
-    if (form.technicalDiagnosis && form.technicalDiagnosis.length > 500) {
+    if (technicalDiagnosis && technicalDiagnosis.length > 500) {
       newErrors.technicalDiagnosis =
         "El diagnóstico no puede superar los 500 caracteres.";
     }
 
-    if (form.spareParts && form.spareParts.length > 500) {
+    if (spareParts && spareParts.length > 500) {
       newErrors.spareParts =
         "Los repuestos no pueden superar los 500 caracteres.";
     }
 
-    if (form.observations && form.observations.length > 500) {
+    if (observations && observations.length > 500) {
       newErrors.observations =
         "Las observaciones no pueden superar los 500 caracteres.";
     }
 
-    if (form.cost === undefined || form.cost < 0) {
-      newErrors.cost = "El costo no puede ser negativo.";
+    if (!Number.isFinite(cost) || cost < 0) {
+      newErrors.cost = "El costo debe ser un valor válido y no puede ser negativo.";
     }
 
-    if (form.taxes === undefined || form.taxes < 0) {
-      newErrors.taxes = "Los impuestos no pueden ser negativos.";
+    if (!Number.isFinite(taxes) || taxes < 0) {
+      newErrors.taxes = "Los impuestos deben ser un valor válido y no pueden ser negativos.";
     }
 
-    if (form.totalPayment === undefined || form.totalPayment < 0) {
-      newErrors.totalPayment = "El pago total no puede ser negativo.";
+    if (!Number.isFinite(totalPayment) || totalPayment < 0) {
+      newErrors.totalPayment = "El pago total debe ser un valor válido y no puede ser negativo.";
+    } else if (Number.isFinite(cost) && Number.isFinite(taxes) && totalPayment < cost + taxes) {
+      newErrors.totalPayment = "El pago total no puede ser menor que la suma de costo e impuestos.";
     }
 
-    if (!form.completionDate) {
+    if (!parsedCompletionDate) {
       newErrors.completionDate = "La fecha de finalización es requerida.";
     }
 
-    if (!form.idMechanic || form.idMechanic <= 0) {
+    if (!form.idMechanic || Number(form.idMechanic) <= 0) {
       newErrors.idMechanic = "Debe ingresar un mecánico válido.";
     }
 
-    if (!form.idAppointment || form.idAppointment <= 0) {
+    if (!form.idAppointment || Number(form.idAppointment) <= 0) {
       newErrors.idAppointment = "Debe seleccionar una cita del taller.";
+    } else if (filteredWorkshopSchedules.length === 0) {
+      newErrors.idAppointment = "No hay citas disponibles para asignar a este reporte.";
     }
 
     setErrors(newErrors);
@@ -200,9 +243,9 @@ const generateRepairReference = (): number => {
         numberReference: repairReportToEdit
           ? Number(form.numberReference)
           : generateRepairReference(),
-        technicalDiagnosis: form.technicalDiagnosis,
-        spareParts: form.spareParts,
-        observations: form.observations,
+        technicalDiagnosis: String(form.technicalDiagnosis ?? "").trim(),
+        spareParts: String(form.spareParts ?? "").trim(),
+        observations: String(form.observations ?? "").trim(),
         cost: Number(form.cost),
         taxes: Number(form.taxes),
         totalPayment: Number(form.totalPayment),
@@ -318,18 +361,31 @@ const generateRepairReference = (): number => {
           </div>
         )}
 
-        <FormField
-          label="Fecha de Finalización:"
-          name="completionDate"
-          value={form.completionDate || ""}
-          onChange={handleChange}
-          type="date"
-        />
-        {errors.completionDate && (
-          <div className="invalid-feedback d-block">
-            {errors.completionDate}
-          </div>
-        )}
+        <div className="mb-3">
+          <label className="form-label">Fecha de Finalización:</label>
+          <DatePicker
+            wrapperClassName="w-100"
+            className={`form-control w-100 ${errors.completionDate ? "is-invalid" : ""}`}
+            placeholderText="Seleccione una fecha"
+            dateFormat="dd/MM/yyyy"
+            selected={parseDateValue(form.completionDate)}
+            onChange={(date: Date | null) => {
+              setForm({
+                ...form,
+                completionDate: formatDateValue(date),
+              });
+              setErrors({
+                ...errors,
+                completionDate: "",
+              });
+            }}
+          />
+          {errors.completionDate && (
+            <div className="invalid-feedback d-block">
+              {errors.completionDate}
+            </div>
+          )}
+        </div>
 
         <div className="mb-3">
           <label className="form-label">Cita del Taller:</label>
