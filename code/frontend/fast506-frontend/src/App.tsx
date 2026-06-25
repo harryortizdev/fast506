@@ -25,6 +25,7 @@ import RepairReportPage from "./pages/RepairReportPage";
 import RolePage from "./pages/RolePage";
 import LoginForm from "./components/organisms/LoginForm";
 import RegisterForm from "./components/organisms/RegisterForm";
+import WorkshopSchedulePageClient from "./pages/WorkshopSchedulePageClient";
 
 function App() {
   return (
@@ -39,17 +40,14 @@ function App() {
           <Route path="/branches" element={<ShowBranches />} />
           <Route path="/catalog/detail/:id" element={<CatalogDetailPage />} />
           <Route path="/catalog/client/sales" element={<SalesClientPage />} />
+          
 
           {/* Rutas que requieren inicio de sesión */}
           <Route path="/testdrive" element={
             <PrivateRoute><CreateTestdrive /></PrivateRoute>
           } />
-          <Route path="/quotation" element={
-            <PrivateRoute><CreateQuotation /></PrivateRoute>
-          } />
-          <Route path="/workshop-schedules/create" element={
-            <PrivateRoute><CreateWorkshopSchedule /></PrivateRoute>
-          } />
+          <Route path="/quotation" element={<PrivateRoute><CreateQuotation /></PrivateRoute>} />
+          <Route path="/workshopSchedules" element ={<PrivateRoute><WorkshopSchedulePageClient/></PrivateRoute>}/>
 
           {/* Rutas de mecánico */}
           <Route path="/mechanic/repair-reports" element={

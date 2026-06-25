@@ -10,11 +10,17 @@ import Footer from "../components/organisms/Footer";
 import AlertConfirm from "../components/atoms/AlertConfirm";
 import ButtonIcon from "../components/molecules/ButtonIcon";
 
+type RoleTable = Role & {
+  dateFormatted: string;
+};
+
 const RolePage = () => {
   const [roles, setRoles] = useState<Role[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [roleToEdit, setRoleToEdit] = useState<Role | undefined>(undefined);
-  const [roleForPermissions, setRoleForPermissions] = useState<Role | undefined>(undefined);
+  const [roleForPermissions, setRoleForPermissions] = useState<
+    Role | undefined
+  >(undefined);
 
   const loadRoles = async () => {
     const data = await getAll();
@@ -51,13 +57,48 @@ const RolePage = () => {
     await loadRoles();
   };
 
-  const columns: { key: keyof Role; label: string }[] = [
+  const formatDate = (date?: any) => {
+    if (!date) return "";
+
+    let dateObject: Date;
+
+    //    Si la fecha viene como un arreglo de número[2026, 6, 23]
+    if (Array.isArray(date)) {
+      const [year, month, day] = date;
+
+      dateObject = new Date(year, month - 1, day);
+    } else {
+      dateObject = new Date(String(date).split("T")[0] + "T00:00:00");
+    }
+
+    // corrupto o algo que no se pudo parsear bien getTime() devolve NaN es así, devolvemos el string original
+    if (isNaN(dateObject.getTime())) {
+      return String(date);
+    }
+
+    const formatted = dateObject.toLocaleDateString("es-CR", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+
+    return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+  };
+
+  const transformedRoles: RoleTable[] = roles.map((r) => ({
+    ...r,
+    dateFormatted: formatDate(r.createDate),
+  }));
+
+  const columns: { key: keyof RoleTable; label: string }[] = [
+    { key: "index" as keyof Role, label: "#" },
     { key: "name", label: "Nombre" },
     { key: "description", label: "Descripción" },
-    { key: "createDate", label: "Fecha de Creación" },
+    { key: "dateFormatted", label: "Fecha de Creación" },
     { key: "levelHierarchy", label: "Nivel de Jerarquía" },
     { key: "isWorker", label: "Es Trabajador" },
-    { key: "haveEmail", label: "Tiene Email" },
+    { key: "haveEmail", label: "Tiene Correo Electrónico" },
     { key: "isActive", label: "Activo" },
   ];
 
@@ -116,7 +157,7 @@ const RolePage = () => {
             >
               {!showForm ? (
                 <TableGeneric
-                  data={roles}
+                  data={transformedRoles}
                   columns={columns}
                   onDelete={handleDelete}
                   onEdit={handleEdit}

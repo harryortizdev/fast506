@@ -162,7 +162,7 @@ const RegisterForm = () => {
                     <div className="col-md-6">
                       
                       <FormField
-                        label="Nombre completo:"
+                        label="Nombre:"
                         name="name"
                         placeholder="Tu nombre completo"
                         value={form.name || ""}
@@ -196,7 +196,7 @@ const RegisterForm = () => {
                   <div className="row g-3 mb-3">
                     <div className="col-md-6">
                       <FormField
-                        label="Email:"
+                        label="Correo electrónico:"
                         name="email"
                         placeholder="tucorreo@ejemplo.com"
                         type="email"
@@ -247,7 +247,7 @@ const RegisterForm = () => {
                     </div>
                     <div className="col-md-6">
                       <FormField
-                        label="Teléfono:"
+                        label="Número de teléfono:"
                         name="phoneNumber"
                         placeholder="Número de teléfono"
                         type="tel"
@@ -285,7 +285,7 @@ const RegisterForm = () => {
                     </div>
                     <div className="col-md-6">
                       <FormField
-                        label="Imagen de perfil:"
+                        label="Foto de perfil:"
                         name="profileImage"
                         placeholder="URL de imagen"
                         value={form.profileImage || ""}
@@ -331,7 +331,7 @@ const RegisterForm = () => {
                   <div className="row g-3 mb-3">
                     <div className="col-md-6">
                       <FormField
-                        label="Dirección:"
+                        label="Dirección física:"
                         name="physicalAddress"
                         placeholder="Tu dirección"
                         value={form.physicalAddress || ""}

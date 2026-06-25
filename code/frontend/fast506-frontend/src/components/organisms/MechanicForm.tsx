@@ -124,7 +124,7 @@ const MechanicForm = ({ onClose, onRefresh, mechanicToEdit }: MechanicFormProps)
           <FormField
             label="Nombre:"
             name="name"
-            placeholder="Nombre"
+            placeholder="Nombre completo"
             value={form.name || ""}
             onChange={handleChange}
           />
@@ -135,7 +135,7 @@ const MechanicForm = ({ onClose, onRefresh, mechanicToEdit }: MechanicFormProps)
           <FormField
             label="Cédula:"
             name="id"
-            placeholder="Cédula"
+            placeholder="Número de cédula"
             value={form.id?.toString() || ""}
             onChange={handleChange}
           />
@@ -144,9 +144,9 @@ const MechanicForm = ({ onClose, onRefresh, mechanicToEdit }: MechanicFormProps)
 
         <div className="mb-3">
           <FormField
-            label="Email:"
+            label="Correo electrónico:"
             name="email"
-            placeholder="Email"
+            placeholder="tucorreo@ejemplo.com"
             type="email"
             value={form.email || ""}
             onChange={handleChange}
@@ -158,7 +158,7 @@ const MechanicForm = ({ onClose, onRefresh, mechanicToEdit }: MechanicFormProps)
           <FormField
             label="Contraseña:"
             name="password"
-            placeholder="Contraseña"
+            placeholder="Mínimo 8 caracteres"
             type="password"
             value={form.password || ""}
             onChange={handleChange}
@@ -192,9 +192,9 @@ const MechanicForm = ({ onClose, onRefresh, mechanicToEdit }: MechanicFormProps)
 
         <div className="mb-3">
           <FormField
-            label="Imagen de perfil:"
+            label="Foto de perfil:"
             name="profileImage"
-            placeholder="Imagen de perfil"
+            placeholder="Foto de perfil"
             value={form.profileImage || ""}
             onChange={handleChange}
           />
@@ -214,9 +214,9 @@ const MechanicForm = ({ onClose, onRefresh, mechanicToEdit }: MechanicFormProps)
 
         <div className="mb-3">
           <FormField
-            label="Email Corporativo:"
+            label="Correo Corporativo:"
             name="corporateEmail"
-            placeholder="Email Corporativo"
+            placeholder="tucorreo@agenciafast.cr"
             type="email"
             value={form.corporateEmail || ""}
             onChange={handleChange}

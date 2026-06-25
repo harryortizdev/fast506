@@ -99,7 +99,7 @@ const Navbar = () => {
                   </li>
 
                   <li className="nav-item">
-                    <Link className={`nav-link magic-link ${isActive("/workshop-schedules/create") ? "active-link" : ""}`} to="/workshop-schedules/create">
+                    <Link className={`nav-link magic-link ${isActive("/workshopSchedules") ? "active-link" : ""}`} to="/workshop-schedules/create">
                       CITAS TALLER
                     </Link>
                   </li>
@@ -200,10 +200,10 @@ const Navbar = () => {
 
                   <ul className="dropdown-menu dropdown-menu-end custom-dropdown text-center">
                     <li>
-                      <span className="dropdown-item-text fw-semibold">{user.name}</span>
+                      <span className="dropdown-item-text fw-semibold text-white">{user.name}</span>
                     </li>
                     <li>
-                      <span className="dropdown-item-text text-muted small">{user.roleName ?? "Sin rol"}</span>
+                      <span className="dropdown-item-text small text-white">{user.roleName ?? "Sin rol"}</span>
                     </li>
                     <li><hr className="dropdown-divider" /></li>
                     <li>
@@ -232,7 +232,7 @@ const Navbar = () => {
           overflow: "hidden",
           transition: "all 0.5s ease",
           backgroundColor: "#EEF1EF",
-          boxShadow: showModels ? "0 6px 16px rgba(0,0,0,0.12)" : "none",
+          boxShadow: showModels ? "0 6px 16px rgba(255, 255, 255, 0.12)" : "none",
         }}
       >
         <div style={{ paddingTop: "30px", paddingBottom: "40px" }}>

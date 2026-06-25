@@ -8,24 +8,27 @@ import ButtonIcon from "../components/molecules/ButtonIcon";
 import Navbar from "../components/organisms/Navbar";
 import Footer from "../components/organisms/Footer";
 import AlertConfirm from "../components/atoms/AlertConfirm";
+import DataTable from "datatables.net-bs5";
+//import "database.net-bs5/css/dataTables.bootstrap5.min.css";
+
+type ClientTable = Client & {
+  dateFormatted: string;
+};
 
 const ClientPage = () => {
-
   const [clients, setClients] = useState<Client[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [clientToEdit, setClientToEdit] = useState<Client | undefined>(undefined);
+  const [clientToEdit, setClientToEdit] = useState<Client | undefined>(
+    undefined,
+  );
 
   const loadClients = async () => {
-
     const data = await getAll();
     setClients(data);
-
   };
 
   useEffect(() => {
-
     loadClients();
-
   }, []);
 
   const handleSaveAndClose = async () => {
@@ -46,27 +49,69 @@ const ClientPage = () => {
 
   const handleDelete = async (client: Client) => {
     if (!client.idUser) return;
-    const confirmar = await AlertConfirm(`¿Desea eliminar el cliente ${client.name}?`);
+    const confirmar = await AlertConfirm(
+      `¿Desea eliminar el cliente ${client.name}?`,
+    );
     if (!confirmar) return;
     await deleteClient(client.idUser!);
     await loadClients();
   };
 
-  const columns: { key: keyof Client; label: string }[] = [
+  const formatDate = (date?: any) => {
+    if (!date) return "";
+
+    let dateObject: Date;
+
+    //    Si la fecha viene como un arreglo de número[2026, 6, 23]
+    if (Array.isArray(date)) {
+      const [year, month, day] = date;
+
+      dateObject = new Date(year, month - 1, day);
+    } else {
+      dateObject = new Date(String(date).split("T")[0] + "T00:00:00");
+    }
+
+    // corrupto o algo que no se pudo parsear bien getTime() devolve NaN es así, devolvemos el string original
+    if (isNaN(dateObject.getTime())) {
+      return String(date);
+    }
+
+    const formatted = dateObject.toLocaleDateString("es-CR", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+
+    return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+  };
+
+  const transformedClient: ClientTable[] = clients.map((c) => ({
+    ...c,
+    dateFormatted: formatDate(c.dateBirth),
+  }));
+
+  const columns: { key: keyof ClientTable; label: string }[] = [
+    { key: "index" as keyof Client, label: "#" },
     { key: "name", label: "Nombre" },
-    { key: "id", label: "Cedula" },
-    { key: "email", label: "Email" },
-    { key: "phoneNumber", label: "Telefono" },
-    { key: "dateBirth", label: "Fecha de Nacimiento" },
-    { key: "profileImage", label: "Imagen de Perfil" },
+    { key: "id", label: "Cédula" },
+    { key: "email", label: "Correo Electrónico" },
+    { key: "phoneNumber", label: "Número de Teléfono" },
+    { key: "dateFormatted", label: "Fecha de Nacimiento" },
+    { key: "profileImage", label: "Foto de Perfil" },
     { key: "commInterest", label: "Intereses" },
     { key: "physicalAddress", label: "Dirección Física" },
   ];
 
   return (
-
-    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", backgroundColor: "#EEF1EF", }}>
-
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+        backgroundColor: "#EEF1EF",
+      }}
+    >
       <Navbar />
 
       <main style={{ flex: 1 }}>
@@ -76,7 +121,10 @@ const ClientPage = () => {
               className="card-header d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center gap-2"
               style={{ backgroundColor: "#2C3E50" }}
             >
-              <h5 className="mb-0 text-center text-md-start" style={{ color: "#EEF1EF" }}>
+              <h5
+                className="mb-0 text-center text-md-start"
+                style={{ color: "#EEF1EF" }}
+              >
                 Gestión de Clientes
               </h5>
 
@@ -92,7 +140,7 @@ const ClientPage = () => {
                   style={{
                     backgroundColor: "#5E6572",
                     color: "#EEF1EF",
-                    border: "none"
+                    border: "none",
                   }}
                 />
               </div>
@@ -104,7 +152,7 @@ const ClientPage = () => {
             >
               {!showForm ? (
                 <TableGeneric
-                  data={clients}
+                  data={transformedClient}
                   columns={columns}
                   onDelete={handleDelete}
                   onEdit={handleEdit}
@@ -114,7 +162,7 @@ const ClientPage = () => {
                   onClose={handleClose}
                   onRefresh={handleSaveAndClose}
                   clientToEdit={clientToEdit}
-                //clients={clients}
+                  //clients={clients}
                 />
               )}
             </div>
@@ -124,9 +172,7 @@ const ClientPage = () => {
 
       <Footer />
     </div>
-
   );
-
-}
+};
 
 export default ClientPage;

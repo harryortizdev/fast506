@@ -9,25 +9,24 @@ import Footer from "../components/organisms/Footer";
 import AlertConfirm from "../components/atoms/AlertConfirm";
 import ButtonIcon from "../components/molecules/ButtonIcon";
 
-
+type AdminTable = Administrator & {
+  dateFormatted : string;
+};
 const AdministratorPage = () => {
-
   const [administrators, setAdministrators] = useState<Administrator[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [administratorToEdit, setAdministratorToEdit] = useState<Administrator | undefined>(undefined);
+  const [administratorToEdit, setAdministratorToEdit] = useState<
+    Administrator | undefined
+  >(undefined);
 
   const loadAdministrators = async () => {
-
     const data = await getAll();
     console.log("Administrators data:", data);
     setAdministrators(Array.isArray(data) ? data : []);
-
   };
 
   useEffect(() => {
-
     loadAdministrators();
-
   }, []);
 
   const handleSaveAndClose = async () => {
@@ -48,27 +47,69 @@ const AdministratorPage = () => {
 
   const handleDelete = async (administrator: Administrator) => {
     if (!administrator.idUser) return;
-    const confirmar = await AlertConfirm(`¿Desea eliminar el administrador ${administrator.name}?`);
+    const confirmar = await AlertConfirm(
+      `¿Desea eliminar el administrador ${administrator.name}?`,
+    );
     if (!confirmar) return;
     await deleteAdministrator(administrator.idUser);
     await loadAdministrators();
   };
 
-  const columns: { key: keyof Administrator; label: string }[] = [
+  const formatDate = (date?: any) => {
+    if (!date) return "";
+
+    let dateObject: Date;
+
+    //    Si la fecha viene como un arreglo de número[2026, 6, 23]
+    if (Array.isArray(date)) {
+      const [year, month, day] = date;
+
+      dateObject = new Date(year, month - 1, day);
+    } else {
+      dateObject = new Date(String(date).split("T")[0] + "T00:00:00");
+    }
+
+    // corrupto o algo que no se pudo parsear bien getTime() devolve NaN es así, devolvemos el string original
+    if (isNaN(dateObject.getTime())) {
+      return String(date);
+    }
+
+    const formatted = dateObject.toLocaleDateString("es-CR", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+
+    return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+  };
+
+  const transformedAdmins: AdminTable[] = administrators.map((a) => ({
+    ...a,
+    dateFormatted: formatDate(a.dateBirth),
+  }));
+
+  const columns: { key: keyof AdminTable; label: string }[] = [
+    { key: "index" as keyof Administrator, label: "#" },
     { key: "name", label: "Nombre" },
-    { key: "id", label: "Cedula" },
-    { key: "email", label: "Email" },
-    { key: "phoneNumber", label: "Telefono" },
-    { key: "dateBirth", label: "Fecha de Nacimiento" },
-    { key: "profileImage", label: "Imagen de Perfil" },
+    { key: "id", label: "Cédula" },
+    { key: "email", label: "Correo Electrónico" },
+    { key: "phoneNumber", label: "Número de Teléfono" },
+    { key: "dateFormatted", label: "Fecha de Nacimiento" },
+    { key: "profileImage", label: "Foto de Perfil" },
     { key: "employeeId", label: "ID de Empleado" },
-    { key: "corporateEmail", label: "Email Corporativo" },
+    { key: "corporateEmail", label: "Correo Corporativo" },
   ];
 
   return (
-
-    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", backgroundColor: "#EEF1EF", }}>
-
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+        backgroundColor: "#EEF1EF",
+      }}
+    >
       <Navbar />
 
       <main style={{ flex: 1 }}>
@@ -78,7 +119,10 @@ const AdministratorPage = () => {
               className="card-header d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center gap-2"
               style={{ backgroundColor: "#2C3E50" }}
             >
-              <h5 className="mb-0 text-center text-md-start" style={{ color: "#EEF1EF" }}>
+              <h5
+                className="mb-0 text-center text-md-start"
+                style={{ color: "#EEF1EF" }}
+              >
                 Gestión de Administradores
               </h5>
 
@@ -94,7 +138,7 @@ const AdministratorPage = () => {
                   style={{
                     backgroundColor: "#5E6572",
                     color: "#EEF1EF",
-                    border: "none"
+                    border: "none",
                   }}
                 />
               </div>
@@ -106,7 +150,7 @@ const AdministratorPage = () => {
             >
               {!showForm ? (
                 <TableGeneric
-                  data={administrators}
+                  data={transformedAdmins}
                   columns={columns}
                   onDelete={handleDelete}
                   onEdit={handleEdit}
@@ -126,9 +170,7 @@ const AdministratorPage = () => {
 
       <Footer />
     </div>
-
   );
-
-}
+};
 
 export default AdministratorPage;

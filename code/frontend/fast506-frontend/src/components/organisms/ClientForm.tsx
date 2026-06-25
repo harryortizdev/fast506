@@ -112,7 +112,7 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
           <FormField
             label="Nombre:"
             name="name"
-            placeholder="Nombre"
+            placeholder="Nombre completo"
             value={form.name || ""}
             onChange={handleChange}
           />
@@ -123,7 +123,7 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
           <FormField
             label="Cédula:"
             name="id"
-            placeholder="Cédula"
+            placeholder="Número de cédula"
             value={form.id?.toString() || ""}
             onChange={handleChange}
           />
@@ -132,9 +132,9 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
 
         <div className="mb-3">
           <FormField
-            label="Email:"
+            label="Correo electrónico:"
             name="email"
-            placeholder="Email"
+            placeholder="tucorreo@ejemplo.com"
             type="email"
             value={form.email || ""}
             onChange={handleChange}
@@ -146,7 +146,7 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
           <FormField
             label="Contraseña:"
             name="password"
-            placeholder="Contraseña"
+            placeholder="Mínimo 8 caracteres"
             type="password"
             value={form.password || ""}
             onChange={handleChange}
@@ -168,9 +168,9 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
 
         <div className="mb-3">
           <FormField
-            label="Fecha de Nacimiento:"
+            label="Fecha de nacimiento:"
             name="dateBirth"
-            placeholder="Fecha de Nacimiento"
+            placeholder="Fecha de nacimiento"
             type="date"
             value={form.dateBirth instanceof Date ? form.dateBirth.toISOString().split('T')[0] : form.dateBirth || ""}
             onChange={handleChange}
@@ -180,9 +180,9 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
 
         <div className="mb-3">
           <FormField
-            label="Imagen de perfil:"
+            label="Foto de perfil:"
             name="profileImage"
-            placeholder="Imagen de perfil"
+            placeholder="Foto de perfil"
             value={form.profileImage || ""}
             onChange={handleChange}
           />
