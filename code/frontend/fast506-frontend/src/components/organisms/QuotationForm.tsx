@@ -9,6 +9,7 @@ import AlertSuccess from "../atoms/AlertSuccess";
 import { create, getUnitsByCatalog, sendEmailCreate, sendEmailUpdate, updateQuotation } from "../../services/QuotationService";
 import Button from "../atoms/Button";
 import FormField from "../molecules/FormField";
+import AlertWarning from "../atoms/AlertWarning";
 
 interface QuotationFormProp {
     onClose: () => void;
@@ -23,6 +24,8 @@ const QuotationForm = ({ onClose, onRefresh, quotationToEdit }: QuotationFormPro
     const [client, setClient] = useState<Client[]>([]);
     const [catalog, setCatalog] = useState<Catalog[]>([]);
     const [filteredUnit, setUnit] = useState<Unit[]>([]);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
 
     const today = new Date();
     const year = today.getFullYear();
@@ -131,25 +134,29 @@ const QuotationForm = ({ onClose, onRefresh, quotationToEdit }: QuotationFormPro
 
     const handleSubmit = async () => {
         if (!validate()) return;
+        setIsSubmitting(true);
+
 
         try {
             if (quotationToEdit) {
                 const updatedQuotation = { ...quotationToEdit, ...form } as Quotation;
                 await updateQuotation(updatedQuotation);
-                 sendEmailUpdate(updatedQuotation);
+                sendEmailUpdate(updatedQuotation);
 
                 AlertSuccess("Los cambios fueron guardados.");
             } else {
                 const newQuotation = { ...form, date: dateToday, isActive: 1 } as Quotation;
                 await create(newQuotation);
-                 sendEmailCreate(newQuotation);
+                sendEmailCreate(newQuotation);
 
                 AlertSuccess("Cotización creada correctamente.");
             }
             onRefresh();
             onClose();
         } catch (error) {
-            alert("Error al guardar la cotización");
+            console.error("Error al guardar:", error);
+            AlertWarning("Error al guardar la cotizacion.");
+            setIsSubmitting(false);
         }
     };
 
@@ -230,7 +237,8 @@ const QuotationForm = ({ onClose, onRefresh, quotationToEdit }: QuotationFormPro
                 </div>
 
                 <div className="mt-3">
-                    <Button label="Guardar" onClick={handleSubmit} backgroundColor="#198754" hoverColor="#145c32" color="#fff" className="btn btn-success me-2" />
+                    <Button label="Guardar" onClick={handleSubmit} backgroundColor="#198754" hoverColor="#145c32" color="#fff" className="btn btn-success me-2" disabled={isSubmitting}
+                    />
                     <Button label="Cancelar" onClick={onClose} backgroundColor="#6c757d" hoverColor="#495057" color="#fff" className="btn btn-secondary" />
                 </div>
             </div>

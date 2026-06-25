@@ -73,7 +73,9 @@ const QuotationPage = () => {
     setShowForm(false);//esconde el formulario
   };
 
-  const handleEdit = (quotation: Quotation) => { //editar
+  const handleEdit =  async (quotation: Quotation) => { //editar
+    const confirmar = await AlertConfirm(`¿Desea editar la Cotizacion ${quotation.referenceNumber}?`); //alerta de confirmacion
+    if (!confirmar) return;//si no selecciona confirmar cancela 
     setQuotationToEdit(quotation);//pone los datos de la sucursal en sus respectivas casillas
     setShowForm(true);//abre el formulario
   };
@@ -149,8 +151,8 @@ const formatDate = (date?: any) => {
                 language: {
                     search: "Buscar:",
                     searchPlaceholder: "Escribe aquí...",
-                    lengthMenu: "Mostrar MENU registros",
-                    info: "Mostrando START a END de TOTAL registros",
+                    lengthMenu: "Mostrar _MENU_ registros",
+                    info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
                     infoEmpty: "No hay registros",
                     zeroRecords: "No se encontraron resultados",
         

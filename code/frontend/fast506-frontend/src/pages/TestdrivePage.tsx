@@ -76,7 +76,9 @@ const TestdrivePage = () => {
     setShowForm(false);//esconde el formulario
   };
 
-  const handleEdit = (testdrive: Testdrive) => { //editar
+  const handleEdit = async (testdrive: Testdrive) => { //editar
+    const confirmar = await AlertConfirm(`¿Desea editar el Testdrive ${testdrive.numberReference}?`); //alerta de confirmacion
+    if (!confirmar) return;//si no selecciona confirmar cancela 
     setTestdriveToEdit(testdrive);//pone los datos del testdrive en sus respectivas casillas
     setShowForm(true);//abre el formulario
   };
@@ -100,7 +102,7 @@ const TestdrivePage = () => {
     //    Si la fecha viene como un arreglo de número[2026, 6, 23]
     if (Array.isArray(date)) {
       const [year, month, day] = date;
-      
+
       dateObject = new Date(year, month - 1, day);
     } else {
 
@@ -113,14 +115,14 @@ const TestdrivePage = () => {
     }
 
     const formatted = dateObject.toLocaleDateString("es-CR", {
-      weekday: "long", 
-      day: "numeric", 
-      month: "long", 
+      weekday: "long",
+      day: "numeric",
+      month: "long",
       year: "numeric",
     });
 
-  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
-};
+    return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+  };
 
   const getUserName = (idUser?: number) => {
     const c = clients.find((c) => Number(c.idUser) === Number(idUser));
@@ -148,27 +150,27 @@ const TestdrivePage = () => {
   }));
 
   useEffect(() => {
-        let table: any;
+    let table: any;
 
-        if (testdrive.length > 0) {
-            table = new DataTable('#myTable', {
-                language: {
-                    search: "Buscar:",
-                    searchPlaceholder: "Escribe aquí...",
-                    lengthMenu: "Mostrar MENU registros",
-                    info: "Mostrando START a END de TOTAL registros",
-                    infoEmpty: "No hay registros",
-                    zeroRecords: "No se encontraron resultados",
-        
-                }
-            });
+    if (testdrive.length > 0) {
+      table = new DataTable('#myTable', {
+        language: {
+          search: "Buscar:",
+          searchPlaceholder: "Escribe aquí...",
+          lengthMenu: "Mostrar _MENU_ registros",
+          info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+          infoEmpty: "No hay registros",
+          zeroRecords: "No se encontraron resultados",
+
         }
-        return () => {
-            if (table) {
-                table.destroy();
-            }
-        };
-    }, [testdrive]);
+      });
+    }
+    return () => {
+      if (table) {
+        table.destroy();
+      }
+    };
+  }, [testdrive]);
 
 
   const columns: { key: keyof TestdriveTable; label: string }[] = [ //columnas

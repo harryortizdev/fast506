@@ -23,6 +23,7 @@ const AdForm = ({ onClose, onRefresh, adToEdit }: AdFormProps) => {
     const [errors, setErrors] = useState<Partial<Record<keyof Ad, string>>>({});
     const [image, setImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string>("");
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     const hoy = new Date();
     const anio = hoy.getFullYear();
@@ -94,6 +95,7 @@ const AdForm = ({ onClose, onRefresh, adToEdit }: AdFormProps) => {
     const handleSubmit = async () => {
         if (!validate()) return; 
 
+        setIsSubmitting(true);
         try {
             //usamos formData en vez de un json
             const formData = new FormData();
@@ -128,6 +130,7 @@ const AdForm = ({ onClose, onRefresh, adToEdit }: AdFormProps) => {
         } catch (error) {
             console.error("Error al guardar:", error);
             AlertWarning("Error al guardar el anuncio.");
+            setIsSubmitting(false);
         }
     };
 
@@ -234,6 +237,7 @@ const AdForm = ({ onClose, onRefresh, adToEdit }: AdFormProps) => {
                         hoverColor="#145c32"
                         color="#fff"
                         className="btn btn-success me-2"
+                        disabled={isSubmitting}
                     />
                     <Button
                         label="Cancelar"

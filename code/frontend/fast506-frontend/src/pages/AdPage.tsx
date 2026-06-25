@@ -47,7 +47,7 @@ const AdPage = () => {
 
   }, []);
 
-  
+
 
   const handleSaveAndClose = async () => {
     await loadAd(); //lista de anuncios
@@ -63,7 +63,9 @@ const AdPage = () => {
     setShowForm(false);//esconde el formulario
   };
 
-  const handleEdit = (ad: Ad) => { //editar
+  const handleEdit = async (ad: Ad) => { //editar
+    const confirmar = await AlertConfirm(`¿Desea editar el anuncio ${ad.title}?`);
+    if (!confirmar) return;//si no selecciona confirmar cancela 
     setAdToEdit(ad);//pone los datos de la sucursal en sus respectivas casillas
     setShowForm(true);//abre el formulario
   };
@@ -89,28 +91,28 @@ const AdPage = () => {
     administratorName: geAdministratorName(q.idUser),
   }));
 
-useEffect(() => {
-        let table: any;
+  useEffect(() => {
+    let table: any;
 
-        if (ad.length > 0) {
-            table = new DataTable('#myTable', {
-                language: {
-                    search: "Buscar:",
-                    searchPlaceholder: "Escribe aquí...",
-                    lengthMenu: "Mostrar MENU registros",
-                    info: "Mostrando START a END de TOTAL registros",
-                    infoEmpty: "No hay registros",
-                    zeroRecords: "No se encontraron resultados",
-        
-                }
-            });
+    if (ad.length > 0) {
+      table = new DataTable('#myTable', {
+        language: {
+          search: "Buscar:",
+          searchPlaceholder: "Escribe aquí...",
+          lengthMenu: "Mostrar _MENU_ registros",
+          info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+          infoEmpty: "No hay registros",
+          zeroRecords: "No se encontraron resultados",
+
         }
-        return () => {
-            if (table) {
-                table.destroy();
-            }
-        };
-    }, [ad]);
+      });
+    }
+    return () => {
+      if (table) {
+        table.destroy();
+      }
+    };
+  }, [ad]);
 
   const columns: { key: keyof adTable; label: string }[] = [ //columnas
     { key: "index" as keyof adTable, label: "#" },

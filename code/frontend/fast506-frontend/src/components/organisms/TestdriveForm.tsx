@@ -13,6 +13,7 @@ import FormField from "../molecules/FormField";
 import { updateTestdrive } from "../../services/TestdriveService";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import AlertWarning from "../atoms/AlertWarning";
 
 interface TestdriveFormProps {
     onClose: () => void;
@@ -28,6 +29,8 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
     const [branches, setBranch] = useState<Branch[]>([]);
     const [occupiedHours, setOccupiedHours] = useState<string[]>([]); // Estado para almacenar horas ocupadas del día
     const [errors, setErrors] = useState<Partial<Record<keyof Testdrive, string>>>({});
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
 
     const RANGO_HORAS = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00"];
 
@@ -136,6 +139,8 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
 
     const handleSubmit = async () => {
         if (!validate()) return;
+        setIsSubmitting(true);
+
 
         try {
             if (testdriveToEdit) {
@@ -162,7 +167,9 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
             onRefresh();
             onClose();
         } catch (error) {
-            alert("Error al guardar el Test Drive");
+            console.error("Error al guardar:", error);
+            AlertWarning("Error al guardar la cotizacion.");
+            setIsSubmitting(false);
         }
     };
 
@@ -196,8 +203,8 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
                                 setForm({
                                     ...form,
                                     scheduledDate: `${year}-${month}-${day}`,
-                                    initiationTime: undefined, 
-                                    finalizationTime: undefined 
+                                    initiationTime: undefined,
+                                    finalizationTime: undefined
                                 });
                             } else {
                                 setForm({
@@ -259,7 +266,7 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
                         <option value="">Seleccione un vehículo</option>
                         {units.map((u) => (
                             <option key={u.idCar} value={u.idCar}>
-                                {u.carName + " "+ u.transmission + " " + u.fuelType}
+                                {u.carName + " " + u.transmission + " " + u.fuelType}
                             </option>
                         ))}
                     </select>
@@ -341,6 +348,7 @@ const TestdriveForm = ({ onClose, onRefresh, testdriveToEdit }: TestdriveFormPro
                         hoverColor="#145c32"
                         color="#fff"
                         className="btn btn-success me-2"
+                        disabled={isSubmitting}
                     />
                     <Button
                         label="Cancelar"

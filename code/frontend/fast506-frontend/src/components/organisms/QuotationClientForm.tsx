@@ -12,6 +12,7 @@ import FormField from "../molecules/FormField";
 import AlertWarning from "../atoms/AlertWarning";
 import ButtonIcon from "../molecules/ButtonIcon";
 
+
 interface QuotationFormProp {
     onClose: () => void;
     onRefresh: () => void;
@@ -25,6 +26,8 @@ const QuotationForm = ({ onClose, onRefresh, quotationToEdit, idCatalog }: Quota
     const [errors, setErrors] = useState<Partial<Record<keyof Quotation, string>>>({});
     const [catalog, setCatalog] = useState<Catalog[]>([]);
     const [filteredUnit, setUnit] = useState<Unit[]>([]);
+        const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
 
     const [id, setId] = useState("");
     const [isClientVerified, setIsClientVerified] = useState(false);
@@ -178,6 +181,8 @@ const QuotationForm = ({ onClose, onRefresh, quotationToEdit, idCatalog }: Quota
 
     const handleSubmit = async () => {
         if (!validate()) return;
+                setIsSubmitting(true);
+
 
         try {
             if (quotationToEdit) {
@@ -194,7 +199,9 @@ const QuotationForm = ({ onClose, onRefresh, quotationToEdit, idCatalog }: Quota
             onRefresh();
             onClose();
         } catch (error) {
-            alert("Error al guardar la cotización");
+           console.error("Error al guardar:", error);
+            AlertWarning("Error al guardar la sucursal.");
+            setIsSubmitting(false);
         }
     };
 
@@ -321,7 +328,8 @@ const QuotationForm = ({ onClose, onRefresh, quotationToEdit, idCatalog }: Quota
                 </div>
 
                 <div className="mt-2 d-flex justify-content-center">
-                    <Button label="Guardar" onClick={handleSubmit} backgroundColor="#198754" hoverColor="#145c32" color="#fff" disabled={!isClientVerified} className="btn btn-success me-2" />
+                    <Button label="Guardar" onClick={handleSubmit} backgroundColor="#198754" hoverColor="#145c32" color="#fff" disabled={!isClientVerified || isSubmitting} className="btn btn-success me-2"
+ />
                     <Button label="Cancelar" onClick={onClose} backgroundColor="#6c757d" hoverColor="#495057" color="#fff" className="btn btn-secondary" />
                 </div>
 

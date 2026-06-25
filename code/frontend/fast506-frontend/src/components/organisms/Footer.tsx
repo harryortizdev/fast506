@@ -8,18 +8,7 @@ const Footer = () => {
 
     <div className="row justify-content-center text-center  gy-4">
 
-      <div className="col-6 col-md-4 col-lg-3 " >
-        <h6 className="text-uppercase mb-3 fw-bold" style={{ color: "#A9B4C2" }}>
-          Autos
-        </h6>
-
-        <p>
-          <a href="#!" className="text-decoration-none small" style={{ color: "#EEF1EF" }}>
-            Catálogo
-          </a>
-        </p>
-      </div>
-
+      
       <div className="col-6 col-md-4 col-lg-3">
         <h6 className="text-uppercase mb-3 fw-bold" style={{ color: "#A9B4C2" }}>
           Servicios
@@ -43,19 +32,6 @@ const Footer = () => {
           </a>
         </p>
 
-        
-      </div>
-
-      <div className="col-6 col-md-4 col-lg-3">
-        <h6 className="text-uppercase mb-3 fw-bold" style={{ color: "#A9B4C2" }}>
-          Pendiente
-        </h6>
-
-        <p>
-          <a href="#!" className="text-decoration-none small" style={{ color: "#EEF1EF" }}>
-            Pendiente
-          </a>
-        </p>
       </div>
 
       <div className="col-6 col-md-4 col-lg-3">

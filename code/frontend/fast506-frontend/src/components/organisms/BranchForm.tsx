@@ -6,6 +6,7 @@ import { getAll } from "../../services/AdministratorService";
 import AlertSuccess from "../atoms/AlertSuccess";
 import FormField from "../molecules/FormField";
 import Button from "../atoms/Button";
+import AlertWarning from "../atoms/AlertWarning";
 
 interface BranchFormProps {
     onClose: () => void;
@@ -18,6 +19,8 @@ const BranchForm = ({ onClose, onRefresh, branchToEdit }: BranchFormProps) => {
     const [form, setForm] = useState<Partial<Branch>>(branchToEdit || {});
     const [Administrator, setAdministrator] = useState<Administrator[]>([]);
     const [errors, setErrors] = useState<Partial<Record<keyof Branch, string>>>({});
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
 
     useEffect(() => {
         getAll().then(setAdministrator);
@@ -64,6 +67,8 @@ const BranchForm = ({ onClose, onRefresh, branchToEdit }: BranchFormProps) => {
 
     const handleSubmit = async () => {
         if (!validate()) return;
+        setIsSubmitting(true);
+
 
         try {
             const cleanNumber = (form.branchPhoneNumber || "").toString().replace(/\D/g, "").slice(-8);
@@ -81,7 +86,9 @@ const BranchForm = ({ onClose, onRefresh, branchToEdit }: BranchFormProps) => {
             onRefresh();
             onClose();
         } catch (error) {
-            alert("Error al guardar");
+            console.error("Error al guardar:", error);
+            AlertWarning("Error al guardar la sucursal.");
+            setIsSubmitting(false);
         }
     };
 
@@ -183,6 +190,8 @@ const BranchForm = ({ onClose, onRefresh, branchToEdit }: BranchFormProps) => {
                         hoverColor="#145c32"
                         color="#fff"
                         className="btn btn-success me-2"
+                        disabled={isSubmitting}
+
                     />
 
                     <Button
