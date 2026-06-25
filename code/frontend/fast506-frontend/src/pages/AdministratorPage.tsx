@@ -8,6 +8,8 @@ import Navbar from "../components/organisms/Navbar";
 import Footer from "../components/organisms/Footer";
 import AlertConfirm from "../components/atoms/AlertConfirm";
 import ButtonIcon from "../components/molecules/ButtonIcon";
+import DataTable from "datatables.net-bs5";
+import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
 
 type AdminTable = Administrator & {
   dateFormatted : string;
@@ -18,6 +20,7 @@ const AdministratorPage = () => {
   const [administratorToEdit, setAdministratorToEdit] = useState<
     Administrator | undefined
   >(undefined);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const loadAdministrators = async () => {
     const data = await getAll();
@@ -33,6 +36,7 @@ const AdministratorPage = () => {
     await loadAdministrators();
     setAdministratorToEdit(undefined);
     setShowForm(false);
+    setRefreshKey((prev) => prev + 1);
   };
 
   const handleClose = () => {
@@ -53,6 +57,7 @@ const AdministratorPage = () => {
     if (!confirmar) return;
     await deleteAdministrator(administrator.idUser);
     await loadAdministrators();
+    setRefreshKey((prev) => prev + 1);
   };
 
   const formatDate = (date?: any) => {
@@ -88,6 +93,35 @@ const AdministratorPage = () => {
     ...a,
     dateFormatted: formatDate(a.dateBirth),
   }));
+
+  useEffect(() => {
+    if (showForm || administrators.length === 0) return;
+
+    const tableElement = document.querySelector("#AdministratorTable table");
+    if (!tableElement) return;
+
+    const hasRows =
+      (tableElement as HTMLTableElement).querySelector("tbody tr") !== null;
+    if (!hasRows) return;
+
+    const table = new DataTable(tableElement as Element, {
+      destroy: true,
+      language: {
+        search: "Buscar:",
+        searchPlaceholder: "Escribe aquí...",
+        lengthMenu: "Mostrar _MENU_ registros",
+        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        infoEmpty: "No hay registros",
+        zeroRecords: "No se encontraron resultados",
+      },
+      pageLength: 10,
+      lengthMenu: [5, 10, 25, 50],
+    });
+
+    return () => {
+      table.destroy();
+    };
+  }, [showForm, administrators.length, refreshKey]);
 
   const columns: { key: keyof AdminTable; label: string }[] = [
     { key: "index" as keyof Administrator, label: "#" },
@@ -149,12 +183,14 @@ const AdministratorPage = () => {
               style={{ backgroundColor: "#EEF1EF" }}
             >
               {!showForm ? (
-                <TableGeneric
-                  data={transformedAdmins}
-                  columns={columns}
-                  onDelete={handleDelete}
-                  onEdit={handleEdit}
-                />
+                <div id="AdministratorTable" key={refreshKey}>
+                  <TableGeneric
+                    data={transformedAdmins}
+                    columns={columns}
+                    onDelete={handleDelete}
+                    onEdit={handleEdit}
+                  />
+                </div>
               ) : (
                 <AdministratorForm
                   onClose={handleClose}

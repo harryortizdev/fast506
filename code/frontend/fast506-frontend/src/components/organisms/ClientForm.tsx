@@ -15,9 +15,15 @@ interface ClientFormProps {
 }
 
 const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
-  const [form, setForm] = useState<Partial<Client>>(
-    clientToEdit || { isActive: true }
-  );
+  const [form, setForm] = useState<Partial<Client>>(() => {
+    if (!clientToEdit) return { isActive: true };
+    return {
+      ...clientToEdit,
+      dateBirth: clientToEdit.dateBirth
+        ? new Date(clientToEdit.dateBirth)
+        : undefined,
+    };
+  });
   const [errors, setErrors] = useState<Partial<Record<keyof Client, string>>>({});
   const [roles, setRoles] = useState<Role[]>([]);
 

@@ -8,6 +8,8 @@ import ButtonIcon from "../components/molecules/ButtonIcon";
 import Navbar from "../components/organisms/Navbar";
 import Footer from "../components/organisms/Footer";
 import AlertConfirm from "../components/atoms/AlertConfirm";
+import DataTable from "datatables.net-bs5";
+import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
 
 type MechanicTable = Mechanic & {
   dateFormatted: string;
@@ -19,6 +21,7 @@ const MechanicPage = () => {
   const [MechanicToEdit, setMechanicToEdit] = useState<Mechanic | undefined>(
     undefined,
   );
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const loadMechanics = async () => {
     const data = await getAll();
@@ -33,6 +36,7 @@ const MechanicPage = () => {
     await loadMechanics();
     setMechanicToEdit(undefined);
     setShowForm(false);
+    setRefreshKey((prev) => prev + 1);
   };
 
   const handleClose = () => {
@@ -53,6 +57,7 @@ const MechanicPage = () => {
     if (!confirmar) return;
     await deleteMechanic(mechanic.idUser!);
     await loadMechanics();
+    setRefreshKey((prev) => prev + 1);
   };
 
   const formatDate = (date?: any) => {
@@ -88,6 +93,35 @@ const MechanicPage = () => {
     ...m,
     dateFormatted: formatDate(m.dateBirth),
   }));
+
+  useEffect(() => {
+    if (showForm || mechanics.length === 0) return;
+
+    const tableElement = document.querySelector("#MechanicTable table");
+    if (!tableElement) return;
+
+    const hasRows =
+      (tableElement as HTMLTableElement).querySelector("tbody tr") !== null;
+    if (!hasRows) return;
+
+    const table = new DataTable(tableElement as Element, {
+      destroy: true,
+      language: {
+        search: "Buscar:",
+        searchPlaceholder: "Escribe aquí...",
+        lengthMenu: "Mostrar _MENU_ registros",
+        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        infoEmpty: "No hay registros",
+        zeroRecords: "No se encontraron resultados",
+      },
+      pageLength: 10,
+      lengthMenu: [5, 10, 25, 50],
+    });
+
+    return () => {
+      table.destroy();
+    };
+  }, [showForm, mechanics.length, refreshKey]);
 
   const columns: { key: keyof MechanicTable; label: string }[] = [
     { key: "index" as keyof Mechanic, label: "#" },
@@ -151,12 +185,14 @@ const MechanicPage = () => {
               style={{ backgroundColor: "#EEF1EF" }}
             >
               {!showForm ? (
-                <TableGeneric
-                  data={transformedMechanics}
-                  columns={columns}
-                  onDelete={handleDelete}
-                  onEdit={handleEdit}
-                />
+                <div id="MechanicTable" key={refreshKey}>
+                  <TableGeneric
+                    data={transformedMechanics}
+                    columns={columns}
+                    onDelete={handleDelete}
+                    onEdit={handleEdit}
+                  />
+                </div>
               ) : (
                 <MechanicForm
                   onClose={handleClose}

@@ -24,9 +24,15 @@ const AdministratorForm = ({
   administratorToEdit,
   administrators,
 }: AdministratorFormProps) => {
-  const [form, setForm] = useState<Partial<Administrator>>(
-    administratorToEdit || { isActive: true },
-  );
+  const [form, setForm] = useState<Partial<Administrator>>(() => {
+    if (!administratorToEdit) return { isActive: true };
+    return {
+      ...administratorToEdit,
+      dateBirth: administratorToEdit.dateBirth
+        ? new Date(administratorToEdit.dateBirth)
+        : undefined,
+    };
+  });
   const [errors, setErrors] = useState<
     Partial<Record<keyof Administrator, string>>
   >({});

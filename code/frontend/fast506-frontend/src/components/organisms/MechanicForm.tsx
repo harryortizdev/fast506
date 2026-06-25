@@ -15,9 +15,15 @@ interface MechanicFormProps {
 }
 
 const MechanicForm = ({ onClose, onRefresh, mechanicToEdit }: MechanicFormProps) => {
-  const [form, setForm] = useState<Partial<Mechanic>>(
-    mechanicToEdit || { isActive: true }
-  );
+  const [form, setForm] = useState<Partial<Mechanic>>(() => {
+    if (!mechanicToEdit) return { isActive: true };
+    return {
+      ...mechanicToEdit,
+      dateBirth: mechanicToEdit.dateBirth
+        ? new Date(mechanicToEdit.dateBirth)
+        : undefined,
+    };
+  });
   const [errors, setErrors] = useState<Partial<Record<keyof Mechanic, string>>>({});
   const [roles, setRoles] = useState<Role[]>([]);
 

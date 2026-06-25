@@ -9,7 +9,7 @@ import Navbar from "../components/organisms/Navbar";
 import Footer from "../components/organisms/Footer";
 import AlertConfirm from "../components/atoms/AlertConfirm";
 import DataTable from "datatables.net-bs5";
-//import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
+import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
 
 type ClientTable = Client & {
   dateFormatted: string;
@@ -21,6 +21,7 @@ const ClientPage = () => {
   const [clientToEdit, setClientToEdit] = useState<Client | undefined>(
     undefined,
   );
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const loadClients = async () => {
     const data = await getAll();
@@ -35,6 +36,7 @@ const ClientPage = () => {
     await loadClients();
     setClientToEdit(undefined);
     setShowForm(false);
+    setRefreshKey((prev) => prev + 1);
   };
 
   const handleClose = () => {
@@ -55,6 +57,7 @@ const ClientPage = () => {
     if (!confirmar) return;
     await deleteClient(client.idUser!);
     await loadClients();
+    setRefreshKey((prev) => prev + 1);
   };
 
   const formatDate = (date?: any) => {
@@ -92,27 +95,33 @@ const ClientPage = () => {
   }));
 
   useEffect(() => {
-    let table: any;
+    if (showForm || clients.length === 0) return;
 
-    if (clients.length > 0) {
-      table = new DataTable('#myTable', {
-        language: {
-          search: "Buscar:",
-          searchPlaceholder: "Escribe aquí...",
-          lengthMenu: "Mostrar _MENU_ registros",
-          info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-          infoEmpty: "No hay registros",
-          zeroRecords: "No se encontraron resultados",
+    const tableElement = document.querySelector("#ClientTable table");
+    if (!tableElement) return;
 
-        }
-      });
-    }
+    const hasRows =
+      (tableElement as HTMLTableElement).querySelector("tbody tr") !== null;
+    if (!hasRows) return;
+
+    const table = new DataTable(tableElement as Element, {
+      destroy: true,
+      language: {
+        search: "Buscar:",
+        searchPlaceholder: "Escribe aquí...",
+        lengthMenu: "Mostrar _MENU_ registros",
+        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        infoEmpty: "No hay registros",
+        zeroRecords: "No se encontraron resultados",
+      },
+      pageLength: 10,
+      lengthMenu: [5, 10, 25, 50],
+    });
+
     return () => {
-      if (table) {
-        table.destroy();
-      }
+      table.destroy();
     };
-  }, [clients]);
+  }, [showForm, clients.length, refreshKey]);
 
   const columns: { key: keyof ClientTable; label: string }[] = [
     { key: "index" as keyof Client, label: "#" },
@@ -174,12 +183,14 @@ const ClientPage = () => {
               style={{ backgroundColor: "#EEF1EF" }}
             >
               {!showForm ? (
-                <TableGeneric
-                  data={transformedClient}
-                  columns={columns}
-                  onDelete={handleDelete}
-                  onEdit={handleEdit}
-                />
+                <div id="ClientTable" key={refreshKey}>
+                  <TableGeneric
+                    data={transformedClient}
+                    columns={columns}
+                    onDelete={handleDelete}
+                    onEdit={handleEdit}
+                  />
+                </div>
               ) : (
                 <ClientForm
                   onClose={handleClose}
