@@ -11,6 +11,7 @@ import AlertSuccess from "../atoms/AlertSuccess";
 import AlertWarning from "../atoms/AlertWarning";
 import FormField from "../molecules/FormField";
 import Button from "../atoms/Button";
+import { useAuth } from "../../context/AuthContext";
 
 interface WorkshopScheduleFormProps {
   onClose: () => void;
@@ -23,8 +24,13 @@ const WorkshopScheduleForm = ({
   onRefresh,
   workshopScheduleToEdit,
 }: WorkshopScheduleFormProps) => {
+  const { user } = useAuth();
+
+  const normalizedRole = (user?.roleName ?? "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const isClient = normalizedRole.includes("cliente") || normalizedRole.includes("client");
+
   const [form, setForm] = useState<Partial<WorkshopSchedule>>(
-    workshopScheduleToEdit || { isActive: true }
+    workshopScheduleToEdit || { isActive: true, idClient: isClient ? user?.userId : undefined }
   );
 
   const [errors, setErrors] = useState<
@@ -37,9 +43,11 @@ const WorkshopScheduleForm = ({
   const [loadingBranches, setLoadingBranches] = useState(true);
 
   useEffect(() => {
-    setForm(workshopScheduleToEdit || { isActive: true });
+    setForm(
+      workshopScheduleToEdit || { isActive: true, idClient: isClient ? user?.userId : undefined }
+    );
     setErrors({});
-  }, [workshopScheduleToEdit]);
+  }, [workshopScheduleToEdit]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const loadClients = async () => {
@@ -286,29 +294,40 @@ const generateWorkshopReference = (): number => {
           </div>
         )}
 
-        <div className="mb-3">
-          <label className="form-label">Cliente:</label>
-          <select
-            name="idClient"
-            value={form.idClient?.toString() || ""}
-            onChange={handleChange}
-            className={`form-control ${errors.idClient ? "is-invalid" : ""}`}
-            disabled={loadingClients}
-          >
-            <option value="">
-              {loadingClients ? "Cargando clientes..." : "Seleccionar cliente"}
-            </option>
-
-            {clients.map((client) => (
-              <option key={client.idUser} value={client.idUser}>
-                {client.name || `Cliente #${client.idUser}`}
+        {isClient ? (
+          <div className="mb-3">
+            <label className="form-label">Cliente:</label>
+            <input
+              className="form-control"
+              value={user?.name || `Cliente #${user?.userId}`}
+              disabled
+            />
+          </div>
+        ) : (
+          <div className="mb-3">
+            <label className="form-label">Cliente:</label>
+            <select
+              name="idClient"
+              value={form.idClient?.toString() || ""}
+              onChange={handleChange}
+              className={`form-control ${errors.idClient ? "is-invalid" : ""}`}
+              disabled={loadingClients}
+            >
+              <option value="">
+                {loadingClients ? "Cargando clientes..." : "Seleccionar cliente"}
               </option>
-            ))}
-          </select>
-          {errors.idClient && (
-            <div className="invalid-feedback d-block">{errors.idClient}</div>
-          )}
-        </div>
+
+              {clients.map((client) => (
+                <option key={client.idUser} value={client.idUser}>
+                  {client.name || `Cliente #${client.idUser}`}
+                </option>
+              ))}
+            </select>
+            {errors.idClient && (
+              <div className="invalid-feedback d-block">{errors.idClient}</div>
+            )}
+          </div>
+        )}
 
         <div className="mb-3">
           <label className="form-label">Sucursal:</label>

@@ -14,6 +14,7 @@ import { Branch } from "../models/Branch";
 import Navbar from "../components/organisms/Navbar";
 import Footer from "../components/organisms/Footer";
 import AlertConfirm from "../components/atoms/AlertConfirm";
+import AlertSuccess from "../components/atoms/AlertSuccess";
 import ButtonIcon from "../components/molecules/ButtonIcon";
 
 const WorkshopSchedulePage = () => {
@@ -183,6 +184,7 @@ const formatDate = (date?: any) => {
     if (!confirmar) return;
 
     await deleteWorkshopSchedule(workshopSchedule.idAppointment);
+    AlertSuccess("Cita eliminada correctamente.");
     await loadWorkshopSchedules();
     await loadRepairReports();
     setRefreshKey((prev) => prev + 1);
