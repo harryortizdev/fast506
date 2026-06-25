@@ -10,6 +10,8 @@ import { deleteAd, getAll } from "../services/AdService";
 import AdForm from "../components/organisms/AdForm";
 import { getAll as getAllAdministrators } from "../services/AdministratorService";
 import { Administrator } from "../models/Administrator";
+import DataTable from "datatables.net-bs5";
+import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
 
 
 type adTable = Ad & { //tabla ajustable 
@@ -44,6 +46,8 @@ const AdPage = () => {
     loadDetails();
 
   }, []);
+
+  
 
   const handleSaveAndClose = async () => {
     await loadAd(); //lista de anuncios
@@ -81,14 +85,37 @@ const AdPage = () => {
   };
 
   const transformedAdTable: adTable[] = ad.map((q) => ({
-    ...q, // Copia la original intacta (¡así no se rompe el Editar!)
+    ...q, // Copia la original intacta 
     administratorName: geAdministratorName(q.idUser),
   }));
 
+useEffect(() => {
+        let table: any;
+
+        if (ad.length > 0) {
+            table = new DataTable('#myTable', {
+                language: {
+                    search: "Buscar:",
+                    searchPlaceholder: "Escribe aquí...",
+                    lengthMenu: "Mostrar MENU registros",
+                    info: "Mostrando START a END de TOTAL registros",
+                    infoEmpty: "No hay registros",
+                    zeroRecords: "No se encontraron resultados",
+        
+                }
+            });
+        }
+        return () => {
+            if (table) {
+                table.destroy();
+            }
+        };
+    }, [ad]);
+
   const columns: { key: keyof adTable; label: string }[] = [ //columnas
-    { key: "idAd", label: "ID" },
+    { key: "index" as keyof adTable, label: "#" },
     { key: "title", label: "Título" },
-    { key: "category", label: "Categoria" },
+    { key: "category", label: "Categoría" },
     { key: "publicationStatus", label: "¿Publicado?" },
     { key: "administratorName", label: "Creador" },
 

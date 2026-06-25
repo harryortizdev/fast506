@@ -15,6 +15,8 @@ import { Unit } from "../models/Unit";
 import { getAll as getAllBranch } from "../services/BranchService";
 import { getAll as getAllClients } from "../services/ClientService";
 import { getAll as getAllUnits } from "../services/UnitService";
+import DataTable from "datatables.net-bs5";
+import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
 
 type TestdriveTable = Testdrive & {
   creationDateFormatted: string;      // Para el día/mes/año
@@ -95,30 +97,30 @@ const TestdrivePage = () => {
 
     let dateObject: Date;
 
-    // Si viene como array [año, mes, día] desde el backend
+    //    Si la fecha viene como un arreglo de número[2026, 6, 23]
     if (Array.isArray(date)) {
       const [year, month, day] = date;
+      
       dateObject = new Date(year, month - 1, day);
     } else {
-      // Si viene como string ISO
+
       dateObject = new Date(String(date).split("T")[0] + "T00:00:00");
     }
 
+    // corrupto o algo que no se pudo parsear bien getTime() devolve NaN es así, devolvemos el string original 
     if (isNaN(dateObject.getTime())) {
       return String(date);
     }
 
-    // Esto te lo devuelve en formato: "23 de junio de 2026" o similar
-    // Si preferís estrictamente "23/06/2026", avisame y lo cambiamos a una sola línea
     const formatted = dateObject.toLocaleDateString("es-CR", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
+      weekday: "long", 
+      day: "numeric", 
+      month: "long", 
       year: "numeric",
     });
 
-    return formatted;
-  };
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+};
 
   const getUserName = (idUser?: number) => {
     const c = clients.find((c) => Number(c.idUser) === Number(idUser));
@@ -145,9 +147,32 @@ const TestdrivePage = () => {
     branchName: getBranchName(q.idBranch),
   }));
 
+  useEffect(() => {
+        let table: any;
+
+        if (testdrive.length > 0) {
+            table = new DataTable('#myTable', {
+                language: {
+                    search: "Buscar:",
+                    searchPlaceholder: "Escribe aquí...",
+                    lengthMenu: "Mostrar MENU registros",
+                    info: "Mostrando START a END de TOTAL registros",
+                    infoEmpty: "No hay registros",
+                    zeroRecords: "No se encontraron resultados",
+        
+                }
+            });
+        }
+        return () => {
+            if (table) {
+                table.destroy();
+            }
+        };
+    }, [testdrive]);
+
 
   const columns: { key: keyof TestdriveTable; label: string }[] = [ //columnas
-    { key: "idTest", label: "ID" },
+    { key: "index" as keyof TestdriveTable, label: "#" },
     { key: "numberReference", label: "Num.Referencia" },
     { key: "creationDateFormatted", label: "Fecha de creación" },
     { key: "scheduledDateFormatted", label: "Fecha cita agendada" },

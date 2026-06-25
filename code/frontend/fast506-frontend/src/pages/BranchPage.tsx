@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import ButtonNew from "../components/ButtonNew";
 import BranchForm from "../components/organisms/BranchForm";
 import TableGeneric from "../components/organisms/TableGeneric";
 import { getAll, deleteBranch } from "../services/BranchService";
@@ -11,6 +10,8 @@ import AlertWarning from "../components/atoms/AlertWarning";
 import ButtonIcon from "../components/molecules/ButtonIcon";
 import { Administrator } from "../models/Administrator";
 import { getAll as getAllAdministrators } from "../services/AdministratorService";
+import DataTable from "datatables.net-bs5";
+import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
 
 
 type branchTable = Branch & {
@@ -84,12 +85,35 @@ const BranchPage = () => {
     administratorName: geAdministratorName(q.idUser),
   }));
 
+  useEffect(() => {
+        let table: any;
+
+        if (branch.length > 0) {
+            table = new DataTable('#myTable', {
+                language: {
+                    search: "Buscar:",
+                    searchPlaceholder: "Escribe aquí...",
+                    lengthMenu: "Mostrar MENU registros",
+                    info: "Mostrando START a END de TOTAL registros",
+                    infoEmpty: "No hay registros",
+                    zeroRecords: "No se encontraron resultados",
+        
+                }
+            });
+        }
+        return () => {
+            if (table) {
+                table.destroy();
+            }
+        };
+    }, [branch]);
+
   const columns: { key: keyof branchTable; label: string }[] = [ //columnas
-    { key: "idBranch", label: "ID" },
+    { key: "index" as keyof branchTable, label: "#" },
     { key: "name", label: "Nombre" },
-    { key: "ubication", label: "Ubicacion" },
-    { key: "direction", label: "Direccion" },
-    { key: "branchPhoneNumber", label: "Numero de telefono" },
+    { key: "ubication", label: "Ubicación" },
+    { key: "direction", label: "Dirección" },
+    { key: "branchPhoneNumber", label: "Número de teléfono" },
     { key: "operationSchedule", label: "Horario" },
     { key: "administratorName", label: "Creador" },
 

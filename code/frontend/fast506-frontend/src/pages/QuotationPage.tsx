@@ -14,6 +14,8 @@ import { getAll as getAllCatalog } from "../services/CatalogService";
 import { getAll as getAllClients } from "../services/ClientService";
 import { getAll as getAllUnits } from "../services/UnitService";
 import { Catalog } from "../models/Catalog";
+import DataTable from "datatables.net-bs5";
+import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
 
 
 
@@ -113,7 +115,7 @@ const formatDate = (date?: any) => {
       year: "numeric",
     });
 
-    return formatted;
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
 };
 
   const getUserName = (idUser?: number) => {
@@ -139,14 +141,37 @@ const formatDate = (date?: any) => {
     catalogName: getCatalogName(q.idCatalog),
   }));
 
+  useEffect(() => {
+        let table: any;
+
+        if (quotation.length > 0) {
+            table = new DataTable('#myTable', {
+                language: {
+                    search: "Buscar:",
+                    searchPlaceholder: "Escribe aquí...",
+                    lengthMenu: "Mostrar MENU registros",
+                    info: "Mostrando START a END de TOTAL registros",
+                    infoEmpty: "No hay registros",
+                    zeroRecords: "No se encontraron resultados",
+        
+                }
+            });
+        }
+        return () => {
+            if (table) {
+                table.destroy();
+            }
+        };
+    }, [quotation]);
+
 
   const columns: { key: keyof QuotationTable; label: string }[] = [ //columnas
-    { key: "idQuotation", label: "ID" },
+    { key: "index" as keyof QuotationTable, label: "#" },
     { key: "referenceNumber", label: "Num. Referencia" },
     { key: "dateFormatted", label: "Fecha" },
     { key: "initialPrice", label: "Precio Inicial" },
     { key: "salesTax", label: "IVA" },
-    { key: "transferCost", label: "Costo Traspaso" },
+    { key: "transferCost", label: "Costo de Traspaso" },
     { key: "totalPayment", label: "Pago Total" },
     { key: "userName", label: "Usuario" },
     { key: "catalogName", label: "Catalogo" },
