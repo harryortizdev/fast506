@@ -14,6 +14,8 @@ const CatalogPage = () => {
     const [catalogs, setCatalogs] = useState<Catalog[]>([]);
     const [showForm, setShowForm] = useState(false);
     const [selectedCatalog, setSelectedCatalog] = useState<Catalog | null>(null);
+    const [refreshKey, setRefreshKey] = useState(0);
+
 
     const loadCatalogs = async () => {
         const data = await getAll();
@@ -24,29 +26,33 @@ const CatalogPage = () => {
         loadCatalogs();
     }, []);
 
-    //para el filtro
     useEffect(() => {
-        let table: any;
+    if (showForm || catalogs.length === 0) return;
 
-        if (catalogs.length > 0) {
-            table = new DataTable('#myTable', {
-                language: {
-                    search: "Buscar:",
-                    searchPlaceholder: "Escribe aquí...",
-                    lengthMenu: "Mostrar _MENU_ registros",
-                    info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-                    infoEmpty: "No hay registros",
-                    zeroRecords: "No se encontraron resultados",
-        
-                }
-            });
-        }
-        return () => {
-            if (table) {
-                table.destroy();
-            }
-        };
-    }, [catalogs]);
+    const tableElement = document.querySelector("#catalogTable table");
+    if (!tableElement) return;
+
+    const hasRows = (tableElement as HTMLTableElement).querySelector("tbody tr") !== null;
+    if (!hasRows) return;
+
+    const table = new DataTable(tableElement as Element, {
+      destroy: true,
+      language: {
+        search: "Buscar:",
+        searchPlaceholder: "Escribe aquí...",
+        lengthMenu: "Mostrar _MENU_ registros",
+        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        infoEmpty: "No hay registros",
+        zeroRecords: "No se encontraron resultados",
+      },
+      pageLength: 10,
+      lengthMenu: [5, 10, 25, 50],
+    });
+
+    return () => {
+      table.destroy();
+    };
+  }, [showForm, catalogs.length, refreshKey]);
 
     const handleDelete = async (catalog: Catalog) => {
         if (!catalog.idCatalog) return;
@@ -55,10 +61,12 @@ const CatalogPage = () => {
         if (!confirmar) return;
         await deleteCatalog(catalog.idCatalog);
         await loadCatalogs();
+        setRefreshKey((prev) => prev + 1);
+
     };
 
     const handleEdit = async (catalog: Catalog) => {
-         const confirmar = await AlertConfirm(`¿Desea editar el cátalogo de ${catalog.carName}?`);
+        const confirmar = await AlertConfirm(`¿Desea editar el cátalogo de ${catalog.carName}?`);
         if (!confirmar) return;
         setSelectedCatalog(catalog);
         setShowForm(true);
@@ -73,10 +81,12 @@ const CatalogPage = () => {
         loadCatalogs();
         setShowForm(false);
         setSelectedCatalog(null);
+        setRefreshKey((prev) => prev + 1);
+
     };
 
     const columns: { key: keyof Catalog; label: string }[] = [
-        { key: "index" as keyof Catalog, label: "#" }, 
+        { key: "index" as keyof Catalog, label: "#" },
         { key: "carName", label: "Nombre" },
         { key: "brandName", label: "Marca" },
         { key: "bodyWork", label: "Carrocería" },
@@ -132,12 +142,16 @@ const CatalogPage = () => {
                             style={{ backgroundColor: "#EEF1EF" }}
                         >
                             {!showForm ? (
-                                <TableGeneric
-                                    data={catalogs}
-                                    columns={columns}
-                                    onDelete={handleDelete}
-                                    onEdit={handleEdit}
-                                />
+                                <div id="catalogTable" key={refreshKey}>
+
+                                    <TableGeneric
+                                        data={catalogs}
+                                        columns={columns}
+                                        onDelete={handleDelete}
+                                        onEdit={handleEdit}
+                                    />
+                                </div>
+
                             ) : (
                                 <CatalogForm
                                     onClose={handleClose}

@@ -9,6 +9,7 @@ import {
     create,
     getUnitsByCatalog,
     getUnitsByColor,
+    sendEmailCreate,
 } from "../../services/SalesService";
 
 import AlertSuccess from "../atoms/AlertSuccess";
@@ -165,10 +166,11 @@ const SalesClientForm = ({ onClose, onRefresh, idCatalogFromUrl }: any) => {
         try {
             const payload = { ...form, transactionDate: dateToday, isActive: true };
             await create(payload);
+            await sendEmailCreate(payload);
             AlertSuccess("Venta creada correctamente");
             onRefresh();
             onClose();
-             navigate("/");
+            navigate("/");
         } catch {
             alert("Error al guardar la venta");
         }

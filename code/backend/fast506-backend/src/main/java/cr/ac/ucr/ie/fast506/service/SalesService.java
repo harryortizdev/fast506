@@ -67,7 +67,7 @@ public class SalesService {
         return salesRepository.filteredUnitsByColor(idCatalog, traction);
     }
 
-    private void setSalesStatus(Sales sales) {
+    public void setSalesStatus(Sales sales) {
         if (sales.getIdAdmin() != null && sales.getIdAdmin() > 0) {
             sales.setSalesStatus("Completada");
         } else {

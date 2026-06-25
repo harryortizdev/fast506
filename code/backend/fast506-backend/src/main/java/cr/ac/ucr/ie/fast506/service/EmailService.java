@@ -39,6 +39,8 @@ public class EmailService {
 
     @Autowired
     BranchService branchService;
+    @Autowired
+    SalesService salesService;
 
     @Autowired
     QuotationRepository quotationRepository;
@@ -145,10 +147,12 @@ public class EmailService {
             int combination = (year % 100) * 1000000 + month * 10000 + day * 100 + unique;
 
             sales.setInvoiceNumber(combination);
+            salesService.setSalesStatus(sales);
+
 
             Context context = new Context();// variables para el HTML
-            context.setVariable("unit", unit);
-            context.setVariable("client", client);
+            context.setVariable("car", unit);
+            context.setVariable("user", client);
             context.setVariable("sales", sales);
 
             // busca en templates/email/sale.html

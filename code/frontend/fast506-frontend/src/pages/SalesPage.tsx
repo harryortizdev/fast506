@@ -17,16 +17,18 @@ import DataTable from "datatables.net-bs5";
 import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
 
 type SalesTable = Sales & {
-  transactionDateFormatted: string;      // Para el día/mes/año
-  clientName: string;           // Para el nombre de la persona
-  carName: string;            // Para el nombre del vehículo
-  adminName: string;         // Para el nombre del admin
+    transactionDateFormatted: string;      // Para el día/mes/año
+    clientName: string;           // Para el nombre de la persona
+    carName: string;            // Para el nombre del vehículo
+    adminName: string;         // Para el nombre del admin
 };
 
 const SalesPage = () => {
     const [sales, setSales] = useState<Sales[]>([]);
     const [showForm, setShowForm] = useState(false);
     const [selectedSales, setSelectedSales] = useState<Sales | null>(null);
+    const [refreshKey, setRefreshKey] = useState(0);
+
 
     const [clients, setClients] = useState<Client[]>([]);
     const [units, setUnits] = useState<Unit[]>([]);
@@ -37,20 +39,20 @@ const SalesPage = () => {
         setSales(data);
     };
 
-     const loadDetails = async () => {
+    const loadDetails = async () => {
         try {
-          const clientsData = await getAllClients();
-          setClients(Array.isArray(clientsData) ? clientsData : []);
-    
-          const unitsData = await getAllUnits();
-          setUnits(Array.isArray(unitsData) ? unitsData : []);
-    
-          const adminsData = await getAllAdmins();
-          setAdmins(Array.isArray(adminsData) ? adminsData : []);
+            const clientsData = await getAllClients();
+            setClients(Array.isArray(clientsData) ? clientsData : []);
+
+            const unitsData = await getAllUnits();
+            setUnits(Array.isArray(unitsData) ? unitsData : []);
+
+            const adminsData = await getAllAdmins();
+            setAdmins(Array.isArray(adminsData) ? adminsData : []);
         } catch (error) {
-          console.error("Error cargando datos ", error);
+            console.error("Error cargando datos ", error);
         }
-      };
+    };
 
     useEffect(() => {
         loadCatalogs();
@@ -58,27 +60,32 @@ const SalesPage = () => {
     }, []);
 
     useEffect(() => {
-        let table: any;
+    if (showForm || sales.length === 0) return;
 
-        if (sales.length > 0) {
-            table = new DataTable('#myTable', {
-                language: {
-                    search: "Buscar:",
-                    searchPlaceholder: "Escribe aquí...",
-                    lengthMenu: "Mostrar _MENU_ registros",
-                    info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-                    infoEmpty: "No hay registros",
-                    zeroRecords: "No se encontraron resultados",
-        
-                }
-            });
-        }
-        return () => {
-            if (table) {
-                table.destroy();
-            }
-        };
-    }, [sales]);
+    const tableElement = document.querySelector("#salesTable table");
+    if (!tableElement) return;
+
+    const hasRows = (tableElement as HTMLTableElement).querySelector("tbody tr") !== null;
+    if (!hasRows) return;
+
+    const table = new DataTable(tableElement as Element, {
+      destroy: true,
+      language: {
+        search: "Buscar:",
+        searchPlaceholder: "Escribe aquí...",
+        lengthMenu: "Mostrar _MENU_ registros",
+        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        infoEmpty: "No hay registros",
+        zeroRecords: "No se encontraron resultados",
+      },
+      pageLength: 10,
+      lengthMenu: [5, 10, 25, 50],
+    });
+
+    return () => {
+      table.destroy();
+    };
+  }, [showForm, sales.length, refreshKey]);
 
     const handleDelete = async (sales: Sales) => {
         if (!sales.idSales) return;
@@ -87,6 +94,8 @@ const SalesPage = () => {
         await deleteSales(sales.idSales);
         await loadCatalogs();
         await loadDetails();
+        setRefreshKey((prev) => prev + 1);
+
     };
 
     const handleEdit = async (sales: Sales) => {
@@ -101,41 +110,43 @@ const SalesPage = () => {
         setSelectedSales(null);
     };
 
-    const handleSaveAndClose = () => {
+    const handleSaveAndClose = async () => {
         loadCatalogs();
         setShowForm(false);
         setSelectedSales(null);
         loadDetails();
+        setRefreshKey((prev) => prev + 1);
+
     };
 
     const formatDate = (date?: any) => {
-    if (!date) return "";
+        if (!date) return "";
 
-    let dateObject: Date;
+        let dateObject: Date;
 
-    // Si viene como array [año, mes, día] desde el backend
-    if (Array.isArray(date)) {
-      const [year, month, day] = date;
-      dateObject = new Date(year, month - 1, day);
-    } else {
-      // Si viene como string ISO
-      dateObject = new Date(String(date).split("T")[0] + "T00:00:00");
-    }
+        // Si viene como array [año, mes, día] desde el backend
+        if (Array.isArray(date)) {
+            const [year, month, day] = date;
+            dateObject = new Date(year, month - 1, day);
+        } else {
+            // Si viene como string ISO
+            dateObject = new Date(String(date).split("T")[0] + "T00:00:00");
+        }
 
-    if (isNaN(dateObject.getTime())) {
-      return String(date);
-    }
+        if (isNaN(dateObject.getTime())) {
+            return String(date);
+        }
 
-    // Esto te lo devuelve en formato: "23 de junio de 2026" o similar
-    // Si preferís estrictamente "23/06/2026", avisame y lo cambiamos a una sola línea
-    const formatted = dateObject.toLocaleDateString("es-CR", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
+        // Esto te lo devuelve en formato: "23 de junio de 2026" o similar
+        // Si preferís estrictamente "23/06/2026", avisame y lo cambiamos a una sola línea
+        const formatted = dateObject.toLocaleDateString("es-CR", {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+        });
 
-    return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+        return formatted.charAt(0).toUpperCase() + formatted.slice(1);
     };
 
     const getClientName = (idUser?: number) => {
@@ -158,7 +169,7 @@ const SalesPage = () => {
         transactionDateFormatted: formatDate(q.transactionDate),
         clientName: getClientName(q.idClient),
         carName: getUnitName(q.idCar),
-       adminName: getAdminName(q.idAdmin ?? undefined),
+        adminName: getAdminName(q.idAdmin ?? undefined),
     }));
 
 
@@ -222,12 +233,16 @@ const SalesPage = () => {
                             style={{ backgroundColor: "#EEF1EF" }}
                         >
                             {!showForm ? (
-                                <TableGeneric
-                                    data={transformedSales}
-                                    columns={columns}
-                                    onDelete={handleDelete}
-                                    onEdit={handleEdit}
-                                />
+                                <div id="salesTable" key={refreshKey}>
+
+                                    <TableGeneric
+                                        data={transformedSales}
+                                        columns={columns}
+                                        onDelete={handleDelete}
+                                        onEdit={handleEdit}
+                                    />
+                                </div>
+
                             ) : (
                                 <SalesForm
                                     onClose={handleClose}

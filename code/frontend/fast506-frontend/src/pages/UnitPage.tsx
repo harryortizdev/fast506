@@ -20,24 +20,26 @@ const UnitPage = () => {
   const [units, setUnits] = useState<Unit[]>([]);//guardo la lista
   const [showForm, setShowForm] = useState(false);//controlo el formulario
   const [unitToEdit, setUnitToEdit] = useState<Unit | undefined>(undefined);//guarda la unidad que desea editar
+  const [refreshKey, setRefreshKey] = useState(0);
+
 
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);//trae los proveedores
 
-  const loadUnits = async () => { 
+  const loadUnits = async () => {
     const data = await getAll();//pide al backend la lista
     console.log(data);
     setUnits(data);//las guarda
   };
 
   const loadDetails = async () => {
-      try {
-        const suppliersData = await getAllSuppliers();
-        setSuppliers(Array.isArray(suppliersData) ? suppliersData : []);
-      }catch (error) {
+    try {
+      const suppliersData = await getAllSuppliers();
+      setSuppliers(Array.isArray(suppliersData) ? suppliersData : []);
+    } catch (error) {
       console.error("Error cargando datos ", error);
-      }
+    }
   };
-  
+
 
   useEffect(() => {//cuando la pagina carga por primera vez
     loadUnits();//carga la lista
@@ -45,33 +47,40 @@ const UnitPage = () => {
   }, []);//solo se ejecuta una vez
 
   useEffect(() => {
-        let table: any;
+    if (showForm || units.length === 0) return;
 
-        if (units.length > 0) {
-            table = new DataTable('#myTable', {
-                language: {
-                    search: "Buscar:",
-                    searchPlaceholder: "Escribe aquí...",
-                    lengthMenu: "Mostrar _MENU_ registros",
-                    info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-                    infoEmpty: "No hay registros",
-                    zeroRecords: "No se encontraron resultados",
-        
-                }
-            });
-        }
-        return () => {
-            if (table) {
-                table.destroy();
-            }
-        };
-    }, [units]);
+    const tableElement = document.querySelector("#unitTable table");
+    if (!tableElement) return;
+
+    const hasRows = (tableElement as HTMLTableElement).querySelector("tbody tr") !== null;
+    if (!hasRows) return;
+
+    const table = new DataTable(tableElement as Element, {
+      destroy: true,
+      language: {
+        search: "Buscar:",
+        searchPlaceholder: "Escribe aquí...",
+        lengthMenu: "Mostrar _MENU_ registros",
+        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        infoEmpty: "No hay registros",
+        zeroRecords: "No se encontraron resultados",
+      },
+      pageLength: 10,
+      lengthMenu: [5, 10, 25, 50],
+    });
+
+    return () => {
+      table.destroy();
+    };
+  }, [showForm, units.length, refreshKey]);
 
   const handleSaveAndClose = async () => {
     await loadUnits();//recargo la lista actualizada
     await loadDetails();//recarga la lista actualizada
     setUnitToEdit(undefined);//limpio la unidad que se estaba editando
     setShowForm(false);//limpio el formulario
+    setRefreshKey((prev) => prev + 1);
+
   };
 
   const handleClose = () => {//cancelar editar formulario
@@ -93,11 +102,13 @@ const UnitPage = () => {
     await deleteUnit(unit.idCar!);//envia la señal al backend de eliminar
     await loadUnits();//recargo la lista 
     await loadDetails();//recarga la lista
+    setRefreshKey((prev) => prev + 1);
+
   };
 
-   const getSupplierName = (idSupplier?: number) => {
+  const getSupplierName = (idSupplier?: number) => {
     const s = suppliers.find((s) => Number(s.idSupplier) === Number(idSupplier));
-    return s?.companyName|| `Proveedor #${idSupplier}`; // Si no lo encuentra, pone el ID por defecto
+    return s?.companyName || `Proveedor #${idSupplier}`; // Si no lo encuentra, pone el ID por defecto
   };
 
   const transformedUnit: UnitTable[] = units.map((q) => ({
@@ -162,12 +173,17 @@ const UnitPage = () => {
               style={{ backgroundColor: "#EEF1EF" }}
             >
               {!showForm ? (
-                <TableGeneric
-                  data={transformedUnit}
-                  columns={columns}
-                  onDelete={handleDelete}
-                  onEdit={handleEdit}
-                />
+                <div id="unitTable" key={refreshKey}>
+
+                  <TableGeneric
+                    data={transformedUnit}
+                    columns={columns}
+                    onDelete={handleDelete}
+                    onEdit={handleEdit}
+
+                  />
+                </div>
+
               ) : (
                 <UnitForm
                   onClose={handleClose}
