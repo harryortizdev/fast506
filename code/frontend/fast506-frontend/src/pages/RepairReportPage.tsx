@@ -187,7 +187,13 @@ const formatDate = (date?: any) => {
     setIdAppointmentFromState(null);
   };
 
-  const handleEdit = (repairReport: RepairReportTable) => {
+  const handleEdit = async (repairReport: RepairReportTable) => {
+    const confirmar = await AlertConfirm(
+      `¿Desea editar el reporte con referencia ${repairReport.numberReference}?`
+    );
+
+    if (!confirmar) return;
+
     setRepairReportToEdit(repairReport);
     setShowForm(true);
   };

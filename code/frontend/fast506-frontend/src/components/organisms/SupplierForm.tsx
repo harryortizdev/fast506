@@ -63,36 +63,40 @@ const SupplierForm = ({ onClose, onRefresh, supplierToEdit }: SupplierFormProps)
     const phoneRegex = /^[0-9\-\+\s()]{7,20}$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!form.name || form.name.trim().length === 0 || form.name.length > 50) {
+    const name = String(form.name ?? "").trim();
+    const companyName = String(form.companyName ?? "").trim();
+    const legalName = String(form.legalName ?? "").trim();
+    const supportPhone = String(form.supportPhone ?? "").trim();
+    const contactName = String(form.bussinesContactName ?? "").trim();
+    const email = String(form.email ?? "").trim();
+    const ubicacion = String(form.ubicacion ?? "").trim();
+
+    if (!name || name.length > 50) {
       newErrors.name = "Nombre inválido: no puede estar vacío, máximo 50 caracteres.";
     }
 
-    if (!form.companyName || form.companyName.trim().length === 0 || form.companyName.length > 50) {
+    if (!companyName || companyName.length > 50) {
       newErrors.companyName = "Compañía inválida: no puede estar vacía, máximo 50 caracteres.";
     }
 
-    if (!form.legalName || form.legalName.trim().length === 0 || form.legalName.length > 50) {
+    if (!legalName || legalName.length > 50) {
       newErrors.legalName = "Nombre legal inválido: no puede estar vacío, máximo 50 caracteres.";
     }
 
-    if (!form.supportPhone || !phoneRegex.test(form.supportPhone)) {
+    if (!supportPhone || !phoneRegex.test(supportPhone)) {
       newErrors.supportPhone = "Teléfono inválido: debe ser un número válido (7-20 caracteres).";
     }
 
-    if (
-      !form.bussinesContactName ||
-      form.bussinesContactName.trim().length === 0 ||
-      form.bussinesContactName.length > 150
-    ) {
+    if (!contactName || contactName.length > 150) {
       newErrors.bussinesContactName = "Contacto inválido: no puede estar vacío, máximo 150 caracteres.";
     }
 
-    if (!form.email || !emailRegex.test(form.email) || form.email.length > 100) {
+    if (!email || !emailRegex.test(email) || email.length > 100) {
       newErrors.email = "Correo inválido: debe ser un email válido, máximo 100 caracteres.";
     } else {
       const emailExists = suppliers.some(
         (s) =>
-          s.email?.toLowerCase().trim() === form.email?.toLowerCase().trim() &&
+          s.email?.toLowerCase().trim() === email.toLowerCase() &&
           s.idSupplier !== form.idSupplier
       );
 
@@ -101,11 +105,11 @@ const SupplierForm = ({ onClose, onRefresh, supplierToEdit }: SupplierFormProps)
       }
     }
 
-    if (!form.ubicacion || form.ubicacion.trim().length === 0 || form.ubicacion.length > 100) {
+    if (!ubicacion || ubicacion.length > 100) {
       newErrors.ubicacion = "Ubicación inválida: no puede estar vacía, máximo 100 caracteres.";
     }
 
-    if (!form.adminId) {
+    if (!form.adminId || Number(form.adminId) <= 0) {
       newErrors.adminId = "Debe seleccionar un administrador.";
     }
 
@@ -119,28 +123,26 @@ const SupplierForm = ({ onClose, onRefresh, supplierToEdit }: SupplierFormProps)
     try {
       let dataToSend: any;
 
+      const normalizedSupplier = {
+        name: String(form.name ?? "").trim(),
+        companyName: String(form.companyName ?? "").trim(),
+        legalName: String(form.legalName ?? "").trim(),
+        supportPhone: String(form.supportPhone ?? "").trim(),
+        bussinesContactName: String(form.bussinesContactName ?? "").trim(),
+        email: String(form.email ?? "").trim(),
+        ubicacion: String(form.ubicacion ?? "").trim(),
+      };
+
       if (supplierToEdit) {
         dataToSend = {
           idSupplier: form.idSupplier,
-          name: form.name,
-          companyName: form.companyName,
-          legalName: form.legalName,
-          supportPhone: form.supportPhone,
-          bussinesContactName: form.bussinesContactName,
-          email: form.email,
-          ubicacion: form.ubicacion,
+          ...normalizedSupplier,
           adminId: Number(form.adminId),
           active: form.isActive,
         };
       } else {
         dataToSend = {
-          name: form.name,
-          companyName: form.companyName,
-          legalName: form.legalName,
-          supportPhone: form.supportPhone,
-          bussinesContactName: form.bussinesContactName,
-          email: form.email,
-          ubicacion: form.ubicacion,
+          ...normalizedSupplier,
           adminId: Number(form.adminId),
           active: form.isActive,
         };

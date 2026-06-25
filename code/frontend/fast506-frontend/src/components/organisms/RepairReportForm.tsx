@@ -179,44 +179,55 @@ const generateRepairReference = (): number => {
 
   const validate = (): boolean => {
     const newErrors: Partial<Record<keyof RepairReport, string>> = {};
+    const technicalDiagnosis = String(form.technicalDiagnosis ?? "").trim();
+    const spareParts = String(form.spareParts ?? "").trim();
+    const observations = String(form.observations ?? "").trim();
+    const cost = Number(form.cost);
+    const taxes = Number(form.taxes);
+    const totalPayment = Number(form.totalPayment);
+    const parsedCompletionDate = parseDateValue(form.completionDate);
 
-    if (form.technicalDiagnosis && form.technicalDiagnosis.length > 500) {
+    if (technicalDiagnosis && technicalDiagnosis.length > 500) {
       newErrors.technicalDiagnosis =
         "El diagnóstico no puede superar los 500 caracteres.";
     }
 
-    if (form.spareParts && form.spareParts.length > 500) {
+    if (spareParts && spareParts.length > 500) {
       newErrors.spareParts =
         "Los repuestos no pueden superar los 500 caracteres.";
     }
 
-    if (form.observations && form.observations.length > 500) {
+    if (observations && observations.length > 500) {
       newErrors.observations =
         "Las observaciones no pueden superar los 500 caracteres.";
     }
 
-    if (form.cost === undefined || form.cost < 0) {
-      newErrors.cost = "El costo no puede ser negativo.";
+    if (!Number.isFinite(cost) || cost < 0) {
+      newErrors.cost = "El costo debe ser un valor válido y no puede ser negativo.";
     }
 
-    if (form.taxes === undefined || form.taxes < 0) {
-      newErrors.taxes = "Los impuestos no pueden ser negativos.";
+    if (!Number.isFinite(taxes) || taxes < 0) {
+      newErrors.taxes = "Los impuestos deben ser un valor válido y no pueden ser negativos.";
     }
 
-    if (form.totalPayment === undefined || form.totalPayment < 0) {
-      newErrors.totalPayment = "El pago total no puede ser negativo.";
+    if (!Number.isFinite(totalPayment) || totalPayment < 0) {
+      newErrors.totalPayment = "El pago total debe ser un valor válido y no puede ser negativo.";
+    } else if (Number.isFinite(cost) && Number.isFinite(taxes) && totalPayment < cost + taxes) {
+      newErrors.totalPayment = "El pago total no puede ser menor que la suma de costo e impuestos.";
     }
 
-    if (!form.completionDate) {
+    if (!parsedCompletionDate) {
       newErrors.completionDate = "La fecha de finalización es requerida.";
     }
 
-    if (!form.idMechanic || form.idMechanic <= 0) {
+    if (!form.idMechanic || Number(form.idMechanic) <= 0) {
       newErrors.idMechanic = "Debe ingresar un mecánico válido.";
     }
 
-    if (!form.idAppointment || form.idAppointment <= 0) {
+    if (!form.idAppointment || Number(form.idAppointment) <= 0) {
       newErrors.idAppointment = "Debe seleccionar una cita del taller.";
+    } else if (filteredWorkshopSchedules.length === 0) {
+      newErrors.idAppointment = "No hay citas disponibles para asignar a este reporte.";
     }
 
     setErrors(newErrors);
@@ -232,9 +243,9 @@ const generateRepairReference = (): number => {
         numberReference: repairReportToEdit
           ? Number(form.numberReference)
           : generateRepairReference(),
-        technicalDiagnosis: form.technicalDiagnosis,
-        spareParts: form.spareParts,
-        observations: form.observations,
+        technicalDiagnosis: String(form.technicalDiagnosis ?? "").trim(),
+        spareParts: String(form.spareParts ?? "").trim(),
+        observations: String(form.observations ?? "").trim(),
         cost: Number(form.cost),
         taxes: Number(form.taxes),
         totalPayment: Number(form.totalPayment),

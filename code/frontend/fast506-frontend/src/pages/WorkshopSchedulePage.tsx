@@ -161,7 +161,13 @@ const formatDate = (date?: any) => {
     setSelectedAppointmentId(undefined);
   };
 
-  const handleEdit = (workshopSchedule: WorkshopSchedule) => {
+  const handleEdit = async (workshopSchedule: WorkshopSchedule) => {
+    const confirmar = await AlertConfirm(
+      `¿Desea editar la cita con referencia ${workshopSchedule.numberReference}?`
+    );
+
+    if (!confirmar) return;
+
     setWorkshopScheduleToEdit(workshopSchedule);
     setShowRepairReportForm(false);
     setShowForm(true);

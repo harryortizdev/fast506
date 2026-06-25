@@ -48,7 +48,13 @@ const loadSuppliers = async () => {
     setShowForm(false);
   };
 
-  const handleEdit = (supplier: Supplier) => {
+  const handleEdit = async (supplier: Supplier) => {
+    const confirmar = await AlertConfirm(
+      `¿Desea editar el proveedor ${supplier.name || supplier.companyName || supplier.idSupplier}?`
+    );
+
+    if (!confirmar) return;
+
     setSupplierToEdit(supplier);
     setShowForm(true);
   };
