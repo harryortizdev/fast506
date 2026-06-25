@@ -41,6 +41,7 @@ const WorkshopScheduleForm = ({
   const [branches, setBranches] = useState<Branch[]>([]);
   const [loadingClients, setLoadingClients] = useState(true);
   const [loadingBranches, setLoadingBranches] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     setForm(
@@ -185,6 +186,7 @@ const generateWorkshopReference = (): number => {
   const handleSubmit = async () => {
     if (!validate()) return;
 
+    setIsSubmitting(true);
     try {
       const dataToSend: any = {
         idAppointment: form.idAppointment,
@@ -213,6 +215,8 @@ const generateWorkshopReference = (): number => {
     } catch (error) {
       AlertWarning("Error al guardar la cita de taller.");
       console.error("Error al guardar cita:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -355,12 +359,13 @@ const generateWorkshopReference = (): number => {
 
         <div className="text-center mt-4">
           <Button
-            label="Guardar"
+            label={isSubmitting ? "Guardando..." : "Guardar"}
             onClick={handleSubmit}
             backgroundColor="#198754"
             hoverColor="#145c32"
             color="#fff"
             className="btn btn-success me-2"
+            disabled={isSubmitting}
           />
 
           <Button

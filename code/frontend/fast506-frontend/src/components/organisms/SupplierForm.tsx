@@ -20,6 +20,7 @@ const SupplierForm = ({ onClose, onRefresh, supplierToEdit }: SupplierFormProps)
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [errors, setErrors] = useState<Partial<Record<keyof Supplier, string>>>({});
   const [submitError, setSubmitError] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchAdmins = async () => {
@@ -190,6 +191,7 @@ const SupplierForm = ({ onClose, onRefresh, supplierToEdit }: SupplierFormProps)
     if (!validate()) return;
 
     setSubmitError("");
+    setIsSubmitting(true);
 
     try {
       let dataToSend: any;
@@ -234,6 +236,8 @@ const SupplierForm = ({ onClose, onRefresh, supplierToEdit }: SupplierFormProps)
       setSubmitError(`No se pudo guardar el proveedor: ${backendError}`);
       AlertWarning("Error al guardar proveedor.");
       console.error("Error al guardar proveedor:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -356,12 +360,13 @@ const SupplierForm = ({ onClose, onRefresh, supplierToEdit }: SupplierFormProps)
 
         <div className="text-center mt-4">
           <Button
-            label="Guardar"
+            label={isSubmitting ? "Guardando..." : "Guardar"}
             onClick={handleSubmit}
             backgroundColor="#198754"
             hoverColor="#145c32"
             color="#fff"
             className="btn btn-success me-2"
+            disabled={isSubmitting}
           />
 
           <Button

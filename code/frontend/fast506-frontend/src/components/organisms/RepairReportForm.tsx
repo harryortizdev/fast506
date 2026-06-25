@@ -47,6 +47,7 @@ const RepairReportForm = ({
   const [workshopSchedules, setWorkshopSchedules] = useState<any[]>([]);
   const [repairReports, setRepairReports] = useState<RepairReport[]>([]);
   const [filteredWorkshopSchedules, setFilteredWorkshopSchedules] = useState<any[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -245,6 +246,7 @@ const generateRepairReference = (): number => {
   const handleSubmit = async () => {
     if (!validate()) return;
 
+    setIsSubmitting(true);
     try {
       const dataToSend: any = {
         idReparation: form.idReparation,
@@ -276,6 +278,8 @@ const generateRepairReference = (): number => {
     } catch (error) {
       AlertWarning("Error al guardar el reporte de reparación.");
       console.error("Error al guardar reporte:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -457,12 +461,13 @@ const generateRepairReference = (): number => {
 
         <div className="text-center mt-4">
           <Button
-            label="Guardar"
+            label={isSubmitting ? "Guardando..." : "Guardar"}
             onClick={handleSubmit}
             backgroundColor="#198754"
             hoverColor="#145c32"
             color="#fff"
             className="btn btn-success me-2"
+            disabled={isSubmitting}
           />
 
           <Button
