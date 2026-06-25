@@ -1,4 +1,5 @@
 import { WorkshopSchedule } from "../../models/WorkshopSchedule";
+import { RepairReport } from "../../models/RepairReport";
 
 interface WorkshopScheduleCardProps {
   appointment: WorkshopSchedule;
@@ -7,6 +8,11 @@ interface WorkshopScheduleCardProps {
   onEdit: (appointment: WorkshopSchedule) => void;
   onDelete: (appointment: WorkshopSchedule) => void;
   formatDate: (dateString: string) => string;
+  repairReport?: RepairReport;
+  onViewReport?: (report: RepairReport) => void;
+  onCreateReport?: (appointment: WorkshopSchedule) => void;
+  canEdit?: boolean;
+  canDelete?: boolean;
 }
 
 const WorkshopScheduleCard = ({
@@ -16,6 +22,11 @@ const WorkshopScheduleCard = ({
   onEdit,
   onDelete,
   formatDate,
+  repairReport,
+  onViewReport,
+  onCreateReport,
+  canEdit = true,
+  canDelete = true,
 }: WorkshopScheduleCardProps) => {
   return (
     <div
@@ -156,57 +167,116 @@ const WorkshopScheduleCard = ({
           backgroundColor: "#F8F9FA",
           borderTop: "1px solid #EEF1EF",
           display: "flex",
+          flexDirection: "column",
           gap: "8px",
         }}
       >
-        <button
-          onClick={() => onEdit(appointment)}
-          style={{
-            flex: 1,
-            padding: "8px 12px",
-            backgroundColor: "#5E6572",
-            color: "#EEF1EF",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontSize: "14px",
-            fontWeight: "500",
-            transition: "background-color 0.3s ease",
-          }}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.backgroundColor = "#2C3E50")
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.backgroundColor = "#5E6572")
-          }
-        >
-          <i className="bi bi-pencil me-2"></i>
-          Editar
-        </button>
-        <button
-          onClick={() => onDelete(appointment)}
-          style={{
-            flex: 1,
-            padding: "8px 12px",
-            backgroundColor: "#dc3545",
-            color: "#EEF1EF",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontSize: "14px",
-            fontWeight: "500",
-            transition: "background-color 0.3s ease",
-          }}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.backgroundColor = "#c82333")
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.backgroundColor = "#dc3545")
-          }
-        >
-          <i className="bi bi-trash me-2"></i>
-          Eliminar
-        </button>
+        {repairReport && onViewReport && (
+          <button
+            onClick={() => onViewReport(repairReport)}
+            style={{
+              width: "100%",
+              padding: "8px 12px",
+              backgroundColor: "#0d6efd",
+              color: "#fff",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontSize: "14px",
+              fontWeight: "500",
+              transition: "background-color 0.3s ease",
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = "#0b5ed7")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = "#0d6efd")
+            }
+          >
+            <i className="bi bi-file-medical me-2"></i>
+            Ver Reporte
+          </button>
+        )}
+        {!repairReport && onCreateReport && (
+          <button
+            onClick={() => onCreateReport(appointment)}
+            style={{
+              width: "100%",
+              padding: "8px 12px",
+              backgroundColor: "#fd7e14",
+              color: "#fff",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontSize: "14px",
+              fontWeight: "500",
+              transition: "background-color 0.3s ease",
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = "#e8690b")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = "#fd7e14")
+            }
+          >
+            <i className="bi bi-file-plus me-2"></i>
+            Crear Reporte
+          </button>
+        )}
+        <div style={{ display: "flex", gap: "8px" }}>
+          {canEdit && (
+            <button
+              onClick={() => onEdit(appointment)}
+              style={{
+                flex: 1,
+                padding: "8px 12px",
+                backgroundColor: "#5E6572",
+                color: "#EEF1EF",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+                fontSize: "14px",
+                fontWeight: "500",
+                transition: "background-color 0.3s ease",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.backgroundColor = "#2C3E50")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor = "#5E6572")
+              }
+            >
+              <i className="bi bi-pencil me-2"></i>
+              Editar
+            </button>
+          )}
+          {canDelete && (
+            <button
+              onClick={() => onDelete(appointment)}
+              style={{
+                flex: 1,
+                padding: "8px 12px",
+                backgroundColor: "#dc3545",
+                color: "#EEF1EF",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+                fontSize: "14px",
+                fontWeight: "500",
+                transition: "background-color 0.3s ease",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.backgroundColor = "#c82333")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor = "#dc3545")
+              }
+            >
+              <i className="bi bi-trash me-2"></i>
+              Eliminar
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

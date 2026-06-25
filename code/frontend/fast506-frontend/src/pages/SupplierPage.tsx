@@ -10,6 +10,7 @@ import { Supplier } from "../models/Supplier";
 import Navbar from "../components/organisms/Navbar";
 import Footer from "../components/organisms/Footer";
 import AlertConfirm from "../components/atoms/AlertConfirm";
+import AlertSuccess from "../components/atoms/AlertSuccess";
 import ButtonIcon from "../components/molecules/ButtonIcon";
 
 type SupplierTableRow = Supplier & { rowNumber: number };
@@ -69,6 +70,7 @@ const loadSuppliers = async () => {
     if (!confirmar) return;
 
     await deleteSupplier(supplier.idSupplier!);
+    AlertSuccess("Proveedor eliminado correctamente.");
     await loadSuppliers();
     setRefreshKey((prev) => prev + 1);
   };
