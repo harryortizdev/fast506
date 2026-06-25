@@ -30,6 +30,8 @@ const TestdrivePage = () => {
   const [testdrive, setTestDrive] = useState<Testdrive[]>([]); //guarda la lista de Testdrives
   const [showForm, setShowForm] = useState(false); //formulario off
   const [testdriveToEdit, setTestdriveToEdit] = useState<Testdrive | undefined>(undefined); //resguarda la sucursal a ediaatr
+  const [refreshKey, setRefreshKey] = useState(0);
+
 
   const [clients, setClients] = useState<Client[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
@@ -66,6 +68,8 @@ const TestdrivePage = () => {
   const handleSaveAndClose = async () => {
     await loadTestdrive(); //lista de testdrives
     await loadDetails(); //lista de datos extra
+    setRefreshKey((prev) => prev + 1);
+
 
     setTestdriveToEdit(undefined); //limpia el testdrive de editar
     setShowForm(false); //limpia formulario
@@ -91,6 +95,8 @@ const TestdrivePage = () => {
     AlertWarning("Testdrive eliminada correctamente."); //alert de eliminado correctamente
     await loadTestdrive();//recargar la lista
     await loadDetails(); //recarga datos extra
+    setRefreshKey((prev) => prev + 1);
+
 
   };
 
@@ -149,28 +155,34 @@ const TestdrivePage = () => {
     branchName: getBranchName(q.idBranch),
   }));
 
+
   useEffect(() => {
-    let table: any;
+    if (showForm || testdrive.length === 0) return;
 
-    if (testdrive.length > 0) {
-      table = new DataTable('#myTable', {
-        language: {
-          search: "Buscar:",
-          searchPlaceholder: "Escribe aquí...",
-          lengthMenu: "Mostrar _MENU_ registros",
-          info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-          infoEmpty: "No hay registros",
-          zeroRecords: "No se encontraron resultados",
+    const tableElement = document.querySelector("#testdriveTable table");
+    if (!tableElement) return;
 
-        }
-      });
-    }
+    const hasRows = (tableElement as HTMLTableElement).querySelector("tbody tr") !== null;
+    if (!hasRows) return;
+
+    const table = new DataTable(tableElement as Element, {
+      destroy: true,
+      language: {
+        search: "Buscar:",
+        searchPlaceholder: "Escribe aquí...",
+        lengthMenu: "Mostrar _MENU_ registros",
+        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        infoEmpty: "No hay registros",
+        zeroRecords: "No se encontraron resultados",
+      },
+      pageLength: 10,
+      lengthMenu: [5, 10, 25, 50],
+    });
+
     return () => {
-      if (table) {
-        table.destroy();
-      }
+      table.destroy();
     };
-  }, [testdrive]);
+  }, [showForm, testdrive.length, refreshKey]);
 
 
   const columns: { key: keyof TestdriveTable; label: string }[] = [ //columnas
@@ -231,12 +243,16 @@ const TestdrivePage = () => {
               style={{ backgroundColor: "#EEF1EF" }}
             >
               {!showForm ? (
+                                                                <div id="testdriveTable" key={refreshKey}>
+
                 <TableGeneric
                   data={transformedTestDrive}
                   columns={columns}
                   onDelete={handleDelete}
                   onEdit={handleEdit}
                 />
+                                                </div>
+
               ) : (
                 <TestdriveForm
                   onClose={handleClose}

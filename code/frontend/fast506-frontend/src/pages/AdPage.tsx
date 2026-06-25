@@ -25,6 +25,7 @@ const AdPage = () => {
   const [showForm, setShowForm] = useState(false); //formulario off
   const [adToEdit, setAdToEdit] = useState<Ad | undefined>(undefined); //resguarda el anuncio
   const [administrators, setAdministrators] = useState<Administrator[]>([]); //lista administradores
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const loadAd = async () => {
     const data = await getAll();//pide lista anuncios
@@ -52,6 +53,7 @@ const AdPage = () => {
   const handleSaveAndClose = async () => {
     await loadAd(); //lista de anuncios
     await loadDetails(); //ajusta id a nombre
+    setRefreshKey((prev) => prev + 1);
 
     setAdToEdit(undefined); //limpia la unidad de editar
     setShowForm(false); //limpia formulario
@@ -78,6 +80,7 @@ const AdPage = () => {
     AlertWarning("Anuncio eliminado correctamente."); //alert de eliminado correctamente
     await loadAd();//recargar la lista
     await loadDetails();
+    setRefreshKey((prev) => prev + 1);
 
   };
 
@@ -91,28 +94,34 @@ const AdPage = () => {
     administratorName: geAdministratorName(q.idUser),
   }));
 
+
   useEffect(() => {
-    let table: any;
+    if (showForm || ad.length === 0) return;
 
-    if (ad.length > 0) {
-      table = new DataTable('#myTable', {
-        language: {
-          search: "Buscar:",
-          searchPlaceholder: "Escribe aquí...",
-          lengthMenu: "Mostrar _MENU_ registros",
-          info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-          infoEmpty: "No hay registros",
-          zeroRecords: "No se encontraron resultados",
+    const tableElement = document.querySelector("#adTable table");
+    if (!tableElement) return;
 
-        }
-      });
-    }
+    const hasRows = (tableElement as HTMLTableElement).querySelector("tbody tr") !== null;
+    if (!hasRows) return;
+
+    const table = new DataTable(tableElement as Element, {
+      destroy: true,
+      language: {
+        search: "Buscar:",
+        searchPlaceholder: "Escribe aquí...",
+        lengthMenu: "Mostrar _MENU_ registros",
+        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        infoEmpty: "No hay registros",
+        zeroRecords: "No se encontraron resultados",
+      },
+      pageLength: 10,
+      lengthMenu: [5, 10, 25, 50],
+    });
+
     return () => {
-      if (table) {
-        table.destroy();
-      }
+      table.destroy();
     };
-  }, [ad]);
+  }, [showForm, ad.length, refreshKey]);
 
   const columns: { key: keyof adTable; label: string }[] = [ //columnas
     { key: "index" as keyof adTable, label: "#" },
@@ -166,12 +175,17 @@ const AdPage = () => {
               style={{ backgroundColor: "#EEF1EF" }}
             >
               {!showForm ? (
-                <TableGeneric
-                  data={transformedAdTable}
-                  columns={columns}
-                  onDelete={handleDelete}
-                  onEdit={handleEdit}
-                />
+                <div id="adTable" key={refreshKey}>
+
+                  <TableGeneric
+
+                    data={transformedAdTable}
+                    columns={columns}
+                    onDelete={handleDelete}
+                    onEdit={handleEdit}
+                  />
+                </div>
+
               ) : (
                 <AdForm
                   onClose={handleClose}

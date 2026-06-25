@@ -22,6 +22,8 @@ const BranchPage = () => {
   const [showForm, setShowForm] = useState(false); //formulario off
   const [branchToEdit, setBranchToEdit] = useState<Branch | undefined>(undefined); //resguarda la sucursal a ediaatr
   const [administrators, setAdministrators] = useState<Administrator[]>([]);
+  const [refreshKey, setRefreshKey] = useState(0);
+
 
 
 
@@ -48,7 +50,9 @@ const BranchPage = () => {
 
   const handleSaveAndClose = async () => {
     await loadBranch(); //lista de sucursales
-     loadDetails();
+    loadDetails();
+    setRefreshKey((prev) => prev + 1);
+
 
     setBranchToEdit(undefined); //limpia la unidad de editar
     setShowForm(false); //limpia formulario
@@ -74,7 +78,9 @@ const BranchPage = () => {
     await deleteBranch(branch.idBranch!); //señal de eliminar
     AlertWarning("Sucursal eliminada correctamente."); //alert de eliminado correctamente
     await loadBranch();//recargar la lista
-   loadDetails();
+    await loadDetails();
+    setRefreshKey((prev) => prev + 1);
+
 
   };
 
@@ -83,33 +89,61 @@ const BranchPage = () => {
     return a?.name || `Usuario #${idUser}`; // Si no lo encuentra, pone el ID por defecto
   };
 
-   const transformedBranchTable: branchTable[] = branch.map((q) => ({
+  const transformedBranchTable: branchTable[] = branch.map((q) => ({
     ...q, // Copia la original intacta 
     administratorName: geAdministratorName(q.idUser),
   }));
 
   useEffect(() => {
-        let table: any;
+    let table: any;
 
-        if (branch.length > 0) {
-            table = new DataTable('#myTable', {
-                language: {
-                    search: "Buscar:",
-                    searchPlaceholder: "Escribe aquí...",
-                    lengthMenu: "Mostrar _MENU_ registros",
-                    info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-                    infoEmpty: "No hay registros",
-                    zeroRecords: "No se encontraron resultados",
-        
-                }
-            });
+    if (branch.length > 0) {
+      table = new DataTable('#myTable', {
+        language: {
+          search: "Buscar:",
+          searchPlaceholder: "Escribe aquí...",
+          lengthMenu: "Mostrar _MENU_ registros",
+          info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+          infoEmpty: "No hay registros",
+          zeroRecords: "No se encontraron resultados",
+
         }
-        return () => {
-            if (table) {
-                table.destroy();
-            }
-        };
-    }, [branch]);
+      });
+    }
+    return () => {
+      if (table) {
+        table.destroy();
+      }
+    };
+  }, [branch]);
+
+  useEffect(() => {
+    if (showForm || branch.length === 0) return;
+
+    const tableElement = document.querySelector("#branchTable table");
+    if (!tableElement) return;
+
+    const hasRows = (tableElement as HTMLTableElement).querySelector("branchTable tr") !== null;
+    if (!hasRows) return;
+
+    const table = new DataTable(tableElement as Element, {
+      destroy: true,
+      language: {
+        search: "Buscar:",
+        searchPlaceholder: "Escribe aquí...",
+        lengthMenu: "Mostrar _MENU_ registros",
+        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        infoEmpty: "No hay registros",
+        zeroRecords: "No se encontraron resultados",
+      },
+      pageLength: 10,
+      lengthMenu: [5, 10, 25, 50],
+    });
+
+    return () => {
+      table.destroy();
+    };
+  }, [showForm, branch.length, refreshKey]);
 
   const columns: { key: keyof branchTable; label: string }[] = [ //columnas
     { key: "index" as keyof branchTable, label: "#" },
@@ -165,12 +199,15 @@ const BranchPage = () => {
               style={{ backgroundColor: "#EEF1EF" }}
             >
               {!showForm ? (
-                <TableGeneric
-                  data={transformedBranchTable}
-                  columns={columns}
-                  onDelete={handleDelete}
-                  onEdit={handleEdit}
-                />
+                <div id="branchTable" key={refreshKey}>
+
+                  <TableGeneric
+                    data={transformedBranchTable}
+                    columns={columns}
+                    onDelete={handleDelete}
+                    onEdit={handleEdit}
+                  />
+                </div>
               ) : (
                 <BranchForm
                   onClose={handleClose}

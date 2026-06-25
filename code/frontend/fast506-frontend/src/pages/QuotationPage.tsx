@@ -31,6 +31,8 @@ const QuotationPage = () => {
   const [quotation, setQuotation] = useState<Quotation[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [quotationToEdit, setQuotationToEdit] = useState<Quotation | undefined>(undefined);
+    const [refreshKey, setRefreshKey] = useState(0);
+
 
   const [clients, setClients] = useState<Client[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
@@ -66,6 +68,8 @@ const QuotationPage = () => {
     await loadDetails(); //lista de datos extra
     setQuotationToEdit(undefined); //limpia la unidad de editar
     setShowForm(false); //limpia formulario
+        setRefreshKey((prev) => prev + 1);
+
   };
 
   const handleClose = () => { //cancelar 
@@ -88,6 +92,8 @@ const QuotationPage = () => {
     AlertWarning("Sucursal eliminada correctamente."); //alert de eliminado correctamente
     await loadQuotation();//recargar la lista
     await loadDetails(); //recarga datos extra
+        setRefreshKey((prev) => prev + 1);
+
   };
 
 const formatDate = (date?: any) => {
@@ -143,28 +149,34 @@ const formatDate = (date?: any) => {
     catalogName: getCatalogName(q.idCatalog),
   }));
 
-  useEffect(() => {
-        let table: any;
+  
+    useEffect(() => {
+    if (showForm || quotation.length === 0) return;
 
-        if (quotation.length > 0) {
-            table = new DataTable('#myTable', {
-                language: {
-                    search: "Buscar:",
-                    searchPlaceholder: "Escribe aquí...",
-                    lengthMenu: "Mostrar _MENU_ registros",
-                    info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-                    infoEmpty: "No hay registros",
-                    zeroRecords: "No se encontraron resultados",
-        
-                }
-            });
-        }
-        return () => {
-            if (table) {
-                table.destroy();
-            }
-        };
-    }, [quotation]);
+    const tableElement = document.querySelector("#quotationTable table");
+    if (!tableElement) return;
+
+    const hasRows = (tableElement as HTMLTableElement).querySelector("tbody tr") !== null;
+    if (!hasRows) return;
+
+    const table = new DataTable(tableElement as Element, {
+      destroy: true,
+      language: {
+        search: "Buscar:",
+        searchPlaceholder: "Escribe aquí...",
+        lengthMenu: "Mostrar _MENU_ registros",
+        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        infoEmpty: "No hay registros",
+        zeroRecords: "No se encontraron resultados",
+      },
+      pageLength: 10,
+      lengthMenu: [5, 10, 25, 50],
+    });
+
+    return () => {
+      table.destroy();
+    };
+  }, [showForm, quotation.length, refreshKey]);
 
 
   const columns: { key: keyof QuotationTable; label: string }[] = [ //columnas
@@ -224,12 +236,17 @@ const formatDate = (date?: any) => {
               style={{ backgroundColor: "#EEF1EF" }}
             >
               {!showForm ? (
+                                                <div id="quotationTable" key={refreshKey}>
+
                 <TableGeneric
+                
                   data={transformedQuotations}
                   columns={columns}
                   onDelete={handleDelete}
                   onEdit={handleEdit}
                 />
+                                </div>
+
               ) : (
                 <QuotationForm
                   onClose={handleClose}
