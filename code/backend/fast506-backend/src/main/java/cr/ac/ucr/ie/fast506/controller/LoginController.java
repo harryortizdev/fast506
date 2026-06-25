@@ -42,6 +42,7 @@ public class LoginController {
         session.setAttribute("userId", user.getIdUser());
         session.setAttribute("userName", user.getName());
         session.setAttribute("userEmail", user.getEmail());
+        session.setAttribute("profileImage", user.getProfileImage());
 
         if (role != null) {
             session.setAttribute("roleId", role.getIdRole());
@@ -55,6 +56,7 @@ public class LoginController {
         response.put("email", user.getEmail());
         response.put("roleId", role != null ? role.getIdRole() : null);
         response.put("roleName", role != null ? role.getName() : null);
+        response.put("profileImage", user.getProfileImage());
 
         return ResponseEntity.ok(response);
     }
@@ -76,6 +78,7 @@ public class LoginController {
         response.put("email", session.getAttribute("userEmail"));
         response.put("roleId", session.getAttribute("roleId"));
         response.put("roleName", session.getAttribute("roleName"));
+        response.put("profileImage", session.getAttribute("profileImage"));
 
         return ResponseEntity.ok(response);
     }

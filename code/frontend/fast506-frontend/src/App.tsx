@@ -26,6 +26,7 @@ import RolePage from "./pages/RolePage";
 import LoginForm from "./components/organisms/LoginForm";
 import RegisterForm from "./components/organisms/RegisterForm";
 import WorkshopSchedulePageClient from "./pages/WorkshopSchedulePageClient";
+import ProfilePage from "./pages/ProfilePage";
 
 function App() {
   return (
@@ -41,6 +42,11 @@ function App() {
           <Route path="/catalog/detail/:id" element={<CatalogDetailPage />} />
           <Route path="/catalog/client/sales" element={<SalesClientPage />} />
           
+
+          {/* Ruta de perfil de usuario */}
+          <Route path="/profile" element={
+            <PrivateRoute><ProfilePage /></PrivateRoute>
+          } />
 
           {/* Rutas que requieren inicio de sesión */}
           <Route path="/testdrive" element={

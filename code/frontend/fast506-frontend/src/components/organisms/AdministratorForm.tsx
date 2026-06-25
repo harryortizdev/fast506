@@ -22,7 +22,6 @@ const AdministratorForm = ({
   onClose,
   onRefresh,
   administratorToEdit,
-  administrators,
 }: AdministratorFormProps) => {
   const [form, setForm] = useState<Partial<Administrator>>(() => {
     if (!administratorToEdit) return { isActive: true };
@@ -36,6 +35,8 @@ const AdministratorForm = ({
   const [errors, setErrors] = useState<
     Partial<Record<keyof Administrator, string>>
   >({});
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
 
   const [roles, setRoles] = useState<Role[]>([]);
 
@@ -51,6 +52,23 @@ const AdministratorForm = ({
     };
     loadRoles();
   }, []);
+
+  useEffect(() => {
+    if (administratorToEdit?.profileImage) {
+      setImagePreview(
+        administratorToEdit.profileImage.startsWith("http")
+          ? administratorToEdit.profileImage
+          : `http://localhost:8080/${administratorToEdit.profileImage}`
+      );
+    }
+  }, [administratorToEdit]);
+
+  const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImage(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -112,9 +130,9 @@ const AdministratorForm = ({
         "Contraseña inválida: debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial.";
     }
     if (
-      form.phoneNumber &&
-      (!numericOnly.test(form.phoneNumber.toString()) ||
-        form.phoneNumber.toString().length !== 8)
+      !form.phoneNumber ||
+      !numericOnly.test(form.phoneNumber.toString()) ||
+      form.phoneNumber.toString().length !== 8
     ) {
       newErrors.phoneNumber =
         "El número de teléfono debe ser numérico y tener exactamente 8 dígitos.";
@@ -127,11 +145,6 @@ const AdministratorForm = ({
     ) {
       newErrors.dateBirth = "Fecha de nacimiento inválida.";
     }
-    if (form.profileImage && form.profileImage.length > 200) {
-      newErrors.profileImage =
-        "La URL de la imagen debe tener máximo 200 caracteres.";
-    }
-
     if (
       !form.employeeId ||
       !alphanumeric.test(form.employeeId.toString()) ||
@@ -157,26 +170,44 @@ const AdministratorForm = ({
   const handleSubmit = async () => {
     if (!validate()) return;
 
-    if (!administratorToEdit) {
-      const idExists = administrators.some((a) => a.id === form.id);
-      if (idExists) {
-        AlertWarning("La cédula ya está registrada.");
-        return;
-      }
-    }
+    const formData = new FormData();
+    formData.append("name", form.name || "");
+    formData.append("id", form.id?.toString() || "");
+    formData.append("email", form.email || "");
+    formData.append("password", form.password || "");
+    formData.append("phoneNumber", form.phoneNumber?.toString() || "");
+    formData.append(
+      "dateBirth",
+      form.dateBirth instanceof Date
+        ? form.dateBirth.toISOString().split("T")[0]
+        : ""
+    );
+    formData.append("isActive", form.isActive ? "true" : "false");
+    if (form.role?.idRole) formData.append("idRole", form.role.idRole.toString());
+    formData.append("employeeId", form.employeeId || "");
+    if (form.corporateEmail) formData.append("corporateEmail", form.corporateEmail);
+    if (administratorToEdit?.idUser) formData.append("idUser", administratorToEdit.idUser.toString());
+    if (image) formData.append("profileImage", image);
 
     try {
       if (administratorToEdit) {
-        await updateAdministrator(form as Administrator);
+        await updateAdministrator(formData);
         AlertSuccess("Administrador actualizado correctamente");
       } else {
-        await create(form as Administrator);
+        await create(formData);
         AlertSuccess("Administrador creado correctamente");
       }
       onRefresh();
       onClose();
     } catch (error) {
-      AlertWarning("Error al guardar el administrador");
+      const msg = error instanceof Error ? error.message : "";
+      if (msg.includes("cédula ya está")) {
+        AlertWarning("La cédula ingresada ya está registrada. Use una cédula diferente.");
+      } else if (msg.includes("correo") && msg.includes("ya está")) {
+        AlertWarning("El correo electrónico ya está en uso. Use un correo diferente.");
+      } else {
+        AlertWarning("Error al guardar el administrador. Verifique los datos e intente de nuevo.");
+      }
     }
   };
 
@@ -277,17 +308,18 @@ const AdministratorForm = ({
         </div>
 
         <div className="mb-3">
-          <FormField
-            label="Foto de perfil:"
-            name="profileImage"
-            placeholder="Foto de perfil"
-            value={form.profileImage || ""}
-            onChange={handleChange}
-          />
+          <label>Foto de perfil</label>
+          <input type="file" className="form-control" accept="image/*" onChange={handleImage} />
           {errors.profileImage && (
-            <div className="invalid-feedback d-block">
-              {errors.profileImage}
-            </div>
+            <div className="text-danger mt-1">{errors.profileImage}</div>
+          )}
+          {imagePreview && (
+            <img
+              src={imagePreview}
+              alt="preview"
+              className="mt-2 rounded"
+              style={{ width: "100%", maxHeight: "200px", objectFit: "cover" }}
+            />
           )}
         </div>
 

@@ -4,6 +4,8 @@ import MechanicForm from "../components/organisms/MechanicForm";
 import TableGeneric from "../components/organisms/TableGeneric";
 import { getAll, deleteMechanic } from "../services/MechanicService";
 import { Mechanic } from "../models/Mechanic";
+import { Role } from "../models/Role";
+import * as RoleService from "../services/RoleService";
 import ButtonIcon from "../components/molecules/ButtonIcon";
 import Navbar from "../components/organisms/Navbar";
 import Footer from "../components/organisms/Footer";
@@ -13,10 +15,12 @@ import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
 
 type MechanicTable = Mechanic & {
   dateFormatted: string;
+  roleName:string;
 };
 
 const MechanicPage = () => {
   const [mechanics, setMechanics] = useState<Mechanic[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [MechanicToEdit, setMechanicToEdit] = useState<Mechanic | undefined>(
     undefined,
@@ -30,6 +34,7 @@ const MechanicPage = () => {
 
   useEffect(() => {
     loadMechanics();
+    RoleService.getAll().then(setRoles);
   }, []);
 
   const handleSaveAndClose = async () => {
@@ -58,6 +63,11 @@ const MechanicPage = () => {
     await deleteMechanic(mechanic.idUser!);
     await loadMechanics();
     setRefreshKey((prev) => prev + 1);
+  };
+
+  const getRoleName = (idRole?: number) => {
+    const role = roles.find((r) => Number(r.idRole) === Number(idRole));
+    return role?.name || `Sin rol`;
   };
 
   const formatDate = (date?: any) => {
@@ -92,6 +102,7 @@ const MechanicPage = () => {
   const transformedMechanics: MechanicTable[] = mechanics.map((m) => ({
     ...m,
     dateFormatted: formatDate(m.dateBirth),
+    roleName : getRoleName (m.role.idRole)
   }));
 
   useEffect(() => {
@@ -135,6 +146,7 @@ const MechanicPage = () => {
     { key: "corporateEmail", label: "Correo Corporativo" },
     { key: "certLevel", label: "Nivel de Certificación" },
     { key: "specialty", label: "Especialidad" },
+    {key: "roleName", label: "Rol"}
   ];
 
   return (

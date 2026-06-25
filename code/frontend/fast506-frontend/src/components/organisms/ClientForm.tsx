@@ -25,6 +25,8 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
     };
   });
   const [errors, setErrors] = useState<Partial<Record<keyof Client, string>>>({});
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
   const [roles, setRoles] = useState<Role[]>([]);
 
   useEffect(() => {
@@ -39,7 +41,24 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
     loadRoles();
   }, []);
 
+  useEffect(() => {
+    if (clientToEdit?.profileImage) {
+      setImagePreview(
+        clientToEdit.profileImage.startsWith("http")
+          ? clientToEdit.profileImage
+          : `http://localhost:8080/${clientToEdit.profileImage}`
+      );
+    }
+  }, [clientToEdit]);
+
   const commInterestOptions = ["Sedán", "SUV", "Camioneta", "Deportivo", "Híbrido", "Eléctrico", "Convertible", "Todoterreno"];
+
+  const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImage(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -66,8 +85,8 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
     if (!form.name || !lettersOnly.test(form.name) || form.name.length > 50) {
       newErrors.name = "Nombre inválido: solo letras y espacios, máximo 50 caracteres.";
     }
-    if (form.id === undefined || form.id === null || !numericOnly.test(form.id.toString()) || form.id.toString().length < 5 || form.id.toString().length > 20) {
-      newErrors.id = "Cédula inválida: debe ser numérica, entre 5 y 20 dígitos.";
+    if (form.id === undefined || form.id === null || !numericOnly.test(form.id.toString()) || form.id.toString().length !== 9) {
+      newErrors.id = "Cédula inválida: debe ser numérica y tener exactamente 9 dígitos.";
     }
     if (!form.email || !emailRegex.test(form.email) || form.email.length > 100) {
       newErrors.email = "Email inválido: ingrese un email válido, máximo 100 caracteres.";
@@ -75,14 +94,11 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
     if (!form.password || form.password.length < 8 || form.password.length > 100 || !/[A-Z]/.test(form.password) || !/[a-z]/.test(form.password) || !/[0-9]/.test(form.password) || !/[!@#$%^&*(),.?":{}|<>]/.test(form.password)) {
       newErrors.password = "Contraseña inválida: debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial.";
     }
-    if (form.phoneNumber && (!numericOnly.test(form.phoneNumber.toString()) || form.phoneNumber.toString().length > 15)) {
-      newErrors.phoneNumber = "El número de teléfono debe ser numérico y tener máximo 15 dígitos.";
+    if (!form.phoneNumber || !numericOnly.test(form.phoneNumber.toString()) || form.phoneNumber.toString().length !== 8) {
+      newErrors.phoneNumber = "El número de teléfono debe ser numérico y tener exactamente 8 dígitos.";
     }
     if (!form.dateBirth || !(form.dateBirth instanceof Date) || isNaN(form.dateBirth.valueOf()) || form.dateBirth > today) {
       newErrors.dateBirth = "Fecha de nacimiento inválida.";
-    }
-    if (form.profileImage && form.profileImage.length > 200) {
-      newErrors.profileImage = "La URL de la imagen debe tener máximo 200 caracteres.";
     }
     if (!form.commInterest || !commInterestOptions.includes(form.commInterest.toString())) {
       newErrors.commInterest = "Seleccione un interés válido.";
@@ -94,18 +110,46 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
 
   const handleSubmit = async () => {
     if (!validate()) return;
+
+    const formData = new FormData();
+    formData.append("name", form.name || "");
+    formData.append("id", form.id?.toString() || "");
+    formData.append("email", form.email || "");
+    formData.append("password", form.password || "");
+    formData.append("phoneNumber", form.phoneNumber?.toString() || "");
+    formData.append(
+      "dateBirth",
+      form.dateBirth instanceof Date
+        ? form.dateBirth.toISOString().split("T")[0]
+        : ""
+    );
+    formData.append("isActive", form.isActive ? "true" : "false");
+    if (form.role?.idRole) formData.append("idRole", form.role.idRole.toString());
+    if (form.commInterest) formData.append("commInterest", form.commInterest);
+    if (form.physicalAddress) formData.append("physicalAddress", form.physicalAddress);
+    if (form.occupation) formData.append("occupation", form.occupation);
+    if (clientToEdit?.idUser) formData.append("idUser", clientToEdit.idUser.toString());
+    if (image) formData.append("profileImage", image);
+
     try {
       if (clientToEdit) {
-        await updateClient(form as Client);
+        await updateClient(formData);
         AlertSuccess("Cliente actualizado correctamente");
       } else {
-        await create(form as Client);
+        await create(formData);
         AlertSuccess("Cliente creado correctamente");
       }
       onRefresh();
       onClose();
     } catch (error) {
-      AlertWarning("Error al guardar");
+      const msg = error instanceof Error ? error.message : "";
+      if (msg.includes("cédula ya está")) {
+        AlertWarning("La cédula ingresada ya está registrada. Use una cédula diferente.");
+      } else if (msg.includes("correo") && msg.includes("ya está")) {
+        AlertWarning("El correo electrónico ya está en uso. Use un correo diferente.");
+      } else {
+        AlertWarning("Error al guardar el cliente. Verifique los datos e intente de nuevo.");
+      }
     }
   };
 
@@ -185,14 +229,16 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
         </div>
 
         <div className="mb-3">
-          <FormField
-            label="Foto de perfil:"
-            name="profileImage"
-            placeholder="Foto de perfil"
-            value={form.profileImage || ""}
-            onChange={handleChange}
-          />
-          {errors.profileImage && <div className="invalid-feedback d-block">{errors.profileImage}</div>}
+          <label>Foto de perfil</label>
+          <input type="file" className="form-control" accept="image/*" onChange={handleImage} />
+          {imagePreview && (
+            <img
+              src={imagePreview}
+              alt="preview"
+              className="mt-2 rounded"
+              style={{ width: "100%", maxHeight: "200px", objectFit: "cover" }}
+            />
+          )}
         </div>
 
         <div className="mb-3">
@@ -248,20 +294,19 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
         </div>
 
         <div className="text-center mt-4">
-           <Button
+          <Button
             label="Guardar"
             onClick={handleSubmit}
-            backgroundColor="#198754"    
-            hoverColor="#145c32"         
-            color="#fff"     
-            className="btn btn-success me-2"            
+            backgroundColor="#198754"
+            hoverColor="#145c32"
+            color="#fff"
+            className="btn btn-success me-2"
           />
-
           <Button
             label="Cancelar"
             onClick={onClose}
-            backgroundColor="#6c757d"    
-            hoverColor="#495057"         
+            backgroundColor="#6c757d"
+            hoverColor="#495057"
             color="#fff"
             className="btn btn-secondary"
           />

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
@@ -9,6 +9,8 @@ import AlertSuccess from "../atoms/AlertSuccess";
 import { create } from "../../services/ClientService";
 import FormField from "../molecules/FormField";
 import Button from "../atoms/Button";
+import * as RoleService from "../../services/RoleService";
+
 
 type RegisterForm = Partial<Client> & { confirmPassword?: string };
 
@@ -19,6 +21,20 @@ const RegisterForm = () => {
   const [errors, setErrors] = useState<
     Partial<Record<keyof Client | "confirmPassword", string>>
   >({});
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const [clientRoleId, setClientRoleId] = useState<number | null>(null);
+
+  useEffect(() => {
+    RoleService.getAll()
+      .then((roles) => {
+        const clientRole = roles.find(
+          (r: { name: string }) => r.name?.toLowerCase() === "cliente"
+        );
+        if (clientRole) setClientRoleId(clientRole.idRole);
+      })
+      .catch(() => {});
+  }, []);
 
   const commInterestOptions = [
     "Sedán",
@@ -30,6 +46,13 @@ const RegisterForm = () => {
     "Convertible",
     "Todoterreno",
   ];
+
+  const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImage(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -62,11 +85,10 @@ const RegisterForm = () => {
       form.id === undefined ||
       form.id === null ||
       !numericOnly.test(form.id.toString()) ||
-      form.id.toString().length < 5 ||
-      form.id.toString().length > 20
+      form.id.toString().length !== 9
     )
       newErrors.id =
-        "Cédula inválida: debe ser numérica, entre 5 y 20 dígitos.";
+        "Cédula inválida: debe ser numérica y tener exactamente 9 dígitos.";
 
     if (!form.email || !emailRegex.test(form.email) || form.email.length > 100)
       newErrors.email =
@@ -88,12 +110,12 @@ const RegisterForm = () => {
       newErrors.confirmPassword = "Las contraseñas no coinciden.";
 
     if (
-      form.phoneNumber &&
-      (!numericOnly.test(form.phoneNumber.toString()) ||
-        form.phoneNumber.toString().length > 15)
+      !form.phoneNumber ||
+      !numericOnly.test(form.phoneNumber.toString()) ||
+      form.phoneNumber.toString().length !== 8
     )
       newErrors.phoneNumber =
-        "El número de teléfono debe ser numérico y tener máximo 15 dígitos.";
+        "El número de teléfono debe ser numérico y tener exactamente 8 dígitos.";
 
     if (
       !form.dateBirth ||
@@ -103,9 +125,6 @@ const RegisterForm = () => {
     )
       newErrors.dateBirth = "Fecha de nacimiento inválida.";
 
-    if (form.profileImage && form.profileImage.length > 200)
-      newErrors.profileImage =
-        "La URL de la imagen debe tener máximo 200 caracteres.";
 
     if (
       !form.commInterest ||
@@ -121,12 +140,37 @@ const RegisterForm = () => {
     if (!validate()) return;
     setLoading(true);
     try {
-      const { confirmPassword, ...clientData } = form;
-      await create(clientData as Client);
+      const formData = new FormData();
+      formData.append("name", form.name || "");
+      formData.append("id", form.id?.toString() || "");
+      formData.append("email", form.email || "");
+      formData.append("password", form.password || "");
+      formData.append("phoneNumber", form.phoneNumber?.toString() || "");
+      formData.append(
+        "dateBirth",
+        form.dateBirth instanceof Date
+          ? form.dateBirth.toISOString().split("T")[0]
+          : ""
+      );
+      formData.append("isActive", "true");
+      if (clientRoleId) formData.append("idRole", clientRoleId.toString());
+      if (form.commInterest) formData.append("commInterest", form.commInterest);
+      if (form.physicalAddress) formData.append("physicalAddress", form.physicalAddress);
+      if (form.occupation) formData.append("occupation", form.occupation);
+      if (image) formData.append("profileImage", image);
+
+      await create(formData);
       AlertSuccess("Cuenta creada correctamente");
       navigate("/login");
-    } catch {
-      AlertWarning("Error al crear la cuenta");
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : "";
+      if (msg.includes("cédula ya está")) {
+        AlertWarning("La cédula ingresada ya está registrada. Use una cédula diferente.");
+      } else if (msg.includes("correo") && msg.includes("ya está")) {
+        AlertWarning("El correo electrónico ya está en uso. Use un correo diferente.");
+      } else {
+        AlertWarning("Error al crear la cuenta. Verifique los datos e intente de nuevo.");
+      }
     } finally {
       setLoading(false);
     }
@@ -284,18 +328,23 @@ const RegisterForm = () => {
                       )}
                     </div>
                     <div className="col-md-6">
-                      <FormField
-                        label="Foto de perfil:"
-                        name="profileImage"
-                        placeholder="URL de imagen"
-                        value={form.profileImage || ""}
-                        onChange={handleChange}
+                      <label className="form-label fw-semibold" style={{ color: "#2C3E50" }}>
+                        Foto de perfil:
+                      </label>
+                      <input
+                        type="file"
+                        className="form-control"
+                        accept="image/*"
+                        onChange={handleImage}
                         disabled={loading}
                       />
-                      {errors.profileImage && (
-                        <div className="invalid-feedback d-block">
-                          {errors.profileImage}
-                        </div>
+                      {imagePreview && (
+                        <img
+                          src={imagePreview}
+                          alt="preview"
+                          className="mt-2 rounded"
+                          style={{ width: "100%", maxHeight: "150px", objectFit: "cover" }}
+                        />
                       )}
                     </div>
                   </div>

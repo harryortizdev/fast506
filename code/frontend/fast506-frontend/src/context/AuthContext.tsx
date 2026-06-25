@@ -14,6 +14,7 @@ export interface AuthUser {
   email: string;
   roleId: number | null;
   roleName: string | null;
+  profileImage: string | null;
   permissions: Permission[];
 }
 
@@ -23,6 +24,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   hasPermission: (module: string, action?: 'read' | 'create' | 'update' | 'delete') => boolean;
+  updateUser: (partial: Partial<Pick<AuthUser, 'name' | 'email' | 'profileImage'>>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -64,6 +66,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(null);
   };
 
+  const updateUser = (partial: Partial<Pick<AuthUser, 'name' | 'email' | 'profileImage'>>) => {
+    setUser(prev => prev ? { ...prev, ...partial } : prev);
+  };
+
   const hasPermission = (module: string, action: 'read' | 'create' | 'update' | 'delete' = 'read'): boolean => {
     if (!user?.permissions) return false;
     const perm = user.permissions.find(p => p.idModule === module);
@@ -77,7 +83,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, hasPermission }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, hasPermission, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

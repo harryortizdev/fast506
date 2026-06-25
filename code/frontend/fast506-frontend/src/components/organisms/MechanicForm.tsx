@@ -25,6 +25,8 @@ const MechanicForm = ({ onClose, onRefresh, mechanicToEdit }: MechanicFormProps)
     };
   });
   const [errors, setErrors] = useState<Partial<Record<keyof Mechanic, string>>>({});
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
   const [roles, setRoles] = useState<Role[]>([]);
 
   useEffect(() => {
@@ -39,8 +41,25 @@ const MechanicForm = ({ onClose, onRefresh, mechanicToEdit }: MechanicFormProps)
     loadRoles();
   }, []);
 
+  useEffect(() => {
+    if (mechanicToEdit?.profileImage) {
+      setImagePreview(
+        mechanicToEdit.profileImage.startsWith("http")
+          ? mechanicToEdit.profileImage
+          : `http://localhost:8080/${mechanicToEdit.profileImage}`
+      );
+    }
+  }, [mechanicToEdit]);
+
   const specialtyOptions = ["Motor", "Transmisión", "Electricidad", "Suspensión", "Frenos"];
   const certLevelOptions = ["Básico", "Intermedio", "Avanzado", "Experto"];
+
+  const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImage(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -77,14 +96,11 @@ const MechanicForm = ({ onClose, onRefresh, mechanicToEdit }: MechanicFormProps)
     if (!form.password || form.password.length < 8 || form.password.length > 100 || !/[A-Z]/.test(form.password) || !/[a-z]/.test(form.password) || !/[0-9]/.test(form.password) || !/[!@#$%^&*(),.?":{}|<>]/.test(form.password)) {
       newErrors.password = "Contraseña inválida: debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial.";
     }
-    if (form.phoneNumber && (!numericOnly.test(form.phoneNumber.toString()) || form.phoneNumber.toString().length !== 8)) {
+    if (!form.phoneNumber || !numericOnly.test(form.phoneNumber.toString()) || form.phoneNumber.toString().length !== 8) {
       newErrors.phoneNumber = "El número de teléfono debe ser numérico y tener exactamente 8 dígitos.";
     }
     if (!form.dateBirth || !(form.dateBirth instanceof Date) || isNaN(form.dateBirth.valueOf()) || form.dateBirth > today) {
       newErrors.dateBirth = "Fecha de nacimiento inválida.";
-    }
-    if (form.profileImage && form.profileImage.length > 200) {
-      newErrors.profileImage = "La URL de la imagen debe tener máximo 200 caracteres.";
     }
     if (form.employeeId === undefined || form.employeeId === null || !alphanumeric.test(form.employeeId.toString()) || form.employeeId.toString().length > 20) {
       newErrors.employeeId = "Identificación de empleado inválida: solo letras y números, máximo 20 caracteres.";
@@ -106,18 +122,47 @@ const MechanicForm = ({ onClose, onRefresh, mechanicToEdit }: MechanicFormProps)
 
   const handleSubmit = async () => {
     if (!validate()) return;
+
+    const formData = new FormData();
+    formData.append("name", form.name || "");
+    formData.append("id", form.id?.toString() || "");
+    formData.append("email", form.email || "");
+    formData.append("password", form.password || "");
+    formData.append("phoneNumber", form.phoneNumber?.toString() || "");
+    formData.append(
+      "dateBirth",
+      form.dateBirth instanceof Date
+        ? form.dateBirth.toISOString().split("T")[0]
+        : ""
+    );
+    formData.append("isActive", form.isActive ? "true" : "false");
+    if (form.role?.idRole) formData.append("idRole", form.role.idRole.toString());
+    formData.append("employeeId", form.employeeId || "");
+    if (form.corporateEmail) formData.append("corporateEmail", form.corporateEmail);
+    if (form.specialty) formData.append("specialty", form.specialty);
+    if (form.certLevel) formData.append("certLevel", form.certLevel);
+    if (mechanicToEdit?.idUser) formData.append("idUser", mechanicToEdit.idUser.toString());
+    if (image) formData.append("profileImage", image);
+
     try {
       if (mechanicToEdit) {
-        await updateMechanic(form as Mechanic);
+        await updateMechanic(formData);
         AlertSuccess("Mecánico actualizado correctamente");
       } else {
-        await create(form as Mechanic);
+        await create(formData);
         AlertSuccess("Mecánico creado correctamente");
       }
       onRefresh();
       onClose();
     } catch (error) {
-      AlertWarning("Error al guardar");
+      const msg = error instanceof Error ? error.message : "";
+      if (msg.includes("cédula ya está")) {
+        AlertWarning("La cédula ingresada ya está registrada. Use una cédula diferente.");
+      } else if (msg.includes("correo") && msg.includes("ya está")) {
+        AlertWarning("El correo electrónico ya está en uso. Use un correo diferente.");
+      } else {
+        AlertWarning("Error al guardar el mecánico. Verifique los datos e intente de nuevo.");
+      }
     }
   };
 
@@ -197,14 +242,16 @@ const MechanicForm = ({ onClose, onRefresh, mechanicToEdit }: MechanicFormProps)
         </div>
 
         <div className="mb-3">
-          <FormField
-            label="Foto de perfil:"
-            name="profileImage"
-            placeholder="Foto de perfil"
-            value={form.profileImage || ""}
-            onChange={handleChange}
-          />
-          {errors.profileImage && <div className="invalid-feedback d-block">{errors.profileImage}</div>}
+          <label>Foto de perfil</label>
+          <input type="file" className="form-control" accept="image/*" onChange={handleImage} />
+          {imagePreview && (
+            <img
+              src={imagePreview}
+              alt="preview"
+              className="mt-2 rounded"
+              style={{ width: "100%", maxHeight: "200px", objectFit: "cover" }}
+            />
+          )}
         </div>
 
         <div className="mb-3">
@@ -279,20 +326,19 @@ const MechanicForm = ({ onClose, onRefresh, mechanicToEdit }: MechanicFormProps)
         </div>
 
         <div className="text-center mt-4">
-             <Button
+          <Button
             label="Guardar"
             onClick={handleSubmit}
-            backgroundColor="#198754"    
-            hoverColor="#145c32"         
-            color="#fff"     
-            className="btn btn-success me-2"            
+            backgroundColor="#198754"
+            hoverColor="#145c32"
+            color="#fff"
+            className="btn btn-success me-2"
           />
-
           <Button
             label="Cancelar"
             onClick={onClose}
-            backgroundColor="#6c757d"    
-            hoverColor="#495057"         
+            backgroundColor="#6c757d"
+            hoverColor="#495057"
             color="#fff"
             className="btn btn-secondary"
           />

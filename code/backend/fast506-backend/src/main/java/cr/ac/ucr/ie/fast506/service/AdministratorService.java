@@ -2,11 +2,19 @@ package cr.ac.ucr.ie.fast506.service;
 
 import cr.ac.ucr.ie.fast506.dao_implement.AdministratorDAOImplement;
 import cr.ac.ucr.ie.fast506.domain.Administrator;
+import cr.ac.ucr.ie.fast506.domain.Role;
 import cr.ac.ucr.ie.fast506.repository.AdministratorRespository;
-import java.util.LinkedList;
+import cr.ac.ucr.ie.fast506.repository.UserRepository;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class AdministratorService {
@@ -17,43 +25,103 @@ public class AdministratorService {
     @Autowired
     private AdministratorRespository adminRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    private final String uploadDir = "uploads/";
+
     public List<Administrator> getAll() {
-
         return adminRepository.getAll();
-
     }
 
-    public void add(Administrator admin) {
-
-        if (existsByEmail(admin.getEmail())) {
-            throw new IllegalArgumentException("El correo electrónico ya está registrado.");
+    public void add(String name, int id, String email, String password, String phoneNumber,
+                    String dateBirth, boolean isActive, Integer idRole, String employeeId,
+                    String corporateEmail, MultipartFile profileImage) throws IOException {
+        if (userRepository.findByIdEquals(id).isPresent()) {
+            throw new IllegalArgumentException("La cédula ya está registrada. Use una cédula diferente.");
         }
-        validate(admin);
-        admin.setIsActive(true);
-        adminRepository.save(admin);
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new IllegalArgumentException("El correo electrónico ya está registrado. Use un correo diferente.");
+        }
 
+        Administrator admin = buildAdministrator(0, name, id, email, password, phoneNumber,
+                dateBirth, isActive, idRole, employeeId, corporateEmail);
+
+        validate(admin);
+
+        if (profileImage != null && !profileImage.isEmpty()) {
+            admin.setProfileImage(saveImage(profileImage));
+        }
+
+        adminRepository.save(admin);
     }
 
     public void deleteById(int id) {
-
         adminRepository.deleteAdministrator(id);
-
     }
 
-    public void update(Administrator admin) {
+    public void update(int idUser, String name, int id, String email, String password, String phoneNumber,
+                       String dateBirth, boolean isActive, Integer idRole, String employeeId,
+                       String corporateEmail, MultipartFile profileImage) throws IOException {
+
+        Administrator admin = buildAdministrator(idUser, name, id, email, password, phoneNumber,
+                dateBirth, isActive, idRole, employeeId, corporateEmail);
 
         validate(admin);
-        admin.setIsActive(true);
-        adminRepository.save(admin);
 
+        if (profileImage != null && !profileImage.isEmpty()) {
+            Administrator existing = adminRepository.findById(idUser).orElse(null);
+            if (existing != null && existing.getProfileImage() != null) {
+                Files.deleteIfExists(Paths.get(existing.getProfileImage()));
+            }
+            admin.setProfileImage(saveImage(profileImage));
+        } else {
+            Administrator existing = adminRepository.findById(idUser).orElse(null);
+            if (existing != null) {
+                admin.setProfileImage(existing.getProfileImage());
+            }
+        }
+
+        adminRepository.save(admin);
     }
+
+    private Administrator buildAdministrator(int idUser, String name, int id, String email,
+                                              String password, String phoneNumber, String dateBirth,
+                                              boolean isActive, Integer idRole, String employeeId,
+                                              String corporateEmail) {
+        Administrator admin = new Administrator();
+        if (idUser != 0) admin.setIdUser(idUser);
+        admin.setName(name);
+        admin.setId(id);
+        admin.setEmail(email);
+        admin.setPassword(password);
+        admin.setPhoneNumber(phoneNumber);
+        admin.setDateBirth(LocalDate.parse(dateBirth));
+        admin.setIsActive(isActive);
+        admin.setEmployeeId(employeeId);
+        if (corporateEmail != null && !corporateEmail.isBlank()) {
+            admin.setCorporateEmail(corporateEmail);
+        }
+        if (idRole != null) {
+            Role role = new Role();
+            role.setIdRole(idRole);
+            admin.setRole(role);
+        }
+        return admin;
+    }
+
+    private String saveImage(MultipartFile image) throws IOException {
+        String fileName = UUID.randomUUID() + "_" + image.getOriginalFilename();
+        Path path = Paths.get(uploadDir + fileName);
+        Files.createDirectories(path.getParent());
+        Files.write(path, image.getBytes());
+        return "uploads/" + fileName;
+    }
+
+
 
     public Administrator findByEmailAndPassword(String email, String password) {
         return adminRepository.findByEmailAndPassword(email, password);
-    }
-
-    public boolean existsByEmail(String email) {
-        return adminRepository.findByEmailAndPassword(email, "") != null;
     }
 
     private void validate(Administrator admin) {

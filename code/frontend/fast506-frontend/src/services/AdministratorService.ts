@@ -10,30 +10,19 @@ export const getAll = async () => {
 }
 
 // Fetch add
-
-export const create = async (administrator: Partial<Administrator>) => {
-   
-
-
+export const create = async (formData: FormData) => {
     const res = await fetch(`${API_URL}/create`, {
         method: 'POST',
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(administrator),
+        body: formData,
     });
     if (!res.ok) {
-        
-        console.error("Respuesta del servidor:", res.status, res.statusText);
         const errorText = await res.text();
-        console.error("Error del servidor:", errorText);
-        throw new Error(`Error creating administrator: ${res.statusText}`);
-        
+        throw new Error(errorText);
     }
     return res.text();
-
 };
 
 // Fetch delete
-
 export const deleteAdministrator = async (id: number) => {
 
     const res = await fetch(`${API_URL}/delete?id=${id}`, {
@@ -47,22 +36,14 @@ export const deleteAdministrator = async (id: number) => {
 };
 
 // Fetch update
-
-export const updateAdministrator = async (administrator: Administrator) => {
-
-    console.log("Datos enviados en PUT:", administrator);
+export const updateAdministrator = async (formData: FormData) => {
     const res = await fetch(`${API_URL}/update`, {
-
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(administrator),
-
+        body: formData,
     });
-    console.log("Respuesta del servidor:", res.status, res.statusText);
     if (!res.ok) {
         const errorText = await res.text();
-        console.log("Error del servidor:", errorText);
-        throw new Error(`Error updating administrator: ${res.statusText}`);
+        throw new Error(errorText);
     }
 
     return res.text();
@@ -70,7 +51,7 @@ export const updateAdministrator = async (administrator: Administrator) => {
 };
 
 //login Sales
- 
+
 export const login = async (email: string, password: string): Promise<Administrator> => {
   const res = await fetch(`${API_URL}/login`, {
     method: "POST",

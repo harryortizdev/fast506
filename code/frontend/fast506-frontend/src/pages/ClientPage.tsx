@@ -4,6 +4,8 @@ import ClientForm from "../components/organisms/ClientForm";
 import TableGeneric from "../components/organisms/TableGeneric";
 import { getAll, deleteClient } from "../services/ClientService";
 import { Client } from "../models/Client";
+import { Role } from "../models/Role";
+import * as RoleService from "../services/RoleService";
 import ButtonIcon from "../components/molecules/ButtonIcon";
 import Navbar from "../components/organisms/Navbar";
 import Footer from "../components/organisms/Footer";
@@ -13,10 +15,12 @@ import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
 
 type ClientTable = Client & {
   dateFormatted: string;
+  roleName: string;
 };
 
 const ClientPage = () => {
   const [clients, setClients] = useState<Client[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [clientToEdit, setClientToEdit] = useState<Client | undefined>(
     undefined,
@@ -30,6 +34,7 @@ const ClientPage = () => {
 
   useEffect(() => {
     loadClients();
+    RoleService.getAll().then(setRoles);
   }, []);
 
   const handleSaveAndClose = async () => {
@@ -89,9 +94,15 @@ const ClientPage = () => {
     return formatted.charAt(0).toUpperCase() + formatted.slice(1);
   };
 
+  const getRoleName = (idRole?: number) => {
+    const role = roles.find((r) => Number(r.idRole) === Number(idRole));
+    return role?.name || `Sin rol`;
+  };
+
   const transformedClient: ClientTable[] = clients.map((c) => ({
     ...c,
     dateFormatted: formatDate(c.dateBirth),
+    roleName: getRoleName(c.role?.idRole),
   }));
 
   useEffect(() => {
@@ -133,6 +144,7 @@ const ClientPage = () => {
     { key: "profileImage", label: "Foto de Perfil" },
     { key: "commInterest", label: "Intereses" },
     { key: "physicalAddress", label: "Dirección Física" },
+    { key: "roleName", label: "Rol" },
   ];
 
   return (

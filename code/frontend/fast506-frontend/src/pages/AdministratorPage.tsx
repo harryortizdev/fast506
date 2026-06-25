@@ -4,6 +4,8 @@ import AdministratorForm from "../components/organisms/AdministratorForm";
 import TableGeneric from "../components/organisms/TableGeneric";
 import { getAll, deleteAdministrator } from "../services/AdministratorService";
 import { Administrator } from "../models/Administrator";
+import { Role } from "../models/Role";
+import * as RoleService from "../services/RoleService";
 import Navbar from "../components/organisms/Navbar";
 import Footer from "../components/organisms/Footer";
 import AlertConfirm from "../components/atoms/AlertConfirm";
@@ -12,10 +14,12 @@ import DataTable from "datatables.net-bs5";
 import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
 
 type AdminTable = Administrator & {
-  dateFormatted : string;
+  dateFormatted: string;
+  roleName: string;
 };
 const AdministratorPage = () => {
   const [administrators, setAdministrators] = useState<Administrator[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [administratorToEdit, setAdministratorToEdit] = useState<
     Administrator | undefined
@@ -30,6 +34,7 @@ const AdministratorPage = () => {
 
   useEffect(() => {
     loadAdministrators();
+    RoleService.getAll().then(setRoles);
   }, []);
 
   const handleSaveAndClose = async () => {
@@ -89,9 +94,15 @@ const AdministratorPage = () => {
     return formatted.charAt(0).toUpperCase() + formatted.slice(1);
   };
 
+  const getRoleName = (idRole?: number) => {
+    const role = roles.find((r) => Number(r.idRole) === Number(idRole));
+    return role?.name || `Sin rol`;
+  };
+
   const transformedAdmins: AdminTable[] = administrators.map((a) => ({
     ...a,
     dateFormatted: formatDate(a.dateBirth),
+    roleName: getRoleName(a.role?.idRole),
   }));
 
   useEffect(() => {
@@ -133,6 +144,7 @@ const AdministratorPage = () => {
     { key: "profileImage", label: "Foto de Perfil" },
     { key: "employeeId", label: "ID de Empleado" },
     { key: "corporateEmail", label: "Correo Corporativo" },
+    { key: "roleName", label: "Rol" },
   ];
 
   return (
