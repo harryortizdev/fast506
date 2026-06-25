@@ -13,6 +13,8 @@ import { Unit } from "../models/Unit";
 import { getAll as getAllClients } from "../services/ClientService";
 import { getAll as getAllUnits } from "../services/UnitService";
 import { getAll as getAllAdmins } from "../services/AdministratorService";
+import DataTable from "datatables.net-bs5";
+import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
 
 type SalesTable = Sales & {
   transactionDateFormatted: string;      // Para el día/mes/año
@@ -55,17 +57,41 @@ const SalesPage = () => {
         loadDetails();
     }, []);
 
+    useEffect(() => {
+        let table: any;
+
+        if (sales.length > 0) {
+            table = new DataTable('#myTable', {
+                language: {
+                    search: "Buscar:",
+                    searchPlaceholder: "Escribe aquí...",
+                    lengthMenu: "Mostrar _MENU_ registros",
+                    info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                    infoEmpty: "No hay registros",
+                    zeroRecords: "No se encontraron resultados",
+        
+                }
+            });
+        }
+        return () => {
+            if (table) {
+                table.destroy();
+            }
+        };
+    }, [sales]);
+
     const handleDelete = async (sales: Sales) => {
         if (!sales.idSales) return;
-        const confirmar = await AlertConfirm(`¿Desea eliminar el vehículo ${sales.idSales}?`
-        );
+        const confirmar = await AlertConfirm(`¿Desea eliminar la venta ${sales.invoiceNumber}?`);
         if (!confirmar) return;
         await deleteSales(sales.idSales);
         await loadCatalogs();
         await loadDetails();
     };
 
-    const handleEdit = (sales: Sales) => {
+    const handleEdit = async (sales: Sales) => {
+        const confirmar = await AlertConfirm(`¿Desea editar la venta ${sales.invoiceNumber}?`);
+        if (!confirmar) return;
         setSelectedSales(sales);
         setShowForm(true);
     };
@@ -109,7 +135,7 @@ const SalesPage = () => {
       year: "numeric",
     });
 
-     return formatted;
+    return formatted.charAt(0).toUpperCase() + formatted.slice(1);
     };
 
     const getClientName = (idUser?: number) => {
@@ -137,6 +163,7 @@ const SalesPage = () => {
 
 
     const columns: { key: keyof SalesTable; label: string }[] = [
+        { key: "index" as keyof SalesTable, label: "#" },
         { key: "invoiceNumber", label: "Factura" },
         { key: "transactionDateFormatted", label: "Fecha" },
         { key: "paymentMethod", label: "Método de pago" },

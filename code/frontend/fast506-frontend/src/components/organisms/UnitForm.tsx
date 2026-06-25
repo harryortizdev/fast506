@@ -285,8 +285,8 @@ const UnitForm = ({ onClose, onRefresh, unitToEdit, units }: UnitFormProps) => {
             <select className="form-select" name="stockStatus"
               value={form.stockStatus ? "true" : "false"}
               onChange={(e) => setForm({ ...form, stockStatus: e.target.value === "true" })}>
-              <option value="true">Disponible</option>
-              <option value="false">No disponible</option>
+              <option value="true">Sí</option>
+              <option value="false">No</option>
             </select>
           </div>
         )}

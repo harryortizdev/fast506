@@ -9,6 +9,8 @@ import AlertConfirm from "../components/atoms/AlertConfirm";
 import ButtonIcon from "../components/molecules/ButtonIcon";
 import { Supplier } from "../models/Supplier";
 import { getAll as getAllSuppliers } from "../services/SupplierService";
+import DataTable from "datatables.net-bs5";
+import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
 
 type UnitTable = Unit & {
   supplierName: string;           // Para el nombre del proveedor
@@ -42,6 +44,30 @@ const UnitPage = () => {
     loadDetails();//carga los proveedores
   }, []);//solo se ejecuta una vez
 
+// este es un useEffect para el datatables
+useEffect(() => {
+        let table: any;
+
+        if (units.length > 0) {
+            table = new DataTable('#myTable', {
+                language: {
+                    search: "Buscar:",
+                    searchPlaceholder: "Escribe aquí...",
+                    lengthMenu: "Mostrar _MENU_ registros",
+                    info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                    infoEmpty: "No hay registros",
+                    zeroRecords: "No se encontraron resultados",
+        
+                }
+            });
+        }
+        return () => {
+            if (table) {
+                table.destroy();
+            }
+        };
+    }, [units]);
+
   const handleSaveAndClose = async () => {
     await loadUnits();//recargo la lista actualizada
     await loadDetails();//recarga la lista actualizada
@@ -54,14 +80,16 @@ const UnitPage = () => {
     setShowForm(false);//cierro el formulario
   };
 
-  const handleEdit = (unit: Unit) => {//cuando presiono el boton editar
+  const handleEdit = async (unit: Unit) => {//cuando presiono el boton editar
+    const confirmar = await AlertConfirm(`¿Desea editar el vehículo ${unit.VIN}?`);//confirmación del usuario
+    if (!confirmar) return;//si cancela no hago nada
     setUnitToEdit(unit);//guardo la unidad que quiero editar
     setShowForm(true);//abro el formulario
   };
 
   const handleDelete = async (unit: Unit) => {// cuando presiono el boton eliminar
     if (!unit.idCar) return;//  si no tiene id no haga nada
-    const confirmar = await AlertConfirm(`¿Desea eliminar el vehículo ${unit.idCar}?`);//confirmación del usuario
+    const confirmar = await AlertConfirm(`¿Desea eliminar el vehículo ${unit.VIN}?`);//confirmación del usuario
     if (!confirmar) return;//si cancela no hago nada
     await deleteUnit(unit.idCar!);//envia la señal al backend de eliminar
     await loadUnits();//recargo la lista 
@@ -79,6 +107,7 @@ const UnitPage = () => {
   }));
 
   const columns: { key: keyof UnitTable; label: string }[] = [//defino las columnas a mostrar en la tabla
+    { key: "index" as keyof UnitTable, label: "#" },
     { key: "VIN", label: "VIN" },
     { key: "carBrand", label: "Marca" },
     { key: "carName", label: "Nombre" },

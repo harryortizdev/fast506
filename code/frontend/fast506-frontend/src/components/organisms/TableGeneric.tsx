@@ -53,6 +53,7 @@ const TableGeneric = <T extends object>({
     >
 
       <table
+        id="myTable"
         className="table table-hover align-middle"
         style={{
           minWidth: "750px",
@@ -132,13 +133,13 @@ const TableGeneric = <T extends object>({
                       fontSize: "clamp(0.8rem, 1vw, 0.95rem)",
                     }}
                   >
-
-                    {typeof item[col.key] === "boolean"
-                      ? item[col.key]
-                        ? "Sí"
-                        : "No"
-                      : String(item[col.key] ?? "")}
-
+                    {col.key === "index"
+                      ? index + 1 
+                      : typeof item[col.key] === "boolean"
+                        ? item[col.key]
+                          ? "Sí"
+                          : "No"
+                        : String(item[col.key] ?? "")}
                   </td>
 
                 ))}
@@ -196,11 +197,11 @@ const TableGeneric = <T extends object>({
                       label="Eliminar"
                       onClick={() => !disabledActions && onDelete?.(item)}
                       backgroundColor="transparent"
-                      hoverColor={disabledActions ? "#6c757d" : "#dc3545"}
-                      color={disabledActions ? "#6c757d" : "#dc3545"}
-                      icon={
-                        <i className="bi bi-trash3" />
-                      }
+                        hoverColor={disabledActions ? "#6c757d" : "#dc3545"}
+                        color={disabledActions ? "#6c757d" : "#dc3545"}
+                        icon={
+                          <i className="bi bi-trash3" />
+                        }
                       className="btn btn-outline-danger btn-sm d-flex align-items-center justify-content-center gap-2"
                       style={{
                         backgroundColor: "transparent",
