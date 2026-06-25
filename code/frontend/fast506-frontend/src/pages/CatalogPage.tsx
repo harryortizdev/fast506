@@ -7,6 +7,8 @@ import Footer from "../components/organisms/Footer";
 import AlertConfirm from "../components/atoms/AlertConfirm";
 import CatalogForm from "../components/organisms/CatalogForm";
 import ButtonIcon from "../components/molecules/ButtonIcon";
+import DataTable from "datatables.net-bs5";
+import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
 
 const CatalogPage = () => {
     const [catalogs, setCatalogs] = useState<Catalog[]>([]);
@@ -21,6 +23,30 @@ const CatalogPage = () => {
     useEffect(() => {
         loadCatalogs();
     }, []);
+
+    //para el filtro
+    useEffect(() => {
+        let table: any;
+
+        if (catalogs.length > 0) {
+            table = new DataTable('#myTable', {
+                language: {
+                    search: "Buscar:",
+                    searchPlaceholder: "Escribe aquí...",
+                    lengthMenu: "Mostrar _MENU_ registros",
+                    info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                    infoEmpty: "No hay registros",
+                    zeroRecords: "No se encontraron resultados",
+        
+                }
+            });
+        }
+        return () => {
+            if (table) {
+                table.destroy();
+            }
+        };
+    }, [catalogs]);
 
     const handleDelete = async (catalog: Catalog) => {
         if (!catalog.idCatalog) return;
@@ -48,6 +74,7 @@ const CatalogPage = () => {
     };
 
     const columns: { key: keyof Catalog; label: string }[] = [
+        { key: "index" as keyof Catalog, label: "#" }, 
         { key: "carName", label: "Nombre" },
         { key: "brandName", label: "Marca" },
         { key: "bodyWork", label: "Carrocería" },

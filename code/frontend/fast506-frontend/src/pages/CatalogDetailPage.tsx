@@ -19,16 +19,29 @@ const CatalogDetailPage = () => {
     const [catalog, setCatalog] = useState<Catalog | null>(null);
     const [loading, setLoading] = useState(true);
     const [colors, setColors] = useState<string[]>([]);
+    const [error, setError] = useState(false);
 
     useEffect(() => {
-        if (id) {
-            getCatalogById(Number(id))
-                .then(setCatalog)
-                .finally(() => setLoading(false));
+        if (!id) return;
 
-            getColorByCatalog(Number(id))
-                .then((data) => setColors(data.map((c) => c.color)));
-        }
+        setLoading(true);
+        setError(false);
+
+        getCatalogById(Number(id))
+            .then((data) => {
+                if (!data) {
+                    setError(true);
+                    return;
+                }
+                setCatalog(data);
+            })
+            .catch(() => setError(true))
+            .finally(() => setLoading(false));
+
+        getColorByCatalog(Number(id))
+            .then((data) => setColors(data.map((c) => c.color)))
+            .catch(() => setColors([]));
+
     }, [id]);
 
     if (loading) {
@@ -39,6 +52,36 @@ const CatalogDetailPage = () => {
         );
     }
 
+    if (error) {
+        return (
+            <>
+                <Navbar />
+
+                <div style={{
+                    minHeight: "70vh",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                    backgroundColor: "#EEF1EF"
+                }}>
+                    <i className="bi bi-emoji-frown" style={{ fontSize: "4rem", color: "#1A2633" }} />
+
+                    <h2 style={{ color: "#1A2633" }}>
+                        Ups... algo salió mal
+                    </h2>
+
+                    <p style={{ color: "#5E6572" }}>
+                        No se encontró el vehículo que estás buscando
+                    </p>
+
+                </div>
+
+                <Footer />
+            </>
+        );
+    }
     if (!catalog) return null;
 
     const whatsappNumber = "50661186130";
