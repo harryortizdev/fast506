@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import DataTable from "datatables.net-bs5";
+import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
 import { useLocation } from "react-router-dom";
 import RepairReportForm from "../components/organisms/RepairReportForm";
 import TableGeneric from "../components/organisms/TableGeneric";
@@ -11,11 +13,14 @@ import Navbar from "../components/organisms/Navbar";
 import Footer from "../components/organisms/Footer";
 import AlertConfirm from "../components/atoms/AlertConfirm";
 import ButtonIcon from "../components/molecules/ButtonIcon";
+import { deduplicateByKey } from "../utils/arrayUtils";
+import { filterWorkshopSchedulesWithoutReport } from "../utils/repairReportUtils";
 
 type RepairReportTable = RepairReport & {
   completionDateFormatted: string;
   mechanicName: string;
   appointmentLabel: string;
+  rowNumber: number;
 };
 
 type WorkshopScheduleTable = {
@@ -25,6 +30,7 @@ type WorkshopScheduleTable = {
   entryDate: string;
   reasonService: string;
   receptionMileage: number;
+  rowNumber: number;
 };
 
 const RepairReportPage = () => {
@@ -37,6 +43,7 @@ const RepairReportPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [repairReportToEdit, setRepairReportToEdit] =
     useState<RepairReport | undefined>(undefined);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const [idAppointmentFromState, setIdAppointmentFromState] =
     useState<number | null>(null);
@@ -136,20 +143,23 @@ const formatDate = (date?: any) => {
     return `#${appointment.numberReference} - ${appointment.licensePlate}`;
   };
 
-  const transformedReports: RepairReportTable[] = repairReports.map((report) => ({
+  const activeRepairReports = deduplicateByKey(
+    repairReports.filter((report) => report.isActive !== false),
+    "idReparation"
+  );
+
+  const transformedReports: RepairReportTable[] = activeRepairReports.map((report, index) => ({
     ...report,
     completionDateFormatted: formatDate(report.completionDate),
     mechanicName: getMechanicName(report.idMechanic),
     appointmentLabel: getAppointmentLabel(report.idAppointment),
+    rowNumber: index + 1,
   }));
 
-  const appointmentsWithReport = new Set(
-    repairReports.map((report) => Number(report.idAppointment))
-  );
-
-  const workshopSchedulesWithoutReport = workshopSchedules
-  .filter((ws) => !appointmentsWithReport.has(Number(ws.idAppointment)))
-  .map((ws) => ({
+  const workshopSchedulesWithoutReport = filterWorkshopSchedulesWithoutReport(
+    activeRepairReports,
+    deduplicateByKey(workshopSchedules, "idAppointment")
+  ).map((ws, index) => ({
     idAppointment: ws.idAppointment,
     numberReference: ws.numberReference,
     licensePlate: ws.licensePlate,
@@ -157,6 +167,7 @@ const formatDate = (date?: any) => {
     reasonService: ws.reasonService,
     receptionMileage: ws.receptionMileage,
     disabled: true,
+    rowNumber: index + 1,
   }));
 
   const handleSaveAndClose = async () => {
@@ -164,6 +175,7 @@ const formatDate = (date?: any) => {
     await loadMechanics();
     await loadWorkshopSchedules();
 
+    setRefreshKey((prev) => prev + 1);
     setRepairReportToEdit(undefined);
     setShowForm(false);
     setIdAppointmentFromState(null);
@@ -192,12 +204,69 @@ const formatDate = (date?: any) => {
     await deleteRepairReport(repairReport.idReparation);
     await loadRepairReports();
     await loadWorkshopSchedules();
+    setRefreshKey((prev) => prev + 1);
   };
 
 
 
+  useEffect(() => {
+    if (showForm || workshopSchedulesWithoutReport.length === 0) return;
+
+    const appointmentsTableElement = document.querySelector("#repairAppointmentsTable table");
+    if (!appointmentsTableElement) return;
+
+    const hasRows = (appointmentsTableElement as HTMLTableElement).querySelector("tbody tr") !== null;
+    if (!hasRows) return;
+
+    const appointmentsTable = new DataTable(appointmentsTableElement as Element, {
+      destroy: true,
+      language: {
+        search: "Buscar:",
+        searchPlaceholder: "Escribe aquí...",
+        lengthMenu: "Mostrar _MENU_ registros",
+        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        infoEmpty: "No hay registros",
+        zeroRecords: "No se encontraron resultados",
+      },
+      pageLength: 10,
+      lengthMenu: [5, 10, 25, 50],
+    });
+
+    return () => {
+      appointmentsTable.destroy();
+    };
+  }, [showForm, workshopSchedulesWithoutReport.length, refreshKey]);
+
+  useEffect(() => {
+    if (showForm || transformedReports.length === 0) return;
+
+    const reportsTableElement = document.querySelector("#repairReportsTable table");
+    if (!reportsTableElement) return;
+
+    const hasRows = (reportsTableElement as HTMLTableElement).querySelector("tbody tr") !== null;
+    if (!hasRows) return;
+
+    const reportsTable = new DataTable(reportsTableElement as Element, {
+      destroy: true,
+      language: {
+        search: "Buscar:",
+        searchPlaceholder: "Escribe aquí...",
+        lengthMenu: "Mostrar _MENU_ registros",
+        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        infoEmpty: "No hay registros",
+        zeroRecords: "No se encontraron resultados",
+      },
+      pageLength: 10,
+      lengthMenu: [5, 10, 25, 50],
+    });
+
+    return () => {
+      reportsTable.destroy();
+    };
+  }, [showForm, transformedReports.length, refreshKey]);
+
   const reportColumns: { key: keyof RepairReportTable; label: string }[] = [
-    { key: "idReparation", label: "ID" },
+    { key: "rowNumber", label: "#" },
     { key: "numberReference", label: "Referencia" },
     { key: "technicalDiagnosis", label: "Diagnóstico" },
     { key: "spareParts", label: "Repuestos" },
@@ -211,7 +280,7 @@ const formatDate = (date?: any) => {
   ];
 
   const appointmentColumns: { key: keyof WorkshopScheduleTable; label: string }[] = [
-    { key: "idAppointment", label: "ID Cita" },
+    { key: "rowNumber", label: "#" },
     { key: "numberReference", label: "Referencia" },
     { key: "licensePlate", label: "Placa" },
     { key: "entryDate", label: "Fecha Ingreso" },
@@ -272,24 +341,17 @@ const formatDate = (date?: any) => {
             >
               {!showForm ? (
                 <>
-                  <h5 className="mb-3">Citas sin reporte asignado</h5>
-
-                  <TableGeneric
-                    data={workshopSchedulesWithoutReport}
-                    columns={appointmentColumns}
-                    disabledActions={true}
-                  />
-
-                  <hr className="my-4" />
-
+                
                   <h5 className="mb-3">Reportes de reparación</h5>
 
-                  <TableGeneric
-                    data={transformedReports}
-                    columns={reportColumns}
-                    onDelete={handleDelete}
-                    onEdit={handleEdit}
-                  />
+                  <div id="repairReportsTable" key={refreshKey}>
+                    <TableGeneric
+                      data={transformedReports}
+                      columns={reportColumns}
+                      onDelete={handleDelete}
+                      onEdit={handleEdit}
+                    />
+                  </div>
                 </>
               ) : (
                 <RepairReportForm

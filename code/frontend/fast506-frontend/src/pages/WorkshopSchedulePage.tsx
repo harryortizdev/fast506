@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
+import DataTable from "datatables.net-bs5";
+import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
 import WorkshopScheduleForm from "../components/organisms/WorkshopScheduleForm";
 import RepairReportForm from "../components/organisms/RepairReportForm";
+import TableGeneric from "../components/organisms/TableGeneric";
 import { getAll, deleteWorkshopSchedule } from "../services/WorkshopScheduleService";
 import { getAll as getAllClients } from "../services/ClientService";
 import { getAll as getAllBranches } from "../services/BranchService";
@@ -21,6 +24,7 @@ const WorkshopSchedulePage = () => {
 
   const [showForm, setShowForm] = useState(false);
   const [showRepairReportForm, setShowRepairReportForm] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const [selectedAppointmentId, setSelectedAppointmentId] =
     useState<number | undefined>(undefined);
@@ -126,9 +130,15 @@ const formatDate = (date?: any) => {
     branchName: getBranchName(ws.idBranch),
   }));
 
+  const tableData = transformedData.map((ws, index) => ({
+    ...ws,
+    rowNumber: index + 1,
+  }));
+
   const handleSaveAndClose = async () => {
     await loadWorkshopSchedules();
     await loadRepairReports();
+    setRefreshKey((prev) => prev + 1);
     setWorkshopScheduleToEdit(undefined);
     setShowForm(false);
   };
@@ -146,6 +156,7 @@ const formatDate = (date?: any) => {
   const handleSaveRepairReportAndClose = async () => {
     await loadRepairReports();
     await loadWorkshopSchedules();
+    setRefreshKey((prev) => prev + 1);
     setShowRepairReportForm(false);
     setSelectedAppointmentId(undefined);
   };
@@ -168,6 +179,7 @@ const formatDate = (date?: any) => {
     await deleteWorkshopSchedule(workshopSchedule.idAppointment);
     await loadWorkshopSchedules();
     await loadRepairReports();
+    setRefreshKey((prev) => prev + 1);
   };
 
   const handleCreateReport = (workshopSchedule: WorkshopSchedule) => {
@@ -177,6 +189,34 @@ const formatDate = (date?: any) => {
     setShowForm(false);
     setShowRepairReportForm(true);
   };
+
+  useEffect(() => {
+    if (showForm || showRepairReportForm || tableData.length === 0) return;
+
+    const tableElement = document.querySelector("#workshopScheduleTable table");
+    if (!tableElement) return;
+
+    const hasRows = (tableElement as HTMLTableElement).querySelector("tbody tr") !== null;
+    if (!hasRows) return;
+
+    const table = new DataTable(tableElement as Element, {
+      destroy: true,
+      language: {
+        search: "Buscar:",
+        searchPlaceholder: "Escribe aquí...",
+        lengthMenu: "Mostrar _MENU_ registros",
+        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        infoEmpty: "No hay registros",
+        zeroRecords: "No se encontraron resultados",
+      },
+      pageLength: 10,
+      lengthMenu: [5, 10, 25, 50],
+    });
+
+    return () => {
+      table.destroy();
+    };
+  }, [showForm, showRepairReportForm, tableData.length, refreshKey]);
 
   return (
     <div
@@ -230,129 +270,34 @@ const formatDate = (date?: any) => {
                   idAppointmentFromWorkshop={selectedAppointmentId}
                 />
               ) : !showForm ? (
-                <div
-                  className="table-responsive"
-                  style={{
-                    maxHeight: "400px",
-                    overflowY: "auto",
-                    overflowX: "auto",
-                    borderRadius: "10px",
-                  }}
-                >
-                  <table
-                    className="table table-hover align-middle"
-                    style={{
-                      minWidth: "750px",
-                      backgroundColor: "#EEF1EF",
-                      borderCollapse: "separate",
-                      borderSpacing: 0,
-                    }}
-                  >
-                    <thead style={{ position: "sticky", top: 0, zIndex: 2 }}>
-                      <tr>
-                        {[
-                          "ID",
-                          "Referencia",
-                          "Placa",
-                          "Fecha Ingreso",
-                          "Motivo",
-                          "Kilometraje",
-                          "Cliente",
-                          "Sucursal",
-                          "Acciones",
-                        ].map((header) => (
-                          <th
-                            key={header}
-                            style={{
-                              backgroundColor: "#A9B4C2",
-                              whiteSpace: "nowrap",
-                              fontSize: "clamp(0.8rem, 1vw, 1rem)",
-                            }}
-                          >
-                            {header}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {transformedData.length === 0 ? (
-                        <tr>
-                          <td colSpan={9} className="text-center">
-                            No hay datos
-                          </td>
-                        </tr>
-                      ) : (
-                        transformedData.map((ws, index) => {
-                          const reportExists = hasReport(ws.idAppointment);
-
-                          return (
-                            <tr key={index}>
-                              <td>{ws.idAppointment}</td>
-                              <td>{ws.numberReference}</td>
-                              <td>{ws.licensePlate}</td>
-                              <td>{ws.entryDateFormatted}</td>
-                              <td>{ws.reasonService}</td>
-                              <td>{ws.receptionMileage}</td>
-                              <td>{ws.clientName}</td>
-                              <td>{ws.branchName}</td>
-
-                              <td>
-                                <div className="d-flex flex-column flex-sm-row gap-2">
-                                  <ButtonIcon
-                                    label="Informe"
-                                    onClick={() => handleCreateReport(ws)}
-                                    backgroundColor="transparent"
-                                    hoverColor={reportExists ? "#6c757d" : "#17a2b8"}
-                                    color={reportExists ? "#6c757d" : "#17a2b8"}
-                                    icon={<i className="bi bi-file-earmark-text" />}
-                                    className="btn btn-outline-info btn-sm d-flex align-items-center justify-content-center gap-2"
-                                    style={{
-                                      backgroundColor: "transparent",
-                                      border: `1px solid ${
-                                        reportExists ? "#6c757d" : "#17a2b8"
-                                      }`,
-                                      opacity: reportExists ? 0.5 : 1,
-                                      cursor: reportExists ? "not-allowed" : "pointer",
-                                      pointerEvents: reportExists ? "none" : "auto",
-                                    }}
-                                  />
-
-                                  <ButtonIcon
-                                    label="Editar"
-                                    onClick={() => handleEdit(ws)}
-                                    backgroundColor="transparent"
-                                    hoverColor="#ffc107"
-                                    color="#ffc107"
-                                    icon={<i className="bi bi-pencil-square" />}
-                                    className="btn btn-outline-warning btn-sm d-flex align-items-center justify-content-center gap-2"
-                                    style={{
-                                      backgroundColor: "transparent",
-                                      border: "1px solid #ffc107",
-                                    }}
-                                  />
-
-                                  <ButtonIcon
-                                    label="Eliminar"
-                                    onClick={() => handleDelete(ws)}
-                                    backgroundColor="transparent"
-                                    hoverColor="#dc3545"
-                                    color="#dc3545"
-                                    icon={<i className="bi bi-trash3" />}
-                                    className="btn btn-outline-danger btn-sm d-flex align-items-center justify-content-center gap-2"
-                                    style={{
-                                      backgroundColor: "transparent",
-                                      border: "1px solid #dc3545",
-                                    }}
-                                  />
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      )}
-                    </tbody>
-                  </table>
+                <div id="workshopScheduleTable" key={refreshKey}>
+                  <TableGeneric
+                    data={tableData}
+                    columns={[
+                      { key: "rowNumber", label: "#" },
+                      { key: "numberReference", label: "Referencia" },
+                      { key: "licensePlate", label: "Placa" },
+                      { key: "entryDateFormatted", label: "Fecha Ingreso" },
+                      { key: "reasonService", label: "Motivo" },
+                      { key: "receptionMileage", label: "Kilometraje" },
+                      { key: "clientName", label: "Cliente" },
+                      { key: "branchName", label: "Sucursal" },
+                    ]}
+                    onEdit={(item) => handleEdit(item as WorkshopSchedule)}
+                    onDelete={(item) => handleDelete(item as WorkshopSchedule)}
+                    extraActions={[
+                      {
+                        label: "Informe",
+                        icon: <i className="bi bi-file-earmark-text" />,
+                        onClick: (item) => handleCreateReport(item as WorkshopSchedule),
+                        backgroundColor: "transparent",
+                        hoverColor: "#17a2b8",
+                        color: "#17a2b8",
+                        buttonClass: "btn btn-outline-info btn-sm d-flex align-items-center justify-content-center gap-2",
+                        disabled: (item) => hasReport((item as WorkshopSchedule).idAppointment),
+                      },
+                    ]}
+                  />
                 </div>
               ) : (
                 <WorkshopScheduleForm

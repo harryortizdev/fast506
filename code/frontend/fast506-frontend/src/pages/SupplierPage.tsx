@@ -1,5 +1,7 @@
 
 import { useEffect, useState } from "react";
+import DataTable from "datatables.net-bs5";
+import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
 import ButtonNew from "../components/ButtonNew";
 import SupplierForm from "../components/organisms/SupplierForm";
 import TableGeneric from "../components/organisms/TableGeneric";
@@ -10,11 +12,13 @@ import Footer from "../components/organisms/Footer";
 import AlertConfirm from "../components/atoms/AlertConfirm";
 import ButtonIcon from "../components/molecules/ButtonIcon";
 
+type SupplierTableRow = Supplier & { rowNumber: number };
 
 const SupplierPage = () => {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [supplierToEdit, setSupplierToEdit] = useState<Supplier | undefined>(undefined);
+  const [refreshKey, setRefreshKey] = useState(0);
 
 const loadSuppliers = async () => {
   try {
@@ -34,6 +38,7 @@ const loadSuppliers = async () => {
 
   const handleSaveAndClose = async () => {
     await loadSuppliers();
+    setRefreshKey((prev) => prev + 1);
     setSupplierToEdit(undefined);
     setShowForm(false);
   };
@@ -59,10 +64,46 @@ const loadSuppliers = async () => {
 
     await deleteSupplier(supplier.idSupplier!);
     await loadSuppliers();
+    setRefreshKey((prev) => prev + 1);
   };
 
-  const columns: { key: keyof Supplier; label: string }[] = [
-    { key: "idSupplier", label: "ID" },
+  const activeSuppliers = suppliers.filter((supplier) => supplier.isActive !== false);
+
+  const supplierTableData: SupplierTableRow[] = activeSuppliers.map((supplier, index) => ({
+    ...supplier,
+    rowNumber: index + 1,
+  }));
+
+  useEffect(() => {
+    if (showForm || supplierTableData.length === 0) return;
+
+    const tableElement = document.querySelector("#supplierTable table");
+    if (!tableElement) return;
+
+    const hasRows = (tableElement as HTMLTableElement).querySelector("tbody tr") !== null;
+    if (!hasRows) return;
+
+    const table = new DataTable(tableElement as Element, {
+      destroy: true,
+      language: {
+        search: "Buscar:",
+        searchPlaceholder: "Escribe aquí...",
+        lengthMenu: "Mostrar _MENU_ registros",
+        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        infoEmpty: "No hay registros",
+        zeroRecords: "No se encontraron resultados",
+      },
+      pageLength: 10,
+      lengthMenu: [5, 10, 25, 50],
+    });
+
+    return () => {
+      table.destroy();
+    };
+  }, [showForm, supplierTableData.length, refreshKey]);
+
+  const columns: { key: keyof SupplierTableRow; label: string }[] = [
+    { key: "rowNumber", label: "#" },
     { key: "name", label: "Nombre" },
     { key: "companyName", label: "Compañía" },
     { key: "legalName", label: "Nombre Legal" },
@@ -120,12 +161,14 @@ const loadSuppliers = async () => {
               style={{ backgroundColor: "#EEF1EF" }}
             >
               {!showForm ? (
-                <TableGeneric
-                  data={suppliers}
-                  columns={columns}
-                  onDelete={handleDelete}
-                  onEdit={handleEdit}
-                />
+                <div id="supplierTable" key={refreshKey}>
+                  <TableGeneric
+                    data={supplierTableData}
+                    columns={columns}
+                    onDelete={handleDelete}
+                    onEdit={handleEdit}
+                  />
+                </div>
               ) : (
                 <SupplierForm
                   onClose={handleClose}

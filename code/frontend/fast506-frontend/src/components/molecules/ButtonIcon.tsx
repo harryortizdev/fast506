@@ -11,6 +11,7 @@ interface ButtonIconProps {
   icon: React.ReactNode;
   className: string;
   style?: React.CSSProperties;
+  disabled?: boolean;
 }
 
 const ButtonIcon = ({
@@ -21,7 +22,8 @@ const ButtonIcon = ({
   hoverColor,
   icon,
   className,
-  style
+  style,
+  disabled = false,
 }: ButtonIconProps) => {
   return (
     <button
@@ -31,13 +33,16 @@ const ButtonIcon = ({
         border: "none",
         ...style
       }}
-      onClick={onClick}
-      onMouseEnter={e =>
-        (e.currentTarget.style.backgroundColor = hoverColor ?? "#2C3E50")
-      }
-      onMouseLeave={e =>
-        (e.currentTarget.style.backgroundColor = backgroundColor ?? "#5E6572")
-      }
+      onClick={disabled ? undefined : onClick}
+      disabled={disabled}
+      onMouseEnter={e => {
+        if (disabled) return;
+        e.currentTarget.style.backgroundColor = hoverColor ?? "#2C3E50";
+      }}
+      onMouseLeave={e => {
+        if (disabled) return;
+        e.currentTarget.style.backgroundColor = backgroundColor ?? "#5E6572";
+      }}
     >
       <div className="d-flex align-items-center justify-content-center gap-2">
         <Icon icon={icon} />

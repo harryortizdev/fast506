@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { WorkshopSchedule } from "../../models/WorkshopSchedule";
 import { create, updateWorkshopSchedule } from "../../services/WorkshopScheduleService";
 import { getAll as getAllClients } from "../../services/ClientService";
@@ -35,6 +37,11 @@ const WorkshopScheduleForm = ({
   const [loadingBranches, setLoadingBranches] = useState(true);
 
   useEffect(() => {
+    setForm(workshopScheduleToEdit || { isActive: true });
+    setErrors({});
+  }, [workshopScheduleToEdit]);
+
+  useEffect(() => {
     const loadClients = async () => {
       try {
         const data = await getAllClients();
@@ -62,6 +69,36 @@ const WorkshopScheduleForm = ({
     loadClients();
     loadBranches();
   }, []);
+
+  const parseDateValue = (value?: string | Date | number[] | null) => {
+    if (!value) return null;
+
+    if (value instanceof Date) {
+      return Number.isNaN(value.getTime()) ? null : value;
+    }
+
+    if (Array.isArray(value)) {
+      const [year, month, day] = value.map(Number);
+      return new Date(year, month - 1, day);
+    }
+
+    const rawValue = String(value).trim();
+    const normalizedValue = rawValue.includes("T") ? rawValue.split("T")[0] : rawValue;
+    const [year, month, day] = normalizedValue.split(/[-/]/).map(Number);
+
+    if (year && month && day) {
+      return new Date(year, month - 1, day);
+    }
+
+    const parsed = new Date(rawValue);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  };
+
+  const formatDateValue = (date: Date | null) => {
+    if (!date) return undefined;
+
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -206,16 +243,29 @@ const generateWorkshopReference = (): number => {
           <div className="invalid-feedback d-block">{errors.licensePlate}</div>
         )}
 
-        <FormField
-          label="Fecha de Ingreso:"
-          name="entryDate"
-          value={form.entryDate || ""}
-          onChange={handleChange}
-          type="date"
-        />
-        {errors.entryDate && (
-          <div className="invalid-feedback d-block">{errors.entryDate}</div>
-        )}
+        <div className="mb-3">
+          <label className="form-label">Fecha de Ingreso:</label>
+          <DatePicker
+            wrapperClassName="w-100"
+            className={`form-control w-100 ${errors.entryDate ? "is-invalid" : ""}`}
+            placeholderText="Seleccione una fecha"
+            dateFormat="dd/MM/yyyy"
+            selected={parseDateValue(form.entryDate)}
+            onChange={(date: Date | null) => {
+              setForm({
+                ...form,
+                entryDate: formatDateValue(date),
+              });
+              setErrors({
+                ...errors,
+                entryDate: "",
+              });
+            }}
+          />
+          {errors.entryDate && (
+            <div className="invalid-feedback d-block">{errors.entryDate}</div>
+          )}
+        </div>
 
         <FormField
           label="Motivo del Servicio:"

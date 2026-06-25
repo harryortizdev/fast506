@@ -9,6 +9,7 @@ interface ExtraAction<T> {
   hoverColor?: string;
   color?: string;
   buttonClass?: string;
+  disabled?: boolean | ((item: T) => boolean);
 }
 
 interface TableGenericProps<T> {
@@ -151,18 +152,26 @@ const TableGeneric = <T extends object>({
 
                   <div className="d-flex flex-column flex-sm-row gap-2">
 
-                    {extraActions.map((action, i) => (
-                      <ButtonIcon
-                        key={i}
-                        label={action.label}
-                        onClick={() => action.onClick(item)}
-                        icon={action.icon}
-                        className={action.buttonClass ?? "btn btn-sm d-flex align-items-center justify-content-center gap-2"}
-                        backgroundColor={action.backgroundColor ?? "transparent"}
-                        hoverColor={action.hoverColor ?? "#2C3E50"}
-                        color={action.color ?? "#EEF1EF"}
-                      />
-                    ))}
+                    {extraActions.map((action, i) => {
+                      const isDisabled = typeof action.disabled === "function"
+                        ? action.disabled(item)
+                        : Boolean(action.disabled);
+
+                      return (
+                        <ButtonIcon
+                          key={i}
+                          label={action.label}
+                          onClick={() => !isDisabled && action.onClick(item)}
+                          icon={action.icon}
+                          className={action.buttonClass ?? "btn btn-sm d-flex align-items-center justify-content-center gap-2"}
+                          backgroundColor={action.backgroundColor ?? "transparent"}
+                          hoverColor={action.hoverColor ?? "#2C3E50"}
+                          color={action.color ?? "#EEF1EF"}
+                          disabled={isDisabled}
+                          style={isDisabled ? { opacity: 0.6, cursor: "not-allowed" } : undefined}
+                        />
+                      );
+                    })}
 
                     <ButtonIcon
                       label="Editar"

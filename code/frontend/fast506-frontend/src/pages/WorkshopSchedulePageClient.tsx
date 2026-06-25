@@ -12,7 +12,7 @@ import Footer from "../components/organisms/Footer";
 import AlertConfirm from "../components/atoms/AlertConfirm";
 import ButtonIcon from "../components/molecules/ButtonIcon";
 
-const WorkshopSchedulePage = () => {
+const WorkshopSchedulePageClient = () => {
   const [workshopSchedules, setWorkshopSchedules] = useState<WorkshopSchedule[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
@@ -218,4 +218,4 @@ const WorkshopSchedulePage = () => {
   );
 };
 
-export default WorkshopSchedulePage;
+export default WorkshopSchedulePageClient;

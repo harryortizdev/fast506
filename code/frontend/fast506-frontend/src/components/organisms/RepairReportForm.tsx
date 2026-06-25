@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { RepairReport } from "../../models/RepairReport";
 import { Mechanic } from "../../models/Mechanic";
 import {
@@ -105,6 +107,36 @@ const RepairReportForm = ({
     idAppointmentFromWorkshop,
     repairReportToEdit,
   ]);
+
+  const parseDateValue = (value?: string | Date | number[] | null) => {
+    if (!value) return null;
+
+    if (value instanceof Date) {
+      return Number.isNaN(value.getTime()) ? null : value;
+    }
+
+    if (Array.isArray(value)) {
+      const [year, month, day] = value.map(Number);
+      return new Date(year, month - 1, day);
+    }
+
+    const rawValue = String(value).trim();
+    const normalizedValue = rawValue.includes("T") ? rawValue.split("T")[0] : rawValue;
+    const [year, month, day] = normalizedValue.split(/[-/]/).map(Number);
+
+    if (year && month && day) {
+      return new Date(year, month - 1, day);
+    }
+
+    const parsed = new Date(rawValue);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  };
+
+  const formatDateValue = (date: Date | null) => {
+    if (!date) return undefined;
+
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -318,18 +350,31 @@ const generateRepairReference = (): number => {
           </div>
         )}
 
-        <FormField
-          label="Fecha de Finalización:"
-          name="completionDate"
-          value={form.completionDate || ""}
-          onChange={handleChange}
-          type="date"
-        />
-        {errors.completionDate && (
-          <div className="invalid-feedback d-block">
-            {errors.completionDate}
-          </div>
-        )}
+        <div className="mb-3">
+          <label className="form-label">Fecha de Finalización:</label>
+          <DatePicker
+            wrapperClassName="w-100"
+            className={`form-control w-100 ${errors.completionDate ? "is-invalid" : ""}`}
+            placeholderText="Seleccione una fecha"
+            dateFormat="dd/MM/yyyy"
+            selected={parseDateValue(form.completionDate)}
+            onChange={(date: Date | null) => {
+              setForm({
+                ...form,
+                completionDate: formatDateValue(date),
+              });
+              setErrors({
+                ...errors,
+                completionDate: "",
+              });
+            }}
+          />
+          {errors.completionDate && (
+            <div className="invalid-feedback d-block">
+              {errors.completionDate}
+            </div>
+          )}
+        </div>
 
         <div className="mb-3">
           <label className="form-label">Cita del Taller:</label>
