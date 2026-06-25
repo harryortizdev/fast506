@@ -9,13 +9,14 @@ import { getCategories } from "../../services/CatalogService";
 import { CategoriesCatalog } from "../../models/CategoriesCatalog";
 import { useAuth } from "../../context/AuthContext";
 import AlertSuccess from "../atoms/AlertSuccess";
+import { useLocation } from "react-router-dom";
 
 const ADMIN_MODULES = ['roles', 'users', 'catalog', 'units', 'suppliers', 'branches', 'quotation', 'sales', 'testdrive', 'adds'];
 
 const Navbar = () => {
   const { user, logout, hasPermission } = useAuth();
   const navigate = useNavigate();
-
+  const location = useLocation();
   const [showModels, setShowModels] = useState(false);
   const [categories, setCategories] = useState<CategoriesCatalog[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -23,6 +24,10 @@ const Navbar = () => {
   useEffect(() => {
     if (showModels) fetchCategories();
   }, [showModels]);
+
+  useEffect(() => {
+  setShowModels(false);
+}, [location.pathname]);
 
   const fetchCategories = async () => {
     try {
@@ -42,6 +47,10 @@ const Navbar = () => {
 
   const hasMechanicAccess = hasPermission('mechanic') || hasPermission('repairreport');
   const hasAdminAccess = ADMIN_MODULES.some(m => hasPermission(m));
+
+
+  const isActive = (path: string) => !showModels && location.pathname === path;
+  
 
   return (
     <>
@@ -70,33 +79,33 @@ const Navbar = () => {
                 <>
                   <li className="nav-item">
                     <button
-                      onClick={() => setShowModels(!showModels)}
-                      className="nav-link magic-link"
-                    >
-                      MODELOS
-                    </button>
+  onClick={() => setShowModels(!showModels)}
+  className={`nav-link magic-link ${showModels ? "active-link" : ""}`}
+>
+  MODELOS
+</button>
                   </li>
 
                   <li className="nav-item">
-                    <Link className="nav-link magic-link" to="/testdrive">
+                    <Link className={`nav-link magic-link ${isActive("/testdrive") ? "active-link" : ""}`} to="/testdrive">
                       TESTDRIVE
                     </Link>
                   </li>
 
                   <li className="nav-item">
-                    <Link className="nav-link magic-link" to="/quotation">
+                    <Link className={`nav-link magic-link ${isActive("/quotation") ? "active-link" : ""}`} to="/quotation">
                       COTIZACIONES
                     </Link>
                   </li>
 
                   <li className="nav-item">
-                    <Link className="nav-link magic-link" to="/workshop-schedules/create">
+                    <Link className={`nav-link magic-link ${isActive("/workshop-schedules/create") ? "active-link" : ""}`} to="/workshop-schedules/create">
                       CITAS TALLER
                     </Link>
                   </li>
 
                   <li className="nav-item">
-                    <Link className="nav-link magic-link" to="/branches">
+                    <Link className={`nav-link magic-link ${isActive("/branches") ? "active-link" : ""}`} to="/branches">
                       SUCURSALES
                     </Link>
                   </li>
@@ -106,7 +115,11 @@ const Navbar = () => {
               {hasMechanicAccess &&(
               
               <li className="nav-item dropdown">
-                  <a className="nav-link dropdown-toggle magic-link" href="#" role="button" data-bs-toggle="dropdown">
+                  <a className={`nav-link dropdown-toggle magic-link ${!showModels && location.pathname.startsWith("/mechanic") ? "active-link" : ""}`}
+                    href="#"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                  >
                     MECÁNICO
                   </a>
                   <ul className="dropdown-menu custom-dropdown text-center">
@@ -120,24 +133,30 @@ const Navbar = () => {
               {/* Menú de administración visible según permisos por módulo */}
               {hasAdminAccess && (
                 <li className="nav-item dropdown">
-                  <a className="nav-link dropdown-toggle magic-link" href="#" role="button" data-bs-toggle="dropdown">
+                  <a  className={`nav-link dropdown-toggle magic-link ${!showModels && location.pathname.startsWith("/admin") ? "active-link" : ""}`}
+                    href="#"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                  >
                     ADMINISTRACIÓN
                   </a>
                   <ul className="dropdown-menu custom-dropdown text-center">
                     {hasPermission('users') && <li><Link className="dropdown-item" to="/admin/administrators">ADMINISTRADORES</Link></li>}
                     {hasPermission('adds') && <li><Link className="dropdown-item" to="/admin/ad">ANUNCIOS</Link></li>}
                     {hasPermission('catalog') && <li><Link className="dropdown-item" to="/admin/catalogs">CATÁLOGOS</Link></li>}
+                    {hasPermission('mechanic') && <li><Link className="dropdown-item" to="/admin/workshop-schedules">CITAS TALLER</Link></li>}
                     {hasPermission('users') && <li><Link className="dropdown-item" to="/admin/clients">CLIENTES</Link></li>}
                     {hasPermission('quotation') && <li><Link className="dropdown-item" to="/admin/quotations">COTIZACIONES</Link></li>}
                     {hasPermission('users') && <li><Link className="dropdown-item" to="/admin/mechanics">MECÁNICOS</Link></li>}
-                    {hasPermission('repairreport') && <li><Link className="dropdown-item" to="/admin/repair-reports">REPORTES DE REPARACIÓN</Link></li>}
                     {hasPermission('suppliers') && <li><Link className="dropdown-item" to="/admin/suppliers">PROVEEDORES</Link></li>}
+                    {hasPermission('repairreport') && <li><Link className="dropdown-item" to="/admin/repair-reports">REPORTES DE REPARACIÓN</Link></li>}
+                    {hasPermission('roles') && <li><Link className="dropdown-item" to="/admin/roles">ROLES</Link></li>}
                     {hasPermission('branches') && <li><Link className="dropdown-item" to="/admin/branches">SUCURSALES</Link></li>}
                     {hasPermission('testdrive') && <li><Link className="dropdown-item" to="/admin/testdrive">TESTDRIVE</Link></li>}
                     {hasPermission('units') && <li><Link className="dropdown-item" to="/admin/units">UNIDADES</Link></li>}
                     {hasPermission('sales') && <li><Link className="dropdown-item" to="/admin/sales">VENTAS</Link></li>}
-                    {hasPermission('mechanic') && <li><Link className="dropdown-item" to="/admin/workshop-schedules">CITAS TALLER</Link></li>}
-                    {hasPermission('roles') && <li><Link className="dropdown-item" to="/admin/roles">ROLES</Link></li>}
+          
+
                   </ul>
                 </li>
               )}
