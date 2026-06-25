@@ -147,17 +147,19 @@ const CatalogForm = ({ onClose, onRefresh, catalogToEdit }: CatalogFormProps) =>
 
                 <h3>{catalogToEdit ? "Editar Catálogo" : "Nuevo Catálogo"}</h3>
 
-                <div className="mb-2">
-                    <label>Unidad existente</label>
-                    <select className="form-select" onChange={handleUnitSelect} defaultValue="">
-                        <option value="">— elegir unidad —</option>
-                        {units.map((u, i) => (
-                            <option key={i} value={i}>
-                                {u.carBrand} {u.carName} {u.yearManufacture}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                {!catalogToEdit && (
+                    <div className="mb-2">
+                        <label>Unidad existente</label>
+                        <select className="form-select" onChange={handleUnitSelect} defaultValue="">
+                            <option value="">— elegir unidad —</option>
+                            {units.map((u, i) => (
+                                <option key={i} value={i}>
+                                    {u.carBrand} {u.carName} {u.yearManufacture}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                )}
 
                 <FormField label="Marca" name="brandName" value={form.brandName || ""} onChange={handleChange} disabled />
                 {errors.brandName && <div className="text-danger">{errors.brandName}</div>}

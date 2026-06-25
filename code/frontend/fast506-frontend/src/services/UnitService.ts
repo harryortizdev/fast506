@@ -31,6 +31,13 @@ export const updateUnit = async (unit: Unit) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(unit),
   });
- 
+
+  // Agrega esto para ver el mensaje del backend
+  if (!res.ok) {
+    const errorMsg = await res.text();
+    console.error("Error del backend:", errorMsg);
+    throw new Error(errorMsg);
+  }
+
   return res.text();
 };
