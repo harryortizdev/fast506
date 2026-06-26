@@ -35,7 +35,7 @@ const LoginForm = () => {
       AlertSuccess('Sesión iniciada correctamente');
       navigate('/');
     } catch {
-      AlertWarning('Credenciales incorrectas o usuario inactivo');
+      AlertWarning('Correo o contraseña incorrectos');
     } finally {
       setLoading(false);
     }

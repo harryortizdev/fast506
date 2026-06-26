@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
@@ -308,17 +310,21 @@ const RegisterForm = () => {
                   </div>
 
                   <div className="row g-3 mb-3">
-                    <div className="col-md-6">
-                      <FormField
-                        label="Fecha de nacimiento:"
-                        name="dateBirth"
-                        type="date"
-                        value={
-                          form.dateBirth instanceof Date
-                            ? form.dateBirth.toISOString().split("T")[0]
-                            : ""
-                        }
-                        onChange={handleChange}
+                    <div className="mb-2">
+                      <label className="form-label fw-semibold" style={{ color: "#2C3E50" }}>
+                        Fecha de nacimiento:
+                      </label>
+                      <DatePicker
+                        wrapperClassName="w-100"
+                        className={`form-control w-100 ${errors.dateBirth ? "is-invalid" : ""}`}
+                        placeholderText="Seleccione una fecha"
+                        dateFormat="dd/MM/yyyy"
+                        selected={form.dateBirth instanceof Date && !isNaN(form.dateBirth.valueOf()) ? form.dateBirth : null}
+                        onChange={(date: Date | null) => {
+                          setForm({ ...form, dateBirth: date ?? undefined });
+                          setErrors({ ...errors, dateBirth: "" });
+                        }}
+                        maxDate={new Date()}
                         disabled={loading}
                       />
                       {errors.dateBirth && (

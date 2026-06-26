@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { Mechanic } from "../../models/Mechanic";
 import { create, updateMechanic } from "../../services/MechanicService";
 import AlertSuccess from "../atoms/AlertSuccess";
@@ -230,13 +232,18 @@ const MechanicForm = ({ onClose, onRefresh, mechanicToEdit }: MechanicFormProps)
         </div>
 
         <div className="mb-3">
-          <FormField
-            label="Fecha de Nacimiento:"
-            name="dateBirth"
-            placeholder="Fecha de Nacimiento"
-            type="date"
-            value={form.dateBirth instanceof Date ? form.dateBirth.toISOString().split('T')[0] : form.dateBirth || ""}
-            onChange={handleChange}
+          <label className="form-label">Fecha de Nacimiento:</label>
+          <DatePicker
+            wrapperClassName="w-100"
+            className={`form-control w-100 ${errors.dateBirth ? "is-invalid" : ""}`}
+            placeholderText="Seleccione una fecha"
+            dateFormat="dd/MM/yyyy"
+            selected={form.dateBirth instanceof Date && !isNaN(form.dateBirth.valueOf()) ? form.dateBirth : null}
+            onChange={(date: Date | null) => {
+              setForm({ ...form, dateBirth: date ?? undefined });
+              setErrors({ ...errors, dateBirth: "" });
+            }}
+            maxDate={new Date()}
           />
           {errors.dateBirth && <div className="invalid-feedback d-block">{errors.dateBirth}</div>}
         </div>
