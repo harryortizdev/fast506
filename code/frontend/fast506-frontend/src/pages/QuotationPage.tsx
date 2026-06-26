@@ -16,6 +16,7 @@ import { getAll as getAllUnits } from "../services/UnitService";
 import { Catalog } from "../models/Catalog";
 import DataTable from "datatables.net-bs5";
 import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
+import { useAuth } from "../context/AuthContext";
 
 
 
@@ -28,6 +29,11 @@ type QuotationTable = Quotation & { //lista personalizada
 
 
 const QuotationPage = () => {
+  const { hasPermission } = useAuth();
+  const canCreate = hasPermission("quotation", "create");
+  const canEdit = hasPermission("quotation", "update");
+  const canDelete = hasPermission("quotation", "delete");
+
   const [quotation, setQuotation] = useState<Quotation[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [quotationToEdit, setQuotationToEdit] = useState<Quotation | undefined>(undefined);
@@ -213,22 +219,24 @@ const formatDate = (date?: any) => {
                 Gestión de Cotizaciones
               </h5>
 
-              <div className="d-flex justify-content-center justify-content-md-end">
-                <ButtonIcon
-                  label="Nuevo"
-                  onClick={() => setShowForm(true)}
-                  icon={<i className="bi bi-plus-circle" />}
-                  className="btn mb-3 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2"
-                  backgroundColor="#5E6572"
-                  hoverColor="#2C3E50"
-                  color="#EEF1EF"
-                  style={{
-                    backgroundColor: "#5E6572",
-                    color: "#EEF1EF",
-                    border: "none"
-                  }}
-                />
-              </div>
+              {canCreate && (
+                <div className="d-flex justify-content-center justify-content-md-end">
+                  <ButtonIcon
+                    label="Nuevo"
+                    onClick={() => setShowForm(true)}
+                    icon={<i className="bi bi-plus-circle" />}
+                    className="btn mb-3 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2"
+                    backgroundColor="#5E6572"
+                    hoverColor="#2C3E50"
+                    color="#EEF1EF"
+                    style={{
+                      backgroundColor: "#5E6572",
+                      color: "#EEF1EF",
+                      border: "none"
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
             <div
@@ -239,11 +247,12 @@ const formatDate = (date?: any) => {
                                                 <div id="quotationTable" key={refreshKey}>
 
                 <TableGeneric
-                
                   data={transformedQuotations}
                   columns={columns}
                   onDelete={handleDelete}
                   onEdit={handleEdit}
+                  canEdit={canEdit}
+                  canDelete={canDelete}
                 />
                                 </div>
 

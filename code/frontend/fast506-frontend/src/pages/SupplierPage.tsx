@@ -12,10 +12,16 @@ import Footer from "../components/organisms/Footer";
 import AlertConfirm from "../components/atoms/AlertConfirm";
 import AlertSuccess from "../components/atoms/AlertSuccess";
 import ButtonIcon from "../components/molecules/ButtonIcon";
+import { useAuth } from "../context/AuthContext";
 
 type SupplierTableRow = Supplier & { rowNumber: number };
 
 const SupplierPage = () => {
+  const { hasPermission } = useAuth();
+  const canCreate = hasPermission("suppliers", "create");
+  const canEdit = hasPermission("suppliers", "update");
+  const canDelete = hasPermission("suppliers", "delete");
+
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [supplierToEdit, setSupplierToEdit] = useState<Supplier | undefined>(undefined);
@@ -146,22 +152,24 @@ const loadSuppliers = async () => {
                 Gestión de Proveedores
               </h5>
 
-              <div className="d-flex justify-content-center justify-content-md-end">
-                <ButtonIcon
-                  label="Nuevo"
-                  onClick={() => setShowForm(true)}
-                  icon={<i className="bi bi-plus-circle" />}
-                  className="btn mb-3 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2"
-                  backgroundColor="#5E6572"
-                  hoverColor="#2C3E50"
-                  color="#EEF1EF"
-                  style={{
-                    backgroundColor: "#5E6572",
-                    color: "#EEF1EF",
-                    border: "none"
-                  }}
-                />
-              </div>
+              {canCreate && (
+                <div className="d-flex justify-content-center justify-content-md-end">
+                  <ButtonIcon
+                    label="Nuevo"
+                    onClick={() => setShowForm(true)}
+                    icon={<i className="bi bi-plus-circle" />}
+                    className="btn mb-3 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2"
+                    backgroundColor="#5E6572"
+                    hoverColor="#2C3E50"
+                    color="#EEF1EF"
+                    style={{
+                      backgroundColor: "#5E6572",
+                      color: "#EEF1EF",
+                      border: "none"
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
             <div
@@ -175,6 +183,8 @@ const loadSuppliers = async () => {
                     columns={columns}
                     onDelete={handleDelete}
                     onEdit={handleEdit}
+                    canEdit={canEdit}
+                    canDelete={canDelete}
                   />
                 </div>
               ) : (

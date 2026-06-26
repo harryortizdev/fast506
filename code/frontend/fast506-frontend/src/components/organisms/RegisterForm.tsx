@@ -18,7 +18,7 @@ type RegisterForm = Partial<Client> & { confirmPassword?: string };
 
 const RegisterForm = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState<RegisterForm>({ isActive: true });
   const [errors, setErrors] = useState<
     Partial<Record<keyof Client | "confirmPassword", string>>
@@ -140,7 +140,7 @@ const RegisterForm = () => {
 
   const handleSubmit = async () => {
     if (!validate()) return;
-    setLoading(true);
+    setIsSubmitting(true);
     try {
       const formData = new FormData();
       formData.append("name", form.name || "");
@@ -174,7 +174,7 @@ const RegisterForm = () => {
         AlertWarning("Error al crear la cuenta. Verifique los datos e intente de nuevo.");
       }
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -213,7 +213,7 @@ const RegisterForm = () => {
                         placeholder="Tu nombre completo"
                         value={form.name || ""}
                         onChange={handleChange}
-                        disabled={loading}
+                        disabled={isSubmitting}
                       />
                       
                       {errors.name && (
@@ -229,7 +229,7 @@ const RegisterForm = () => {
                         placeholder="Número de cédula"
                         value={form.id?.toString() || ""}
                         onChange={handleChange}
-                        disabled={loading}
+                        disabled={isSubmitting}
                       />
                       {errors.id && (
                         <div className="invalid-feedback d-block">
@@ -248,7 +248,7 @@ const RegisterForm = () => {
                         type="email"
                         value={form.email || ""}
                         onChange={handleChange}
-                        disabled={loading}
+                        disabled={isSubmitting}
                       />
                       {errors.email && (
                         <div className="invalid-feedback d-block">
@@ -264,7 +264,7 @@ const RegisterForm = () => {
                         type="password"
                         value={form.password || ""}
                         onChange={handleChange}
-                        disabled={loading}
+                        disabled={isSubmitting}
                       />
                       {errors.password && (
                         <div className="invalid-feedback d-block">
@@ -283,7 +283,7 @@ const RegisterForm = () => {
                         type="password"
                         value={form.confirmPassword || ""}
                         onChange={handleChange}
-                        disabled={loading}
+                        disabled={isSubmitting}
                       />
                       {errors.confirmPassword && (
                         <div className="invalid-feedback d-block">
@@ -299,7 +299,7 @@ const RegisterForm = () => {
                         type="tel"
                         value={form.phoneNumber || ""}
                         onChange={handleChange}
-                        disabled={loading}
+                        disabled={isSubmitting}
                       />
                       {errors.phoneNumber && (
                         <div className="invalid-feedback d-block">
@@ -325,7 +325,7 @@ const RegisterForm = () => {
                           setErrors({ ...errors, dateBirth: "" });
                         }}
                         maxDate={new Date()}
-                        disabled={loading}
+                        disabled={isSubmitting}
                       />
                       {errors.dateBirth && (
                         <div className="invalid-feedback d-block">
@@ -342,7 +342,7 @@ const RegisterForm = () => {
                         className="form-control"
                         accept="image/*"
                         onChange={handleImage}
-                        disabled={loading}
+                        disabled={isSubmitting}
                       />
                       {imagePreview && (
                         <img
@@ -367,7 +367,7 @@ const RegisterForm = () => {
                       className={`form-select ${errors.commInterest ? "is-invalid" : ""}`}
                       value={form.commInterest || ""}
                       onChange={handleChange}
-                      disabled={loading}
+                      disabled={isSubmitting}
                     >
                       <option value="">Selecciona una opción</option>
                       {commInterestOptions.map((option) => (
@@ -391,7 +391,7 @@ const RegisterForm = () => {
                         placeholder="Tu dirección"
                         value={form.physicalAddress || ""}
                         onChange={handleChange}
-                        disabled={loading}
+                        disabled={isSubmitting}
                       />
                     </div>
                     <div className="col-md-6">
@@ -401,7 +401,7 @@ const RegisterForm = () => {
                         placeholder="Tu ocupación"
                         value={form.occupation || ""}
                         onChange={handleChange}
-                        disabled={loading}
+                        disabled={isSubmitting}
                       />
                     </div>
                   </div>
@@ -413,13 +413,13 @@ const RegisterForm = () => {
                   </div>
 
                   <Button
-                    label={loading ? "Creando cuenta..." : "Crear cuenta"}
+                    label={isSubmitting ? "Creando cuenta..." : "Crear cuenta"}
                     onClick={handleSubmit}
                     backgroundColor="#2C3E50"
                     hoverColor="#1a252f"
                     color="#EEF1EF"
                     className="btn w-100 mb-3"
-                    disabled={loading}
+                    disabled={isSubmitting}
                   />
 
                   <div className="text-center">

@@ -22,4 +22,17 @@ public class UserService {
         return userRepository.findByEmail(email)
                 .filter(user -> user.isIsActive() && user.getPassword().equals(password));
     }
+
+    @Transactional(readOnly = true)
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    @Transactional
+    public void updatePassword(String email, String newPassword) {
+        userRepository.findByEmail(email).ifPresent(user -> {
+            user.setPassword(newPassword);
+            userRepository.save(user);
+        });
+    }
 }

@@ -132,6 +132,21 @@ public class EmailService {
         }
     }
 
+    public void sendPasswordReset(String toEmail, String code) throws MessagingException {
+        Context context = new Context();
+        context.setVariable("code", code);
+
+        String htmlContent = templateEngine.process("email/password-reset", context);
+
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        helper.setTo(toEmail);
+        helper.setSubject("Recuperación de contraseña");
+        helper.setText(htmlContent, true);
+
+        mailSender.send(message);
+    }
+
     public void sendSales(Sales sales) throws MessagingException, Exception {
         Optional<Unit> unitVerification = unitService.findById(sales.getIdCar());
         Optional<User> clientVerification = userService.findById(sales.getIdClient());

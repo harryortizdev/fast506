@@ -9,12 +9,18 @@ import Navbar from "../components/organisms/Navbar";
 import Footer from "../components/organisms/Footer";
 import AlertConfirm from "../components/atoms/AlertConfirm";
 import ButtonIcon from "../components/molecules/ButtonIcon";
+import { useAuth } from "../context/AuthContext";
 
 type RoleTable = Role & {
   dateFormatted: string;
 };
 
 const RolePage = () => {
+  const { hasPermission } = useAuth();
+  const canCreate = hasPermission("roles", "create");
+  const canEdit = hasPermission("roles", "update");
+  const canDelete = hasPermission("roles", "delete");
+
   const [roles, setRoles] = useState<Role[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [roleToEdit, setRoleToEdit] = useState<Role | undefined>(undefined);
@@ -133,22 +139,24 @@ const RolePage = () => {
                 Gestión de Roles
               </h5>
 
-              <div className="d-flex justify-content-center justify-content-md-end">
-                <ButtonIcon
-                  label="Nuevo"
-                  onClick={() => setShowForm(true)}
-                  icon={<i className="bi bi-plus-circle" />}
-                  className="btn mb-3 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2"
-                  backgroundColor="#5E6572"
-                  hoverColor="#2C3E50"
-                  color="#EEF1EF"
-                  style={{
-                    backgroundColor: "#5E6572",
-                    color: "#EEF1EF",
-                    border: "none",
-                  }}
-                />
-              </div>
+              {canCreate && (
+                <div className="d-flex justify-content-center justify-content-md-end">
+                  <ButtonIcon
+                    label="Nuevo"
+                    onClick={() => setShowForm(true)}
+                    icon={<i className="bi bi-plus-circle" />}
+                    className="btn mb-3 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2"
+                    backgroundColor="#5E6572"
+                    hoverColor="#2C3E50"
+                    color="#EEF1EF"
+                    style={{
+                      backgroundColor: "#5E6572",
+                      color: "#EEF1EF",
+                      border: "none",
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
             <div
@@ -161,6 +169,8 @@ const RolePage = () => {
                   columns={columns}
                   onDelete={handleDelete}
                   onEdit={handleEdit}
+                  canEdit={canEdit}
+                  canDelete={canDelete}
                   extraActions={[
                     {
                       label: "Permisos",

@@ -18,6 +18,8 @@ interface TableGenericProps<T> {
   onDelete?: (item: T) => void;
   onEdit?: (item: T) => void;
   disabledActions?: boolean;
+  canEdit?: boolean;
+  canDelete?: boolean;
   extraActions?: ExtraAction<T>[];
 }
 
@@ -37,8 +39,12 @@ const TableGeneric = <T extends object>({
   onDelete,
   onEdit,
   disabledActions = false,
+  canEdit = true,
+  canDelete = true,
   extraActions = [],
 }: TableGenericProps<T>) => {
+  const editDisabled = disabledActions || !canEdit;
+  const deleteDisabled = disabledActions || !canDelete;
 
   return (
 
@@ -174,43 +180,37 @@ const TableGeneric = <T extends object>({
                       );
                     })}
 
-                    <ButtonIcon
-                      label="Editar"
-                      onClick={() => !disabledActions && onEdit?.(item)}
-                      backgroundColor="transparent"
-                      hoverColor={disabledActions ? "#6c757d" : "#ffc107"}
-                      color={disabledActions ? "#6c757d" : "#ffc107"}
-                      icon={
-                        <i className="bi bi-pencil-square" />
-                      }
-                      className="btn btn-outline-warning btn-sm d-flex align-items-center justify-content-center gap-2"
-                      style={{
-                        backgroundColor: "transparent",
-                        border: `1px solid ${disabledActions ? "#6c757d" : "#ffc107"}`,
-                        opacity: disabledActions ? 0.5 : 1,
-                        cursor: disabledActions ? "not-allowed" : "pointer",
-                        pointerEvents: disabledActions ? "none" : "auto"
-                      }}
-                    />
+                    {!editDisabled && (
+                      <ButtonIcon
+                        label="Editar"
+                        onClick={() => onEdit?.(item)}
+                        backgroundColor="transparent"
+                        hoverColor="#ffc107"
+                        color="#ffc107"
+                        icon={<i className="bi bi-pencil-square" />}
+                        className="btn btn-outline-warning btn-sm d-flex align-items-center justify-content-center gap-2"
+                        style={{
+                          backgroundColor: "transparent",
+                          border: "1px solid #ffc107",
+                        }}
+                      />
+                    )}
 
-                   <ButtonIcon
-                      label="Eliminar"
-                      onClick={() => !disabledActions && onDelete?.(item)}
-                      backgroundColor="transparent"
-                      hoverColor={disabledActions ? "#6c757d" : "#dc3545"}
-                      color={disabledActions ? "#6c757d" : "#dc3545"}
-                      icon={
-                        <i className="bi bi-trash3" />
-                      }
-                      className="btn btn-outline-danger btn-sm d-flex align-items-center justify-content-center gap-2"
-                      style={{
-                        backgroundColor: "transparent",
-                        border: `1px solid ${disabledActions ? "#6c757d" : "#dc3545"}`,
-                        opacity: disabledActions ? 0.5 : 1,
-                        cursor: disabledActions ? "not-allowed" : "pointer",
-                        pointerEvents: disabledActions ? "none" : "auto"
-                      }}
-                  />
+                    {!deleteDisabled && (
+                      <ButtonIcon
+                        label="Eliminar"
+                        onClick={() => onDelete?.(item)}
+                        backgroundColor="transparent"
+                        hoverColor="#dc3545"
+                        color="#dc3545"
+                        icon={<i className="bi bi-trash3" />}
+                        className="btn btn-outline-danger btn-sm d-flex align-items-center justify-content-center gap-2"
+                        style={{
+                          backgroundColor: "transparent",
+                          border: "1px solid #dc3545",
+                        }}
+                      />
+                    )}
                   </div>
 
                 </td>
