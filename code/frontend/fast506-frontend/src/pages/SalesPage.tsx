@@ -15,6 +15,7 @@ import { getAll as getAllUnits } from "../services/UnitService";
 import { getAll as getAllAdmins } from "../services/AdministratorService";
 import DataTable from "datatables.net-bs5";
 import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
+import { useAuth } from "../context/AuthContext";
 
 type SalesTable = Sales & {
     transactionDateFormatted: string;      // Para el día/mes/año
@@ -24,6 +25,11 @@ type SalesTable = Sales & {
 };
 
 const SalesPage = () => {
+    const { hasPermission } = useAuth();
+    const canCreate = hasPermission("sales", "create");
+    const canEdit = hasPermission("sales", "update");
+    const canDelete = hasPermission("sales", "delete");
+
     const [sales, setSales] = useState<Sales[]>([]);
     const [showForm, setShowForm] = useState(false);
     const [selectedSales, setSelectedSales] = useState<Sales | null>(null);
@@ -210,7 +216,7 @@ const SalesPage = () => {
                                 style={{ color: "#EEF1EF" }}>
                                 Venta de Vehículo
                             </h5>
-                            {!showForm && (
+                            {!showForm && canCreate && (
                                 <div className="d-flex justify-content-center justify-content-md-end">
                                     <ButtonIcon
                                         label="Nuevo"
@@ -240,6 +246,8 @@ const SalesPage = () => {
                                         columns={columns}
                                         onDelete={handleDelete}
                                         onEdit={handleEdit}
+                                        canEdit={canEdit}
+                                        canDelete={canDelete}
                                     />
                                 </div>
 

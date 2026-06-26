@@ -16,8 +16,14 @@ import Footer from "../components/organisms/Footer";
 import AlertConfirm from "../components/atoms/AlertConfirm";
 import AlertSuccess from "../components/atoms/AlertSuccess";
 import ButtonIcon from "../components/molecules/ButtonIcon";
+import { useAuth } from "../context/AuthContext";
 
 const WorkshopSchedulePage = () => {
+  const { hasPermission } = useAuth();
+  const canCreate = hasPermission("mechanic", "create");
+  const canEdit = hasPermission("mechanic", "update");
+  const canDelete = hasPermission("mechanic", "delete");
+
   const [workshopSchedules, setWorkshopSchedules] = useState<WorkshopSchedule[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
@@ -248,26 +254,28 @@ const formatDate = (date?: any) => {
                 Gestión de Agenda del Taller
               </h5>
 
-              <div className="d-flex justify-content-center justify-content-md-end">
-                <ButtonIcon
-                  label="Nuevo"
-                  onClick={() => {
-                    setShowRepairReportForm(false);
-                    setWorkshopScheduleToEdit(undefined);
-                    setShowForm(true);
-                  }}
-                  icon={<i className="bi bi-plus-circle" />}
-                  className="btn mb-3 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2"
-                  backgroundColor="#5E6572"
-                  hoverColor="#2C3E50"
-                  color="#EEF1EF"
-                  style={{
-                    backgroundColor: "#5E6572",
-                    color: "#EEF1EF",
-                    border: "none",
-                  }}
-                />
-              </div>
+              {canCreate && (
+                <div className="d-flex justify-content-center justify-content-md-end">
+                  <ButtonIcon
+                    label="Nuevo"
+                    onClick={() => {
+                      setShowRepairReportForm(false);
+                      setWorkshopScheduleToEdit(undefined);
+                      setShowForm(true);
+                    }}
+                    icon={<i className="bi bi-plus-circle" />}
+                    className="btn mb-3 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2"
+                    backgroundColor="#5E6572"
+                    hoverColor="#2C3E50"
+                    color="#EEF1EF"
+                    style={{
+                      backgroundColor: "#5E6572",
+                      color: "#EEF1EF",
+                      border: "none",
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
             <div className="card-body p-2 p-md-4" style={{ backgroundColor: "#EEF1EF" }}>
@@ -293,6 +301,8 @@ const formatDate = (date?: any) => {
                     ]}
                     onEdit={(item) => handleEdit(item as WorkshopSchedule)}
                     onDelete={(item) => handleDelete(item as WorkshopSchedule)}
+                    canEdit={canEdit}
+                    canDelete={canDelete}
                     extraActions={[
                       {
                         label: "Informe",

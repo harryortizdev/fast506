@@ -12,12 +12,17 @@ import { Administrator } from "../models/Administrator";
 import { getAll as getAllAdministrators } from "../services/AdministratorService";
 import DataTable from "datatables.net-bs5";
 import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
-
+import { useAuth } from "../context/AuthContext";
 
 type branchTable = Branch & {
   administratorName: string;
 };
 const BranchPage = () => {
+  const { hasPermission } = useAuth();
+  const canCreate = hasPermission("branches", "create");
+  const canEdit = hasPermission("branches", "update");
+  const canDelete = hasPermission("branches", "delete");
+
   const [branch, setBranch] = useState<Branch[]>([]); //guarda la lista de Sucursales
   const [showForm, setShowForm] = useState(false); //formulario off
   const [branchToEdit, setBranchToEdit] = useState<Branch | undefined>(undefined); //resguarda la sucursal a ediaatr
@@ -176,22 +181,24 @@ const BranchPage = () => {
                 Gestión de Sucursales
               </h5>
 
-              <div className="d-flex justify-content-center justify-content-md-end">
-                <ButtonIcon
-                  label="Nuevo"
-                  onClick={() => setShowForm(true)}
-                  icon={<i className="bi bi-plus-circle" />}
-                  className="btn mb-3 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2"
-                  backgroundColor="#5E6572"
-                  hoverColor="#2C3E50"
-                  color="#EEF1EF"
-                  style={{
-                    backgroundColor: "#5E6572",
-                    color: "#EEF1EF",
-                    border: "none"
-                  }}
-                />
-              </div>
+              {canCreate && (
+                <div className="d-flex justify-content-center justify-content-md-end">
+                  <ButtonIcon
+                    label="Nuevo"
+                    onClick={() => setShowForm(true)}
+                    icon={<i className="bi bi-plus-circle" />}
+                    className="btn mb-3 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2"
+                    backgroundColor="#5E6572"
+                    hoverColor="#2C3E50"
+                    color="#EEF1EF"
+                    style={{
+                      backgroundColor: "#5E6572",
+                      color: "#EEF1EF",
+                      border: "none"
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
             <div
@@ -206,6 +213,8 @@ const BranchPage = () => {
                     columns={columns}
                     onDelete={handleDelete}
                     onEdit={handleEdit}
+                    canEdit={canEdit}
+                    canDelete={canDelete}
                   />
                 </div>
               ) : (

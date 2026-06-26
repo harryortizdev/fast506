@@ -9,8 +9,14 @@ import CatalogForm from "../components/organisms/CatalogForm";
 import ButtonIcon from "../components/molecules/ButtonIcon";
 import DataTable from "datatables.net-bs5";
 import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
+import { useAuth } from "../context/AuthContext";
 
 const CatalogPage = () => {
+    const { hasPermission } = useAuth();
+    const canCreate = hasPermission("catalog", "create");
+    const canEdit = hasPermission("catalog", "update");
+    const canDelete = hasPermission("catalog", "delete");
+
     const [catalogs, setCatalogs] = useState<Catalog[]>([]);
     const [showForm, setShowForm] = useState(false);
     const [selectedCatalog, setSelectedCatalog] = useState<Catalog | null>(null);
@@ -119,7 +125,7 @@ const CatalogPage = () => {
                                 style={{ color: "#EEF1EF" }}>
                                 Catálogo de Vehículos
                             </h5>
-                            {!showForm && (
+                            {!showForm && canCreate && (
                                 <div className="d-flex justify-content-center justify-content-md-end">
                                     <ButtonIcon
                                         label="Nuevo"
@@ -149,6 +155,8 @@ const CatalogPage = () => {
                                         columns={columns}
                                         onDelete={handleDelete}
                                         onEdit={handleEdit}
+                                        canEdit={canEdit}
+                                        canDelete={canDelete}
                                     />
                                 </div>
 

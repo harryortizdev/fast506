@@ -12,12 +12,18 @@ import AlertConfirm from "../components/atoms/AlertConfirm";
 import ButtonIcon from "../components/molecules/ButtonIcon";
 import DataTable from "datatables.net-bs5";
 import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
+import { useAuth } from "../context/AuthContext";
 
 type AdminTable = Administrator & {
   dateFormatted: string;
   roleName: string;
 };
 const AdministratorPage = () => {
+  const { hasPermission } = useAuth();
+  const canCreate = hasPermission("users", "create");
+  const canEdit = hasPermission("users", "update");
+  const canDelete = hasPermission("users", "delete");
+
   const [administrators, setAdministrators] = useState<Administrator[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
   const [showForm, setShowForm] = useState(false);
@@ -172,22 +178,24 @@ const AdministratorPage = () => {
                 Gestión de Administradores
               </h5>
 
-              <div className="d-flex justify-content-center justify-content-md-end">
-                <ButtonIcon
-                  label="Nuevo"
-                  onClick={() => setShowForm(true)}
-                  icon={<i className="bi bi-plus-circle" />}
-                  className="btn mb-3 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2"
-                  backgroundColor="#5E6572"
-                  hoverColor="#2C3E50"
-                  color="#EEF1EF"
-                  style={{
-                    backgroundColor: "#5E6572",
-                    color: "#EEF1EF",
-                    border: "none",
-                  }}
-                />
-              </div>
+              {canCreate && (
+                <div className="d-flex justify-content-center justify-content-md-end">
+                  <ButtonIcon
+                    label="Nuevo"
+                    onClick={() => setShowForm(true)}
+                    icon={<i className="bi bi-plus-circle" />}
+                    className="btn mb-3 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2"
+                    backgroundColor="#5E6572"
+                    hoverColor="#2C3E50"
+                    color="#EEF1EF"
+                    style={{
+                      backgroundColor: "#5E6572",
+                      color: "#EEF1EF",
+                      border: "none",
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
             <div
@@ -201,6 +209,8 @@ const AdministratorPage = () => {
                     columns={columns}
                     onDelete={handleDelete}
                     onEdit={handleEdit}
+                    canEdit={canEdit}
+                    canDelete={canDelete}
                   />
                 </div>
               ) : (

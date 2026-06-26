@@ -12,7 +12,7 @@ import { getAll as getAllAdministrators } from "../services/AdministratorService
 import { Administrator } from "../models/Administrator";
 import DataTable from "datatables.net-bs5";
 import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
-
+import { useAuth } from "../context/AuthContext";
 
 type adTable = Ad & { //tabla ajustable 
   administratorName: string;
@@ -21,6 +21,11 @@ type adTable = Ad & { //tabla ajustable
 
 
 const AdPage = () => {
+  const { hasPermission } = useAuth();
+  const canCreate = hasPermission("adds", "create");
+  const canEdit = hasPermission("adds", "update");
+  const canDelete = hasPermission("adds", "delete");
+
   const [ad, setAd] = useState<Ad[]>([]); //guarda la lista de anuncios
   const [showForm, setShowForm] = useState(false); //formulario off
   const [adToEdit, setAdToEdit] = useState<Ad | undefined>(undefined); //resguarda el anuncio
@@ -152,22 +157,24 @@ const AdPage = () => {
                 Gestión de Anuncios
               </h5>
 
-              <div className="d-flex justify-content-center justify-content-md-end">
-                <ButtonIcon
-                  label="Nuevo"
-                  onClick={() => setShowForm(true)}
-                  icon={<i className="bi bi-plus-circle" />}
-                  className="btn mb-3 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2"
-                  backgroundColor="#5E6572"
-                  hoverColor="#2C3E50"
-                  color="#EEF1EF"
-                  style={{
-                    backgroundColor: "#5E6572",
-                    color: "#EEF1EF",
-                    border: "none"
-                  }}
-                />
-              </div>
+              {canCreate && (
+                <div className="d-flex justify-content-center justify-content-md-end">
+                  <ButtonIcon
+                    label="Nuevo"
+                    onClick={() => setShowForm(true)}
+                    icon={<i className="bi bi-plus-circle" />}
+                    className="btn mb-3 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2"
+                    backgroundColor="#5E6572"
+                    hoverColor="#2C3E50"
+                    color="#EEF1EF"
+                    style={{
+                      backgroundColor: "#5E6572",
+                      color: "#EEF1EF",
+                      border: "none"
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
             <div
@@ -178,11 +185,12 @@ const AdPage = () => {
                 <div id="adTable" key={refreshKey}>
 
                   <TableGeneric
-
                     data={transformedAdTable}
                     columns={columns}
                     onDelete={handleDelete}
                     onEdit={handleEdit}
+                    canEdit={canEdit}
+                    canDelete={canDelete}
                   />
                 </div>
 
