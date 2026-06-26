@@ -80,7 +80,7 @@ const HomePage = () => {
 
 
         <HorizontalCard image={mecanicImage} title="TALLER"
-          description="Mantené tu auto como nuevo. Agendá tu cita de taller en línea y elegí tu horario ideal." to="/workshop-schedules/create"
+          description="Mantené tu auto como nuevo. Agendá tu cita de taller en línea y elegí tu horario ideal." to="/workshopSchedules"
         />
 
         <br></br>

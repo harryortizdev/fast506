@@ -27,7 +27,7 @@ const Footer = () => {
         </p>
 
         <p>
-          <a href="/workshop-schedules/create" className="text-decoration-none small" style={{ color: "#EEF1EF" }}>
+          <a href="/workshopSchedules" className="text-decoration-none small" style={{ color: "#EEF1EF" }}>
             Cita Taller
           </a>
         </p>
