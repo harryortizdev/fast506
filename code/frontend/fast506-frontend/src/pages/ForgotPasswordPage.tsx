@@ -29,7 +29,7 @@ const ForgotPasswordPage = () => {
     setLoading(true);
     try {
       await forgotPassword(email);
-      AlertSuccess('Si el correo existe, recibirás el código en tu bandeja');
+      AlertSuccess('Recibirás el código en tu bandeja');
       setStep(2);
     } catch {
       AlertWarning('Ocurrió un error al enviar el código');
