@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Sales } from "../../models/Sales";
 import { Catalog } from "../../models/Catalog";
 import { Unit } from "../../models/Unit";
-import { login as clientLogin } from "../../services/ClientService";
 import { getAll as getAllCatalog } from "../../services/CatalogService";
 import {
     create,
@@ -11,25 +10,16 @@ import {
     getUnitsByColor,
     sendEmailCreate,
 } from "../../services/SalesService";
-
 import AlertSuccess from "../atoms/AlertSuccess";
 import Button from "../atoms/Button";
-import FormField from "../molecules/FormField";
 import Table from "../atoms/Table";
 import Icon from "../atoms/Icon";
+import { useAuth } from "../../context/AuthContext";
 
 const SalesClientForm = ({ onClose, onRefresh, idCatalogFromUrl }: any) => {
 
     const navigate = useNavigate();
-
-    const [loginStep, setLoginStep] = useState(true);
-
-    const [loginEmail, setLoginEmail] = useState("");
-    const [loginPassword, setLoginPassword] = useState("");
-    const [loginError, setLoginError] = useState("");
-    const [loadingLogin, setLoadingLogin] = useState(false);
-
-    const [clientInfo, setClientInfo] = useState<{ name: string; id: number } | null>(null);
+    const { user, loading } = useAuth();
 
     const [form, setForm] = useState<Partial<Sales>>({});
     const [errors, setErrors] = useState<any>({});
@@ -40,8 +30,8 @@ const SalesClientForm = ({ onClose, onRefresh, idCatalogFromUrl }: any) => {
 
     const [selectedTraction, setSelectedTraction] = useState("");
     const [selectedColor, setSelectedColor] = useState("");
+    const [isSubmitting, setSubmitting] = useState<boolean>(false);
 
-    const [catalogIdInput, setCatalogIdInput] = useState("");
     const [selectedCatalogInfo, setSelectedCatalogInfo] = useState<Catalog | null>(null);
 
     const today = new Date();
@@ -51,8 +41,19 @@ const SalesClientForm = ({ onClose, onRefresh, idCatalogFromUrl }: any) => {
     const uniqueTractions = [...new Set(filteredUnit.map(u => u.traction))];
     const availableColors = [...new Set(colorUnits.map(u => u.color))];
 
-
+    // Si no hay sesión, redirigir al login
     useEffect(() => {
+        if (!loading && !user) {
+            navigate("/login");
+        }
+    }, [user, loading]);
+
+    // Setear idClient con el usuario logueado y cargar catálogo
+    useEffect(() => {
+        if (!user) return;
+
+        setForm(prev => ({ ...prev, idClient: user.userId }));
+
         getAllCatalog().then(data => {
             const list = Array.isArray(data) ? data : [];
             setCatalog(list);
@@ -61,7 +62,6 @@ const SalesClientForm = ({ onClose, onRefresh, idCatalogFromUrl }: any) => {
                 const found = list.find((c: Catalog) => c.idCatalog === Number(idCatalogFromUrl));
                 if (found) {
                     setSelectedCatalogInfo(found);
-                    setCatalogIdInput(String(found.idCatalog));
                     setForm(prev => ({ ...prev, idCatalog: found.idCatalog, idCar: undefined }));
                     getUnitsByCatalog(Number(found.idCatalog)).then(units =>
                         setFilteredUnit(Array.isArray(units) ? units : [])
@@ -69,30 +69,7 @@ const SalesClientForm = ({ onClose, onRefresh, idCatalogFromUrl }: any) => {
                 }
             }
         });
-    }, []);
-
-    const handleLogin = async () => {
-        if (!loginEmail || !loginPassword) {
-            setLoginError("Ingrese correo y contraseña");
-            return;
-        }
-        setLoadingLogin(true);
-        setLoginError("");
-        try {
-            const client = await clientLogin(loginEmail, loginPassword);
-            setClientInfo({ name: client.name, id: client.id });
-            setForm(prev => ({
-                ...prev,
-                idClient: client.idUser,
-                idAdmin: undefined
-            }));
-            setLoginStep(false);
-        } catch {
-            setLoginError("Correo o contraseña incorrectos");
-        } finally {
-            setLoadingLogin(false);
-        }
-    };
+    }, [user]);
 
     const validate = () => {
         const newErrors: any = {};
@@ -163,6 +140,9 @@ const SalesClientForm = ({ onClose, onRefresh, idCatalogFromUrl }: any) => {
 
     const handleSubmit = async () => {
         if (!validate()) return;
+
+        setSubmitting(true);
+
         try {
             const payload = { ...form, transactionDate: dateToday, isActive: true };
             await create(payload);
@@ -173,58 +153,15 @@ const SalesClientForm = ({ onClose, onRefresh, idCatalogFromUrl }: any) => {
             navigate("/");
         } catch {
             alert("Error al guardar la venta");
+            setSubmitting(false);
         }
     };
 
-    if (loginStep) {
-        return (
-            <div className="container d-flex justify-content-center">
-                <div className="card p-4" style={{ maxWidth: "400px", width: "100%" }}>
-                    <h4 className="mb-3">
-                        <Icon icon={<i className="bi bi-person-circle" />} /> Iniciar Sesión
-                    </h4>
+    // Mientras verifica la sesión, no renderizar nada
+    if (loading) return null;
 
-                    {loginError && <div className="alert alert-danger py-2">{loginError}</div>}
-
-                    <FormField
-                        label="Correo"
-                        name="email"
-                        value={loginEmail}
-                        onChange={e => setLoginEmail(e.target.value)}
-                        type="email"
-                        disabled={loadingLogin}
-                    />
-                    <FormField
-                        label="Contraseña"
-                        name="password"
-                        value={loginPassword}
-                        onChange={e => setLoginPassword(e.target.value)}
-                        type="password"
-                        disabled={loadingLogin}
-                    />
-
-                    <div className="d-flex gap-2 mt-3">
-                        <Button
-                            label={loadingLogin ? "Verificando..." : "Ingresar"}
-                            onClick={handleLogin}
-                            backgroundColor="#198754"
-                            hoverColor="#145c32"
-                            color="#EEF1EF "
-                            className="btn btn-success"
-                        />
-                        <Button
-                            label="Cancelar"
-                            onClick={onClose}
-                            backgroundColor="#6c757d"
-                            hoverColor="#495057"
-                            color="#EEF1EF "
-                            className="btn btn-secondary"
-                        />
-                    </div>
-                </div>
-            </div>
-        );
-    }
+    // Si no hay usuario, no renderizar (el useEffect ya redirige)
+    if (!user) return null;
 
     return (
         <div className="container d-flex justify-content-center py-3">
@@ -235,8 +172,8 @@ const SalesClientForm = ({ onClose, onRefresh, idCatalogFromUrl }: any) => {
                         <Icon icon={<i className="bi bi-person-badge" />} /> Datos Personales
                     </h6>
                     <div className="alert alert-info py-2 mb-0">
-                        <div><Icon icon={<i className="bi bi-person" />} /><strong> Nombre:</strong> {clientInfo?.name}</div>
-                        <div><Icon icon={<i className="bi bi-card-text" />} /><strong> Cédula:</strong> {clientInfo?.id}</div>
+                        <div><Icon icon={<i className="bi bi-person" />} /><strong> Nombre:</strong> {user.name}</div>
+                        <div><Icon icon={<i className="bi bi-envelope" />} /><strong> Correo:</strong> {user.email}</div>
                     </div>
                 </div>
 
@@ -383,15 +320,16 @@ const SalesClientForm = ({ onClose, onRefresh, idCatalogFromUrl }: any) => {
                         onClick={handleSubmit}
                         backgroundColor="#198754"
                         hoverColor="#145c32"
-                        color="#EEF1EF "
+                        color="#EEF1EF"
                         className="btn btn-success flex-grow-1"
+                        disabled={isSubmitting}
                     />
                     <Button
                         label="Cancelar"
                         onClick={onClose}
                         backgroundColor="#6c757d"
                         hoverColor="#495057"
-                        color="#EEF1EF "
+                        color="#EEF1EF"
                         className="btn btn-secondary"
                     />
                 </div>

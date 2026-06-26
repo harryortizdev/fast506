@@ -29,6 +29,7 @@ const SalesForm = ({ onClose, onRefresh, salesToEdit }: any) => {
   const [loginPassword, setLoginPassword] = useState("");
   const [loginError, setLoginError] = useState("");
   const [loadingLogin, setLoadingLogin] = useState(false);
+  const [isSubmitting, setSubmitting] = useState<boolean>(false);
 
   const [adminInfo, setAdminInfo] = useState<any>(null);
 
@@ -273,6 +274,8 @@ useEffect(() => {
 
     if (!validate()) return;
 
+    setSubmitting(true);
+
     try {
 
       const payload = {
@@ -295,6 +298,7 @@ useEffect(() => {
 
     } catch {
       alert("Error al guardar la venta");
+       setSubmitting(false);
     }
   };
 
@@ -466,6 +470,7 @@ useEffect(() => {
             hoverColor="#145c32"
             color="#fff"
             className="btn btn-success me-2"
+            disabled={isSubmitting}
           />
 
           <Button

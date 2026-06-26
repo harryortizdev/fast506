@@ -8,6 +8,7 @@ import AlertWarning from "../atoms/AlertWarning";
 import FormField from "../molecules/FormField";
 import Button from "../atoms/Button";
 
+
 interface UnitFormProps {
   onClose: () => void;
   onRefresh: () => void;
@@ -22,6 +23,7 @@ const UnitForm = ({ onClose, onRefresh, unitToEdit, units }: UnitFormProps) => {
   );
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [errors, setErrors] = useState<Partial<Record<keyof Unit, string>>>({});
+  const [isSubmitting, setSubmitting] = useState<boolean>(false);
 
   useEffect(() => {
     getAll().then(setSuppliers);
@@ -85,6 +87,7 @@ const UnitForm = ({ onClose, onRefresh, unitToEdit, units }: UnitFormProps) => {
 
   const handleSubmit = async () => {
     if (!validate()) return;
+    setSubmitting(true);
     if (!unitToEdit) {
       const vinExiste = units.some((u: Unit) => u.VIN === form.VIN);
       if (vinExiste) {
@@ -110,6 +113,7 @@ const UnitForm = ({ onClose, onRefresh, unitToEdit, units }: UnitFormProps) => {
       onClose();
     } catch (error) {
       AlertWarning("Error al guardar");
+      setSubmitting(false);
     }
   };
 
@@ -298,7 +302,8 @@ const UnitForm = ({ onClose, onRefresh, unitToEdit, units }: UnitFormProps) => {
             backgroundColor="#198754"    
             hoverColor="#145c32"         
             color="#fff"     
-            className="btn btn-success me-2"            
+            className="btn btn-success me-2"  
+            disabled={isSubmitting}          
           />
 
           <Button

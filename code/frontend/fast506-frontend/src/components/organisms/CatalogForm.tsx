@@ -20,6 +20,7 @@ const CatalogForm = ({ onClose, onRefresh, catalogToEdit }: CatalogFormProps) =>
     const [image, setImage] = useState<File | null>(null);
     const [errors, setErrors] = useState<Partial<Record<keyof Catalog, string>>>({});
     const [imagePreview, setImagePreview] = useState<string>("");
+    const [isSubmitting, setSubmitting] = useState<boolean>(false);
 
     useEffect(() => {
         getAvailable().then(setUnits);
@@ -107,6 +108,8 @@ const CatalogForm = ({ onClose, onRefresh, catalogToEdit }: CatalogFormProps) =>
     const handleSubmit = async () => {
         if (!validate()) return;
 
+        setSubmitting(true);
+
         try {
             const formData = new FormData();
 
@@ -138,6 +141,7 @@ const CatalogForm = ({ onClose, onRefresh, catalogToEdit }: CatalogFormProps) =>
 
         } catch (error) {
             AlertWarning("Error al guardar el catálogo.");
+            setSubmitting(false);
         }
     };
 
@@ -210,6 +214,7 @@ const CatalogForm = ({ onClose, onRefresh, catalogToEdit }: CatalogFormProps) =>
                         hoverColor="#145c32"
                         color="#fff"
                         className="btn btn-success me-2"
+                        disabled={isSubmitting}
                     />
 
                     <Button
