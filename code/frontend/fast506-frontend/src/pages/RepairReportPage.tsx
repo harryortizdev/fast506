@@ -134,7 +134,7 @@ const formatDate = (date?: any) => {
     );
 
     if (!appointment) {
-      return "⚠ Cita no encontrada";
+      return " Cita no encontrada";
     }
 
     if (appointment.isActive === false || appointment.active === false) {
