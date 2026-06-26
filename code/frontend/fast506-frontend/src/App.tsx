@@ -54,6 +54,10 @@ function App() {
           } />
           <Route path="/quotation" element={<PrivateRoute><CreateQuotation /></PrivateRoute>} />
           <Route path="/workshopSchedules" element ={<PrivateRoute><WorkshopSchedulePageClient/></PrivateRoute>}/>
+          
+
+          {/*Rutas de cliente*/}
+          <Route path="/SalesClientPage" element ={<PrivateRoute><SalesClientPage/></PrivateRoute>}/>
 
           {/* Rutas de mecánico */}
           <Route path="/mechanic/repair-reports" element={

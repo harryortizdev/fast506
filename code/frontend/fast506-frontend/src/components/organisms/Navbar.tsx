@@ -58,6 +58,7 @@ const Navbar = () => {
 
   const isAdmin = user?.roleName === "Administrador";
   const isMechanic = user?.roleName === "Mecánico";
+  const isClient = user?.roleName === "Cliente";
 
   const hasMechanicAccess =
     isMechanic && (hasPermission("mechanic") || hasPermission("repairreport"));
@@ -133,6 +134,17 @@ const Navbar = () => {
                     SUCURSALES
                   </Link>
                 </li>
+
+                {isClient&&(
+                <li className="nav-item">
+                  <Link
+                    className={`nav-link magic-link ${isActive("/catalog/client/sales") ? "active-link" : ""}`}
+                    to="/catalog/client/sales"
+                  >
+                    COMPRAS
+                  </Link>
+                </li>
+                )}
               </>
 
               {hasMechanicAccess && (
