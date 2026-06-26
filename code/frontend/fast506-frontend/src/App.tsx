@@ -25,6 +25,7 @@ import RepairReportPage from "./pages/RepairReportPage";
 import RolePage from "./pages/RolePage";
 import LoginForm from "./components/organisms/LoginForm";
 import RegisterForm from "./components/organisms/RegisterForm";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import WorkshopSchedulePageClient from "./pages/WorkshopSchedulePageClient";
 import ProfilePage from "./pages/ProfilePage";
 
@@ -38,6 +39,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/branches" element={<ShowBranches />} />
           <Route path="/catalog/detail/:id" element={<CatalogDetailPage />} />
           <Route path="/catalog/client/sales" element={<SalesClientPage />} />

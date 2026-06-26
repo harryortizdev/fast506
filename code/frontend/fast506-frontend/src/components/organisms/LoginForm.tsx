@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import WhatsAppButton from '../atoms/WhatsAppButton';
@@ -34,8 +35,13 @@ const LoginForm = () => {
       await login(email, password);
       AlertSuccess('Sesión iniciada correctamente');
       navigate('/');
-    } catch {
-      AlertWarning('Correo o contraseña incorrectos');
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.status === 423 && err.response.data?.recoverRequired) {
+        AlertWarning('Demasiados intentos fallidos. Redirigiendo a recuperación de contraseña...');
+        setTimeout(() => navigate('/forgot-password'), 2600);
+      } else {
+        AlertWarning('Correo o contraseña incorrectos');
+      }
     } finally {
       setLoading(false);
     }
@@ -112,6 +118,12 @@ const LoginForm = () => {
                           Regístrate aquí
                         </a>
                       </span>
+                    </div>
+
+                    <div className="mt-2 text-center">
+                      <a href="/forgot-password" style={{ color: '#5E6572', fontSize: 13, textDecoration: 'underline' }}>
+                        ¿Olvidó su contraseña?
+                      </a>
                     </div>
 
                   </form>

@@ -20,7 +20,6 @@ CREATE TABLE users (
 );
 
 
-
 -- 02/05/2026 - Creación de la tabla Administrator (Allan)
 
 CREATE TABLE administrator (

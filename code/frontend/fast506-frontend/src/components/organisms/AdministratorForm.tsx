@@ -25,6 +25,8 @@ const AdministratorForm = ({
   onRefresh,
   administratorToEdit,
 }: AdministratorFormProps) => {
+  const isEditing = !!administratorToEdit;
+
   const [form, setForm] = useState<Partial<Administrator>>(() => {
     if (!administratorToEdit) return { isActive: true };
     return {
@@ -39,6 +41,7 @@ const AdministratorForm = ({
   >({});
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const [roles, setRoles] = useState<Role[]>([]);
 
@@ -101,15 +104,28 @@ const AdministratorForm = ({
       newErrors.name =
         "Nombre inválido: solo letras y espacios, máximo 50 caracteres.";
     }
-    if (
-      form.id === undefined ||
-      form.id === null ||
-      !numericOnly.test(form.id.toString()) ||
-      form.id.toString().length !== 9
-    ) {
-      //
-      newErrors.id =
-        "Cédula inválida: debe ser numérica y tener exactamente 9 dígitos.";
+    if (!isEditing) {
+      if (
+        form.id === undefined ||
+        form.id === null ||
+        !numericOnly.test(form.id.toString()) ||
+        form.id.toString().length !== 9
+      ) {
+        newErrors.id =
+          "Cédula inválida: debe ser numérica y tener exactamente 9 dígitos.";
+      }
+      if (
+        !form.password ||
+        form.password.length < 8 ||
+        form.password.length > 100 ||
+        !/[A-Z]/.test(form.password) ||
+        !/[a-z]/.test(form.password) ||
+        !/[0-9]/.test(form.password) ||
+        !/[!@#$%^&*(),.?":{}|<>]/.test(form.password)
+      ) {
+        newErrors.password =
+          "Contraseña inválida: debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial.";
+      }
     }
     if (
       !form.email ||
@@ -118,18 +134,6 @@ const AdministratorForm = ({
     ) {
       newErrors.email =
         "Email inválido: ingrese un email válido, máximo 100 caracteres.";
-    }
-    if (
-      !form.password ||
-      form.password.length < 8 ||
-      form.password.length > 100 ||
-      !/[A-Z]/.test(form.password) ||
-      !/[a-z]/.test(form.password) ||
-      !/[0-9]/.test(form.password) ||
-      !/[!@#$%^&*(),.?":{}|<>]/.test(form.password)
-    ) {
-      newErrors.password =
-        "Contraseña inválida: debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial.";
     }
     if (
       !form.phoneNumber ||
@@ -172,11 +176,10 @@ const AdministratorForm = ({
   const handleSubmit = async () => {
     if (!validate()) return;
 
+    setIsSubmitting(true);
     const formData = new FormData();
     formData.append("name", form.name || "");
-    formData.append("id", form.id?.toString() || "");
     formData.append("email", form.email || "");
-    formData.append("password", form.password || "");
     formData.append("phoneNumber", form.phoneNumber?.toString() || "");
     formData.append(
       "dateBirth",
@@ -189,7 +192,12 @@ const AdministratorForm = ({
     formData.append("employeeId", form.employeeId || "");
     if (form.corporateEmail) formData.append("corporateEmail", form.corporateEmail);
     if (administratorToEdit?.idUser) formData.append("idUser", administratorToEdit.idUser.toString());
-    if (image) formData.append("profileImage", image);
+
+    if (!isEditing) {
+      formData.append("id", form.id?.toString() || "");
+      formData.append("password", form.password || "");
+      if (image) formData.append("profileImage", image);
+    }
 
     try {
       if (administratorToEdit) {
@@ -210,6 +218,7 @@ const AdministratorForm = ({
       } else {
         AlertWarning("Error al guardar el administrador. Verifique los datos e intente de nuevo.");
       }
+      setIsSubmitting(false);
     }
   };
 
@@ -220,7 +229,7 @@ const AdministratorForm = ({
         style={{ maxWidth: "500px", width: "100%" }}
       >
         <h3 className="text-center mb-4">
-          {administratorToEdit ? "Editar Administrador" : "Nuevo Administrador"}
+          {isEditing ? "Editar Administrador" : "Nuevo Administrador"}
         </h3>
 
         <div className="mb-3">
@@ -236,18 +245,20 @@ const AdministratorForm = ({
           )}
         </div>
 
-        <div className="mb-3">
-          <FormField
-            label="Cédula:"
-            name="id"
-            placeholder="Número de cédula"
-            value={form.id?.toString() || ""}
-            onChange={handleChange}
-          />
-          {errors.id && (
-            <div className="invalid-feedback d-block">{errors.id}</div>
-          )}
-        </div>
+        {!isEditing && (
+          <div className="mb-3">
+            <FormField
+              label="Cédula:"
+              name="id"
+              placeholder="Número de cédula"
+              value={form.id?.toString() || ""}
+              onChange={handleChange}
+            />
+            {errors.id && (
+              <div className="invalid-feedback d-block">{errors.id}</div>
+            )}
+          </div>
+        )}
 
         <div className="mb-3">
           <FormField
@@ -263,19 +274,21 @@ const AdministratorForm = ({
           )}
         </div>
 
-        <div className="mb-3">
-          <FormField
-            label="Contraseña:"
-            name="password"
-            placeholder="Mínimo 8 caracteres"
-            type="password"
-            value={form.password || ""}
-            onChange={handleChange}
-          />
-          {errors.password && (
-            <div className="invalid-feedback d-block">{errors.password}</div>
-          )}
-        </div>
+        {!isEditing && (
+          <div className="mb-3">
+            <FormField
+              label="Contraseña:"
+              name="password"
+              placeholder="Mínimo 8 caracteres"
+              type="password"
+              value={form.password || ""}
+              onChange={handleChange}
+            />
+            {errors.password && (
+              <div className="invalid-feedback d-block">{errors.password}</div>
+            )}
+          </div>
+        )}
 
         <div className="mb-3">
           <FormField
@@ -310,21 +323,23 @@ const AdministratorForm = ({
           )}
         </div>
 
-        <div className="mb-3">
-          <label>Foto de perfil</label>
-          <input type="file" className="form-control" accept="image/*" onChange={handleImage} />
-          {errors.profileImage && (
-            <div className="text-danger mt-1">{errors.profileImage}</div>
-          )}
-          {imagePreview && (
-            <img
-              src={imagePreview}
-              alt="preview"
-              className="mt-2 rounded"
-              style={{ width: "100%", maxHeight: "200px", objectFit: "cover" }}
-            />
-          )}
-        </div>
+        {!isEditing && (
+          <div className="mb-3">
+            <label>Foto de perfil</label>
+            <input type="file" className="form-control" accept="image/*" onChange={handleImage} />
+            {errors.profileImage && (
+              <div className="text-danger mt-1">{errors.profileImage}</div>
+            )}
+            {imagePreview && (
+              <img
+                src={imagePreview}
+                alt="preview"
+                className="mt-2 rounded"
+                style={{ width: "100%", maxHeight: "200px", objectFit: "cover" }}
+              />
+            )}
+          </div>
+        )}
 
         <div className="mb-3">
           <label>Rol</label>
@@ -383,6 +398,7 @@ const AdministratorForm = ({
             hoverColor="#145c32"
             color="#fff"
             className="btn btn-success me-2"
+            disabled={isSubmitting}
           />
 
           <Button

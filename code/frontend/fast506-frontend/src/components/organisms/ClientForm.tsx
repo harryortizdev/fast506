@@ -17,6 +17,8 @@ interface ClientFormProps {
 }
 
 const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
+  const isEditing = !!clientToEdit;
+
   const [form, setForm] = useState<Partial<Client>>(() => {
     if (!clientToEdit) return { isActive: true };
     return {
@@ -30,6 +32,7 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [roles, setRoles] = useState<Role[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   useEffect(() => {
     const loadRoles = async () => {
@@ -87,23 +90,25 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
     if (!form.name || !lettersOnly.test(form.name) || form.name.length > 50) {
       newErrors.name = "Nombre inválido: solo letras y espacios, máximo 50 caracteres.";
     }
-    if (form.id === undefined || form.id === null || !numericOnly.test(form.id.toString()) || form.id.toString().length !== 9) {
-      newErrors.id = "Cédula inválida: debe ser numérica y tener exactamente 9 dígitos.";
+    if (!isEditing) {
+      if (form.id === undefined || form.id === null || !numericOnly.test(form.id.toString()) || form.id.toString().length !== 9) {
+        newErrors.id = "Cédula inválida: debe ser numérica y tener exactamente 9 dígitos.";
+      }
+      if (!form.password || form.password.length < 8 || form.password.length > 100 || !/[A-Z]/.test(form.password) || !/[a-z]/.test(form.password) || !/[0-9]/.test(form.password) || !/[!@#$%^&*(),.?":{}|<>]/.test(form.password)) {
+        newErrors.password = "Contraseña inválida: debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial.";
+      }
+      if (!form.commInterest || !commInterestOptions.includes(form.commInterest.toString())) {
+        newErrors.commInterest = "Seleccione un interés válido.";
+      }
     }
     if (!form.email || !emailRegex.test(form.email) || form.email.length > 100) {
       newErrors.email = "Email inválido: ingrese un email válido, máximo 100 caracteres.";
-    }
-    if (!form.password || form.password.length < 8 || form.password.length > 100 || !/[A-Z]/.test(form.password) || !/[a-z]/.test(form.password) || !/[0-9]/.test(form.password) || !/[!@#$%^&*(),.?":{}|<>]/.test(form.password)) {
-      newErrors.password = "Contraseña inválida: debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial.";
     }
     if (!form.phoneNumber || !numericOnly.test(form.phoneNumber.toString()) || form.phoneNumber.toString().length !== 8) {
       newErrors.phoneNumber = "El número de teléfono debe ser numérico y tener exactamente 8 dígitos.";
     }
     if (!form.dateBirth || !(form.dateBirth instanceof Date) || isNaN(form.dateBirth.valueOf()) || form.dateBirth > today) {
       newErrors.dateBirth = "Fecha de nacimiento inválida.";
-    }
-    if (!form.commInterest || !commInterestOptions.includes(form.commInterest.toString())) {
-      newErrors.commInterest = "Seleccione un interés válido.";
     }
 
     setErrors(newErrors);
@@ -113,11 +118,10 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
   const handleSubmit = async () => {
     if (!validate()) return;
 
+    setIsSubmitting(true);
     const formData = new FormData();
     formData.append("name", form.name || "");
-    formData.append("id", form.id?.toString() || "");
     formData.append("email", form.email || "");
-    formData.append("password", form.password || "");
     formData.append("phoneNumber", form.phoneNumber?.toString() || "");
     formData.append(
       "dateBirth",
@@ -127,11 +131,16 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
     );
     formData.append("isActive", form.isActive ? "true" : "false");
     if (form.role?.idRole) formData.append("idRole", form.role.idRole.toString());
-    if (form.commInterest) formData.append("commInterest", form.commInterest);
     if (form.physicalAddress) formData.append("physicalAddress", form.physicalAddress);
-    if (form.occupation) formData.append("occupation", form.occupation);
     if (clientToEdit?.idUser) formData.append("idUser", clientToEdit.idUser.toString());
-    if (image) formData.append("profileImage", image);
+
+    if (!isEditing) {
+      formData.append("id", form.id?.toString() || "");
+      formData.append("password", form.password || "");
+      if (form.commInterest) formData.append("commInterest", form.commInterest);
+      if (form.occupation) formData.append("occupation", form.occupation);
+      if (image) formData.append("profileImage", image);
+    }
 
     try {
       if (clientToEdit) {
@@ -152,13 +161,14 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
       } else {
         AlertWarning("Error al guardar el cliente. Verifique los datos e intente de nuevo.");
       }
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className="container d-flex justify-content-center">
       <div className="card p-4 shadow-sm" style={{ maxWidth: '500px', width: '100%' }}>
-        <h3 className="text-center mb-4">{clientToEdit ? "Editar Cliente" : "Nuevo Cliente"}</h3>
+        <h3 className="text-center mb-4">{isEditing ? "Editar Cliente" : "Nuevo Cliente"}</h3>
 
         <div className="mb-3">
           <FormField
@@ -171,16 +181,18 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
           {errors.name && <div className="invalid-feedback d-block">{errors.name}</div>}
         </div>
 
-        <div className="mb-3">
-          <FormField
-            label="Cédula:"
-            name="id"
-            placeholder="Número de cédula"
-            value={form.id?.toString() || ""}
-            onChange={handleChange}
-          />
-          {errors.id && <div className="invalid-feedback d-block">{errors.id}</div>}
-        </div>
+        {!isEditing && (
+          <div className="mb-3">
+            <FormField
+              label="Cédula:"
+              name="id"
+              placeholder="Número de cédula"
+              value={form.id?.toString() || ""}
+              onChange={handleChange}
+            />
+            {errors.id && <div className="invalid-feedback d-block">{errors.id}</div>}
+          </div>
+        )}
 
         <div className="mb-3">
           <FormField
@@ -194,17 +206,19 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
           {errors.email && <div className="invalid-feedback d-block">{errors.email}</div>}
         </div>
 
-        <div className="mb-3">
-          <FormField
-            label="Contraseña:"
-            name="password"
-            placeholder="Mínimo 8 caracteres"
-            type="password"
-            value={form.password || ""}
-            onChange={handleChange}
-          />
-          {errors.password && <div className="invalid-feedback d-block">{errors.password}</div>}
-        </div>
+        {!isEditing && (
+          <div className="mb-3">
+            <FormField
+              label="Contraseña:"
+              name="password"
+              placeholder="Mínimo 8 caracteres"
+              type="password"
+              value={form.password || ""}
+              onChange={handleChange}
+            />
+            {errors.password && <div className="invalid-feedback d-block">{errors.password}</div>}
+          </div>
+        )}
 
         <div className="mb-3">
           <FormField
@@ -235,34 +249,38 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
           {errors.dateBirth && <div className="invalid-feedback d-block">{errors.dateBirth}</div>}
         </div>
 
-        <div className="mb-3">
-          <label>Foto de perfil</label>
-          <input type="file" className="form-control" accept="image/*" onChange={handleImage} />
-          {imagePreview && (
-            <img
-              src={imagePreview}
-              alt="preview"
-              className="mt-2 rounded"
-              style={{ width: "100%", maxHeight: "200px", objectFit: "cover" }}
-            />
-          )}
-        </div>
+        {!isEditing && (
+          <div className="mb-3">
+            <label>Foto de perfil</label>
+            <input type="file" className="form-control" accept="image/*" onChange={handleImage} />
+            {imagePreview && (
+              <img
+                src={imagePreview}
+                alt="preview"
+                className="mt-2 rounded"
+                style={{ width: "100%", maxHeight: "200px", objectFit: "cover" }}
+              />
+            )}
+          </div>
+        )}
 
-        <div className="mb-3">
-          <label>Intereses de autos:</label>
-          <select
-            className={`form-control ${errors.commInterest ? "is-invalid" : ""}`}
-            name="commInterest"
-            value={form.commInterest || ""}
-            onChange={handleChange}
-          >
-            <option value="">Seleccione un tipo de auto</option>
-            {commInterestOptions.map((option) => (
-              <option key={option} value={option}>{option}</option>
-            ))}
-          </select>
-          {errors.commInterest && <div className="invalid-feedback">{errors.commInterest}</div>}
-        </div>
+        {!isEditing && (
+          <div className="mb-3">
+            <label>Intereses de autos:</label>
+            <select
+              className={`form-control ${errors.commInterest ? "is-invalid" : ""}`}
+              name="commInterest"
+              value={form.commInterest || ""}
+              onChange={handleChange}
+            >
+              <option value="">Seleccione un tipo de auto</option>
+              {commInterestOptions.map((option) => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+            {errors.commInterest && <div className="invalid-feedback">{errors.commInterest}</div>}
+          </div>
+        )}
 
         <div className="mb-3">
           <label>Rol:</label>
@@ -290,15 +308,17 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
           />
         </div>
 
-        <div className="mb-3">
-          <FormField
-            label="Ocupación:"
-            name="occupation"
-            placeholder="Ocupación"
-            value={form.occupation || ""}
-            onChange={handleChange}
-          />
-        </div>
+        {!isEditing && (
+          <div className="mb-3">
+            <FormField
+              label="Ocupación:"
+              name="occupation"
+              placeholder="Ocupación"
+              value={form.occupation || ""}
+              onChange={handleChange}
+            />
+          </div>
+        )}
 
         <div className="text-center mt-4">
           <Button
@@ -308,6 +328,7 @@ const ClientForm = ({ onClose, onRefresh, clientToEdit }: ClientFormProps) => {
             hoverColor="#145c32"
             color="#fff"
             className="btn btn-success me-2"
+            disabled={isSubmitting}
           />
           <Button
             label="Cancelar"
