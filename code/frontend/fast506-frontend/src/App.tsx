@@ -56,9 +56,6 @@ function App() {
           <Route path="/workshopSchedules" element ={<PrivateRoute><WorkshopSchedulePageClient/></PrivateRoute>}/>
           
 
-          {/*Rutas de cliente*/}
-          <Route path="/SalesClientPage" element ={<PrivateRoute><SalesClientPage/></PrivateRoute>}/>
-
           {/* Rutas de mecánico */}
           <Route path="/mechanic/repair-reports" element={
             <PrivateRoute allowedModules={["repairreport"]}><RepairReportPage /></PrivateRoute>

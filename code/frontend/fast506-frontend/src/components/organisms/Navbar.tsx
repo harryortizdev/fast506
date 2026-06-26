@@ -135,16 +135,7 @@ const Navbar = () => {
                   </Link>
                 </li>
 
-                {isClient&&(
-                <li className="nav-item">
-                  <Link
-                    className={`nav-link magic-link ${isActive("/catalog/client/sales") ? "active-link" : ""}`}
-                    to="/catalog/client/sales"
-                  >
-                    COMPRAS
-                  </Link>
-                </li>
-                )}
+                
               </>
 
               {hasMechanicAccess && (
